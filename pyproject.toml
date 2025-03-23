@@ -1,0 +1,22 @@
+[project]
+name = "pydongo"
+version = "0.1.0"
+description = "A lightweight ORM for MongoDB using Pydantic models."
+authors = [
+    {name = "Samuel Abolo",email = "ikabolo59@gmil.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+]
+
+[tool.poetry]
+
+[tool.poetry.group.dev.dependencies]
+pymongo = "^4.11.3"
+pydantic = "^2.10.6"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
