@@ -36,32 +36,32 @@ async def main():
 
     async with AsyncMongoDriver():
 
-        PostCollection = as_collection(Post)
-        post = await PostCollection.find_one(PostCollection.post_id == post_id)
+        PostCollectionWorker = as_collection(Post)
+        post = await PostCollectionWorker.find_one(PostCollectionWorker.post_id == post_id)
         
         print("Check if post exists")
-        print(await PostCollection.find(PostCollection.post_id == post_id).exists())
+        print(await PostCollectionWorker.find(PostCollectionWorker.post_id == post_id).exists())
 
     driver = AsyncMongoDriver()
 
-    PostCollection = as_collection(Post, driver=driver)
+    PostCollectionWorker = as_collection(Post, driver=driver)
 
     print("Get the list of posts made by the user, sort in decending order of likes")
-    posts = await PostCollection.find(PostCollection.user_id == user_id).sort(-PostCollection.n_likes).all()
+    posts = await PostCollectionWorker.find(PostCollectionWorker.user_id == user_id).sort(-PostCollectionWorker.n_likes).all()
     print(posts)
 
     print("More Complex querying")
-    posts = await PostCollection.find((PostCollection.user_id == user_id) & (PostCollection.n_likes > 5))
+    posts = await PostCollectionWorker.find((PostCollectionWorker.user_id == user_id) & (PostCollectionWorker.n_likes > 5))
     print(posts.all())
 
     print("Count Documents")
     print(await posts.count())
 
     print("Get all user's posts and paginate")
-    paginated_posts = await PostCollection.find(PostCollection.user_id == user_id).paginate(page_size=10, page_number=1)
+    paginated_posts = await PostCollectionWorker.find(PostCollectionWorker.user_id == user_id).paginate(page_size=10, page_number=1)
     print(next(paginated_posts))
     print("Get all user's posts and paginate manually")
-    posts = await PostCollection.find(PostCollection.user_id == user_id).skip(20).limit(10).all()
+    posts = await PostCollectionWorker.find(PostCollectionWorker.user_id == user_id).skip(20).limit(10).all()
 
     # Create a new Post
     print("Save a new document to the collection")
