@@ -38,6 +38,10 @@ class CollectionWorker(Generic[T]):
         )
 
     def __getattr__(self, name: str) -> FieldExpression:
+        if name not in self.pydantic_model.model_fields:
+            raise AttributeError(
+                f"'{self.pydantic_model.__name__}' has no field named '{name}'"
+            )
         return FieldExpression(name)
 
 
