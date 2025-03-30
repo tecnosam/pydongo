@@ -2,10 +2,10 @@ import uuid
 from typing import List, Dict, Any, Optional
 from copy import deepcopy
 
-from pydongo.drivers.base import AbstractMongoDBDriver, AbstractAsyncMongoDBDriver
+from pydongo.drivers.base import AbstractSyncMongoDBDriver, AbstractAsyncMongoDBDriver
 
 
-class MockMongoDBDriver(AbstractMongoDBDriver):
+class MockMongoDBDriver(AbstractSyncMongoDBDriver):
     """
     In-memory mock implementation of AbstractMongoDBDriver for testing.
     """
@@ -44,14 +44,19 @@ class MockMongoDBDriver(AbstractMongoDBDriver):
         return None
 
     def find_many(
-        self, collection: str, query: Dict[str, Any], limit: Optional[int] = None
+        self,
+        collection: str,
+        query: Dict[str, Any],
+        sort_criteria: Dict[str, Any],
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         result = [
             deepcopy(doc)
             for doc in self._collections.get(collection, [])
             if all(doc.get(k) == v for k, v in query.items())
         ]
-        return result[:limit] if limit else result
+        return result[offset:limit] if limit else result
 
     def update_one(
         self, collection: str, query: Dict[str, Any], update: Dict[str, Any]
@@ -69,6 +74,25 @@ class MockMongoDBDriver(AbstractMongoDBDriver):
                 del docs[i]
                 return {"deleted_count": 1}
         return {"deleted_count": 0}
+
+    def count(self, collection: str, query: Dict[str, Any]) -> int:
+        """
+        Count how many records match the specified query.
+        """
+        return sum(
+            1
+            for doc in self._collections.get(collection, [])
+            if all(doc.get(k) == v for k, v in query.items())
+        )
+
+    def exists(self, collection: str, query: Dict[str, Any]) -> bool:
+        """
+        Check if at least one document exists that matches the query.
+        """
+        return any(
+            all(doc.get(k) == v for k, v in query.items())
+            for doc in self._collections.get(collection, [])
+        )
 
 
 class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
@@ -112,14 +136,19 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
         return None
 
     async def find_many(
-        self, collection: str, query: Dict[str, Any], limit: Optional[int] = None
+        self,
+        collection: str,
+        query: Dict[str, Any],
+        sort_criteria: Dict[str, Any],
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         result = [
             deepcopy(doc)
             for doc in self._collections.get(collection, [])
             if all(doc.get(k) == v for k, v in query.items())
         ]
-        return result[:limit] if limit else result
+        return result[offset:limit] if limit else result
 
     async def update_one(
         self, collection: str, query: Dict[str, Any], update: Dict[str, Any]
@@ -139,3 +168,22 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
                 del docs[i]
                 return {"deleted_count": 1}
         return {"deleted_count": 0}
+
+    async def count(self, collection: str, query: Dict[str, Any]) -> int:
+        """
+        Count how many records match the specified query.
+        """
+        return sum(
+            1
+            for doc in self._collections.get(collection, [])
+            if all(doc.get(k) == v for k, v in query.items())
+        )
+
+    async def exists(self, collection: str, query: Dict[str, Any]) -> bool:
+        """
+        Check if at least one document exists that matches the query.
+        """
+        return any(
+            all(doc.get(k) == v for k, v in query.items())
+            for doc in self._collections.get(collection, [])
+        )

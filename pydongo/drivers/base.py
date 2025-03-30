@@ -1,17 +1,23 @@
 import contextvars
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Iterable
 
 
 class AbstractMongoDBDriver(ABC):
+    """
+    Abstract base class for MongoDB drivers.
+    """
+
+
+class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
     """
     Abstract base class for synchronous MongoDB drivers.
     Provides context management support and coroutine/thread-safe access
     to the currently active driver instance via contextvars.
     """
 
-    _current: contextvars.ContextVar["AbstractMongoDBDriver"] = contextvars.ContextVar(
-        "mongo_driver_current"
+    _current: contextvars.ContextVar["AbstractSyncMongoDBDriver"] = (
+        contextvars.ContextVar("mongo_driver_current")
     )
 
     def __init__(self, connection_string: str, database_name: str):
@@ -41,7 +47,7 @@ class AbstractMongoDBDriver(ABC):
         self._current.reset(self._token)
 
     @classmethod
-    def current(cls) -> "AbstractMongoDBDriver":
+    def current(cls) -> "AbstractSyncMongoDBDriver":
         """
         Get the current MongoDB driver instance for this coroutine/thread.
 
@@ -120,18 +126,25 @@ class AbstractMongoDBDriver(ABC):
 
     @abstractmethod
     def find_many(
-        self, collection: str, query: Dict[str, Any], limit: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+        self,
+        collection: str,
+        query: Dict[str, Any],
+        sort_criteria: Dict[str, Any],
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
+    ) -> Iterable[Dict[str, Any]]:
         """
         Find multiple documents matching the query.
 
         Args:
             collection (str): The collection name.
             query (dict): The filter query.
+            sort_criteria (dict): How to order the results
+            offset (int, optional): Number of records to skip (useful for pagination)
             limit (int, optional): Max number of documents to return.
 
         Returns:
-            list: List of matching documents.
+            iterator for result: Iterable sequence of matching documents.
         """
         pass
 
@@ -166,8 +179,35 @@ class AbstractMongoDBDriver(ABC):
         """
         pass
 
+    @abstractmethod
+    def count(self, collection: str, query: dict[str, Any]) -> int:
+        """
+        Count how many records are in a collection that match the specified query
 
-class AbstractAsyncMongoDBDriver(ABC):
+        Args:
+            collection (str): The collection name.
+            query (dict): The filter query.
+
+        Returns:
+            int: Number of documents that match the specified query
+        """
+
+    @abstractmethod
+    def exists(self, collection: str, query: dict[str, Any]) -> bool:
+        """
+        Check if at least one document exists in the collection that matches the
+        specified query
+
+        Args:
+            collection (str): The collection name.
+            query (dict): The filter query.
+
+        Returns:
+            bool: True if a document exists and False if it doesn't
+        """
+
+
+class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
     """
     Abstract base class for asynchronous MongoDB drivers.
     Provides async context management and coroutine-safe access
@@ -286,18 +326,25 @@ class AbstractAsyncMongoDBDriver(ABC):
 
     @abstractmethod
     async def find_many(
-        self, collection: str, query: Dict[str, Any], limit: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+        self,
+        collection: str,
+        query: Dict[str, Any],
+        sort_criteria: Dict[str, Any],
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
+    ) -> Iterable[Dict[str, Any]]:
         """
         Find multiple documents matching the query.
 
         Args:
             collection (str): The collection name.
             query (dict): The filter query.
+            sort_criteria (dict): How to order the results
+            offset (int, optional): Number of records to skip (useful for pagination)
             limit (int, optional): Max number of documents to return.
 
         Returns:
-            list: List of matching documents.
+            iterable sequence: Iterable sequence of matching documents.
         """
         pass
 
@@ -333,3 +380,30 @@ class AbstractAsyncMongoDBDriver(ABC):
             dict: Result of the delete operation.
         """
         pass
+
+    @abstractmethod
+    async def count(self, collection: str, query: dict[str, Any]) -> int:
+        """
+        Count how many records are in a collection that match the specified query
+
+        Args:
+            collection (str): The collection name.
+            query (dict): The filter query.
+
+        Returns:
+            int: Number of documents that match the specified query
+        """
+
+    @abstractmethod
+    async def exists(self, collection: str, query: dict[str, Any]) -> bool:
+        """
+        Check if at least one document exists in the collection that matches the
+        specified query
+
+        Args:
+            collection (str): The collection name.
+            query (dict): The filter query.
+
+        Returns:
+            bool: True if a document exists and False if it doesn't
+        """

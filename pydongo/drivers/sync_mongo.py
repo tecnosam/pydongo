@@ -1,11 +1,11 @@
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Iterable
 
-from pydongo.drivers.base import AbstractMongoDBDriver
+from pydongo.drivers.base import AbstractSyncMongoDBDriver
 
 
-class DefaultMongoDBDriver(AbstractMongoDBDriver):
+class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
     """
     Default synchronous MongoDB driver using pymongo.
     """
@@ -15,9 +15,6 @@ class DefaultMongoDBDriver(AbstractMongoDBDriver):
         self.client: Optional[MongoClient] = None
 
     def connect(self) -> bool:
-        """
-        Establish a connection to MongoDB using pymongo.
-        """
         try:
             self.client = MongoClient(self.connection_string)
             self.db = self.client[self.database_name]
@@ -26,53 +23,48 @@ class DefaultMongoDBDriver(AbstractMongoDBDriver):
             raise RuntimeError(f"Failed to connect to MongoDB: {e}")
 
     def close(self) -> None:
-        """
-        Close the MongoDB connection.
-        """
         if self.client:
             self.client.close()
 
     def insert_one(self, collection: str, document: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Insert a single document into a collection.
-        """
         result = self.db[collection].insert_one(document)
         return {"inserted_id": str(result.inserted_id)}
 
     def insert_many(
         self, collection: str, documents: List[Dict[str, Any]]
     ) -> Dict[str, Any]:
-        """
-        Insert multiple documents into a collection.
-        """
         result = self.db[collection].insert_many(documents)
         return {"inserted_ids": [str(_id) for _id in result.inserted_ids]}
 
     def find_one(
         self, collection: str, query: Dict[str, Any]
     ) -> Optional[Dict[str, Any]]:
-        """
-        Find a single document matching the query.
-        """
         return self.db[collection].find_one(query)
 
     def find_many(
-        self, collection: str, query: Dict[str, Any], limit: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
-        """
-        Find multiple documents matching the query.
-        """
+        self,
+        collection: str,
+        query: Dict[str, Any],
+        sort_criteria: Dict[str, Any],
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
+    ) -> Iterable[Dict[str, Any]]:
         cursor = self.db[collection].find(query)
+
+        if sort_criteria:
+            cursor = cursor.sort([(k, v) for k, v in sort_criteria.items()])
+
+        if offset:
+            cursor = cursor.skip(offset)
+
         if limit:
             cursor = cursor.limit(limit)
-        return list(cursor)
+
+        return cursor
 
     def update_one(
         self, collection: str, query: Dict[str, Any], update: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """
-        Update a single document matching the query.
-        """
         result = self.db[collection].update_one(query, update)
         return {
             "matched_count": result.matched_count,
@@ -81,8 +73,11 @@ class DefaultMongoDBDriver(AbstractMongoDBDriver):
         }
 
     def delete_one(self, collection: str, query: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Delete a single document matching the query.
-        """
         result = self.db[collection].delete_one(query)
         return {"deleted_count": result.deleted_count}
+
+    def count(self, collection: str, query: Dict[str, Any]) -> int:
+        return self.db[collection].count_documents(query)
+
+    def exists(self, collection: str, query: Dict[str, Any]) -> bool:
+        return self.db[collection].count_documents(query, limit=1) > 0
