@@ -2,44 +2,9 @@ from typing import Any, Optional
 from pydongo.expressions.base import BaseExpression
 
 
-# todo: support for field expression on deep nested fields
+# todo: support for field expression on deep nested fields and array fields
 # todo: expression values in CollectionFilterExpression should be json serializable data.
 # todo: query should be optimized
-
-
-class FieldExpression:
-    def __init__(self, field_name: str):
-        self.field_name = field_name
-
-    def __eq__(self, other: Any) -> "CollectionFilterExpression":  # type: ignore
-        return CollectionFilterExpression().with_expression(
-            self.field_name, "$eq", other
-        )
-
-    def __ne__(self, other: Any) -> "CollectionFilterExpression":  # type: ignore
-        return CollectionFilterExpression().with_expression(
-            self.field_name, "$ne", other
-        )
-
-    def __gt__(self, other: Any) -> "CollectionFilterExpression":
-        return CollectionFilterExpression().with_expression(
-            self.field_name, "$gt", other
-        )
-
-    def __ge__(self, other: Any) -> "CollectionFilterExpression":
-        return CollectionFilterExpression().with_expression(
-            self.field_name, "$gte", other
-        )
-
-    def __lt__(self, other: Any) -> "CollectionFilterExpression":
-        return CollectionFilterExpression().with_expression(
-            self.field_name, "$lt", other
-        )
-
-    def __le__(self, other: Any) -> "CollectionFilterExpression":
-        return CollectionFilterExpression().with_expression(
-            self.field_name, "$lte", other
-        )
 
 
 class CollectionFilterExpression(BaseExpression):
