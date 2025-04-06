@@ -30,9 +30,9 @@ class CollectionWorker(Generic[T]):
         self.driver = driver
 
         self.response_builder_class = (
-            SyncCollectionResponseBuilder
+            AsyncCollectionResponseBuilder
             if issubclass(type(driver), AbstractAsyncMongoDBDriver)
-            else AsyncCollectionResponseBuilder
+            else SyncCollectionResponseBuilder
         )
 
     def find_one(self, expression: CollectionFilterExpression) -> Optional[T]:
@@ -64,17 +64,19 @@ class CollectionWorker(Generic[T]):
         return self.pydantic_model(**result) if result else None
 
     def find(
-        self, expression: CollectionFilterExpression
+        self, expression: Optional[CollectionFilterExpression] = None
     ) -> "CollectionResponseBuilder":
         """
         Takes in a filter expression, and returns a CollectionResponseBuilder
         that can be used to fetch the actual results from the database
         """
+        expression = expression or CollectionFilterExpression({})
 
         return self.response_builder_class(
             expression=expression,
             pydantic_model=self.pydantic_model,
             driver=self.driver,  # type: ignore
+            collection_name=self.collection_name,
         )
 
     def __getattr__(self, name: str) -> FieldExpression:
@@ -156,7 +158,7 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
         driver: AbstractSyncMongoDBDriver,
         collection_name: str,
     ):
-        if issubclass(type(self.driver), AbstractAsyncMongoDBDriver):
+        if issubclass(type(driver), AbstractAsyncMongoDBDriver):
             raise AttributeError(
                 "Use the AsyncCollectionResponseBuilder instead as you're using an async driver"
             )
