@@ -8,6 +8,7 @@ from pydongo.expressions.filter import CollectionFilterExpression
 from pydongo.expressions.sort import CollectionSortExpression
 
 from pydongo.drivers.base import AbstractSyncMongoDBDriver, AbstractAsyncMongoDBDriver
+from pydongo.utils.serializer import restore_unserializable_fields
 
 
 T = TypeVar("T", bound=BaseModel)
@@ -191,7 +192,11 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
         """
 
         kwargs = self.build_kwargs()
-        return self.driver.find_many(collection=self.collection_name, **kwargs)  # type: ignore
+        documents = self.driver.find_many(collection=self.collection_name, **kwargs)  # type: ignore
+
+        for doc in documents:  # type: ignore
+            deserialized_doc = restore_unserializable_fields(doc)
+            yield self.model(**deserialized_doc)
 
     def paginate(self, page_size: int, page_number: int) -> Iterable[T]:
         """
@@ -226,21 +231,34 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
         Check the database to see if an object that matches the filter exists
         """
 
-        return True
+        return await self.driver.exists(
+            self.collection_name, self._expression.serialize()
+        )  # type: ignore
 
     async def count(self) -> int:
         """
         Count the number of documents that match the filter.
         """
 
-        return 0
+        return await self.driver.count(
+            self.collection_name, self._expression.serialize()
+        )  # type: ignore
 
     async def all(self) -> Iterable[T]:
         """
         Returns an iteratable element of all the documents marshaled with
         the pydantic model.
         """
-        return []
+        kwargs = self.build_kwargs()
+        documents = await self.driver.find_many(
+            collection=self.collection_name, **kwargs
+        )  # type: ignore
+
+        result = []
+        async for doc in documents:
+            deserialized_doc = restore_unserializable_fields(doc)
+            result.append(self.model(**deserialized_doc))
+        return result
 
     async def paginate(self, page_size: int, page_number: int) -> Iterable[Iterable[T]]:
         """
