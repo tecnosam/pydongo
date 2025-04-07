@@ -1,5 +1,6 @@
 from typing import Any, Optional
 from pydongo.expressions.base import BaseExpression
+from pydongo.utils.serializer import HANDLER_MAPPING
 
 
 # todo: support for field expression on deep nested fields and array fields
@@ -29,6 +30,10 @@ class CollectionFilterExpression(BaseExpression):
     def with_expression(
         self, field_name: str, operator: str, value: Any
     ) -> "CollectionFilterExpression":
+        value_class = type(value)
+        if value_class in HANDLER_MAPPING:
+            value = HANDLER_MAPPING[value_class].serialize(value)
+
         self.expression[field_name] = {operator: value}
         return self
 
