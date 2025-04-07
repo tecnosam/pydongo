@@ -50,13 +50,17 @@ def replace_unserializable_fields(pydantic_object: T) -> T:
 
 
 def restore_unserializable_fields(document: dict) -> dict:
+    # todo: this approach is logically incorrect
+    # todo: We should bind this function to the field of the pydantic objects themselves
+    # todo: food for thought: is providing this feature a form of over engineering or is it
+    # todo: important for DX (developer experience)
     def deserialize(val: Any) -> Any:
         value_type = type(val)
         if value_type in HANDLER_MAPPING:
             val = HANDLER_MAPPING[value_type].deserialize(val)
         return val
 
-    for key, value in document:
+    for key, value in document.items():
         if isinstance(value, dict):
             document[key] = restore_unserializable_fields(value)
         elif isinstance(value, (list, tuple, set)):
