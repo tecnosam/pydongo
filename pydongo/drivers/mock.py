@@ -59,7 +59,11 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
         return result[offset:limit] if limit else result
 
     def update_one(
-        self, collection: str, query: Dict[str, Any], update: Dict[str, Any]
+        self,
+        collection: str,
+        query: Dict[str, Any],
+        update: Dict[str, Any],
+        upsert: bool = False,
     ) -> Dict[str, Any]:
         for doc in self._collections.get(collection, []):
             if all(doc.get(k) == v for k, v in query.items()):
@@ -151,7 +155,11 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
         return result[offset:limit] if limit else result
 
     async def update_one(
-        self, collection: str, query: Dict[str, Any], update: Dict[str, Any]
+        self,
+        collection: str,
+        query: Dict[str, Any],
+        update: Dict[str, Any],
+        upsert: bool = False,
     ) -> Dict[str, Any]:
         for doc in self._collections.get(collection, []):
             if all(doc.get(k) == v for k, v in query.items()):

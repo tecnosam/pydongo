@@ -65,9 +65,13 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
         return [doc async for doc in cursor]
 
     async def update_one(
-        self, collection: str, query: Dict[str, Any], update: Dict[str, Any]
+        self,
+        collection: str,
+        query: Dict[str, Any],
+        update: Dict[str, Any],
+        upsert: bool = False,
     ) -> Dict[str, Any]:
-        result = await self.db[collection].update_one(query, update)
+        result = await self.db[collection].update_one(query, update, upsert=upsert)
         return {
             "matched_count": result.matched_count,
             "modified_count": result.modified_count,

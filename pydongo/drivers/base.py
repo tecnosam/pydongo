@@ -150,7 +150,11 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
 
     @abstractmethod
     def update_one(
-        self, collection: str, query: Dict[str, Any], update: Dict[str, Any]
+        self,
+        collection: str,
+        query: Dict[str, Any],
+        update: Dict[str, Any],
+        upsert: bool = False,
     ) -> Dict[str, Any]:
         """
         Update a single document matching the query.
@@ -350,7 +354,11 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
 
     @abstractmethod
     async def update_one(
-        self, collection: str, query: Dict[str, Any], update: Dict[str, Any]
+        self,
+        collection: str,
+        query: Dict[str, Any],
+        update: Dict[str, Any],
+        upsert: bool = False,
     ) -> Dict[str, Any]:
         """
         Update a single document matching the query.

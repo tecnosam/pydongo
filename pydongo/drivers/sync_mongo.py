@@ -63,9 +63,13 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
         return cursor
 
     def update_one(
-        self, collection: str, query: Dict[str, Any], update: Dict[str, Any]
+        self,
+        collection: str,
+        query: Dict[str, Any],
+        update: Dict[str, Any],
+        upsert: bool = False,
     ) -> Dict[str, Any]:
-        result = self.db[collection].update_one(query, update)
+        result = self.db[collection].update_one(query, update, upsert=upsert)
         return {
             "matched_count": result.matched_count,
             "modified_count": result.modified_count,
