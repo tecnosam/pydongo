@@ -30,8 +30,11 @@ class DeleteResponse(BaseModel):
 
 
 class BaseDocumentWorker(Generic[T]):
-    def __init__(self, pydantic_object: T, *args, **kwargs):
+    def __init__(
+        self, pydantic_object: T, objectId: Optional[str] = None, *args, **kwargs
+    ):
         self.pydantic_object = pydantic_object
+        self.objectId = objectId
 
     @property
     def collection_name(self):
@@ -65,16 +68,27 @@ class BaseDocumentWorker(Generic[T]):
 
 
 class DocumentWorker(BaseDocumentWorker):
-    def __init__(self, pydantic_object: T, driver: AbstractSyncMongoDBDriver):
-        super().__init__(pydantic_object=pydantic_object)
+    def __init__(
+        self,
+        pydantic_object: T,
+        objectId: Optional[None],
+        driver: AbstractSyncMongoDBDriver,
+    ):
+        super().__init__(pydantic_object=pydantic_object, objectId=objectId)
         self.driver = driver
 
-    def save(self) -> SaveResponse:
+    def save(self):
         # TODO: sanity check for non-json serializable fields
-        response = self.driver.insert_one(self.collection_name, self.serialize())
 
-        # TODO: SaveResponse only when document didn't exist before
-        return SaveResponse(inserted_id=response.get("insertion_id"))
+        payload = self.serialize()
+        if self.objectId is None:
+            response = self.driver.insert_one(self.collection_name, payload)
+            self.objectId = response.get("insertion_id")
+        else:
+            query = {"_id": self.objectId}
+            response = self.driver.update_one(
+                self.collection_name, query=query, update=payload
+            )
 
     def delete(self) -> DeleteResponse:
         query = self.get_query()
@@ -85,16 +99,25 @@ class DocumentWorker(BaseDocumentWorker):
 
 
 class AsyncDocumentWorker(BaseDocumentWorker):
-    def __init__(self, pydantic_object: T, driver: AbstractAsyncMongoDBDriver):
-        super().__init__(pydantic_object=pydantic_object)
+    def __init__(
+        self,
+        pydantic_object: T,
+        objectId: Optional[None],
+        driver: AbstractAsyncMongoDBDriver,
+    ):
+        super().__init__(pydantic_object=pydantic_object, objectId=objectId)
         self.driver = driver
 
-    async def save(self) -> SaveResponse:
-        # TODO: sanity check for non-json serializable fields
-        response = await self.driver.insert_one(self.collection_name, self.serialize())
-
-        # TODO: SaveResponse only when document didn't exist before
-        return SaveResponse(inserted_id=response.get("insertion_id"))
+    async def save(self):
+        payload = self.serialize()
+        if self.objectId is None:
+            response = await self.driver.insert_one(self.collection_name, payload)
+            self.objectId = response.get("insertion_id")
+        else:
+            query = {"_id": self.objectId}
+            response = await self.driver.update_one(
+                self.collection_name, query=query, update=payload
+            )
 
     async def delete(self) -> DeleteResponse:
         query = self.get_query()
