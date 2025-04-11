@@ -43,7 +43,9 @@ class BaseDocumentWorker(Generic[T]):
         """
         Returns a mongodb query that will yield the object when parsed to mongodb
         """
-        # TODO: system for figuring out primary key from pydantic model
+
+        if self.objectId:
+            return {"_id": self.objectId}
         return self.pydantic_object.model_dump()
 
     def serialize(self) -> dict:
@@ -57,18 +59,19 @@ class BaseDocumentWorker(Generic[T]):
     def __getattr__(self, name: str) -> Any:
         return getattr(self.pydantic_object, name)
 
-    def __setattr__(self, name, value):
-        if not hasattr(self.pydantic_object, name):
-            raise AttributeError(f"{self.pydantic_object} has no attribute {name}")
-        setattr(self.pydantic_object, name, value)
+    # def __setattr__(self, name, value):
+
+    #     if not hasattr(self.pydantic_object, name):
+    #         raise AttributeError(f"{self.pydantic_object} has no attribute {name}")
+    #     setattr(self.pydantic_object, name, value)
 
 
 class DocumentWorker(BaseDocumentWorker):
     def __init__(
         self,
         pydantic_object: T,
-        objectId: Optional[None],
         driver: AbstractSyncMongoDBDriver,
+        objectId: Optional[str] = None,
     ):
         super().__init__(pydantic_object=pydantic_object, objectId=objectId)
         self.driver = driver
@@ -81,7 +84,7 @@ class DocumentWorker(BaseDocumentWorker):
         else:
             query = {"_id": self.objectId}
             response = self.driver.update_one(
-                self.collection_name, query=query, update=payload
+                self.collection_name, query=query, update={"$set": payload}
             )
 
         return response
@@ -96,8 +99,8 @@ class AsyncDocumentWorker(BaseDocumentWorker):
     def __init__(
         self,
         pydantic_object: T,
-        objectId: Optional[None],
         driver: AbstractAsyncMongoDBDriver,
+        objectId: Optional[str] = None,
     ):
         super().__init__(pydantic_object=pydantic_object, objectId=objectId)
         self.driver = driver
