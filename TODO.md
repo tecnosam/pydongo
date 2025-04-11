@@ -1,8 +1,5 @@
 0. Use serialization helper in `CollectionWorker` and `CollectionResponseBuilder` (done)
-1. Save / Upsert mechanism
-    - Figuring out primary key from pydantic model
-    - Upserting based on that primary key
-    - Argument to alow duplicates (not upsert but insert)
+1. Save / Upsert mechanism (done)
 2. Test `find_one` and `afind_one`
 3. Test Filter expressions (Ensure that it's generating the correct filter query)
 4. Work on sort expressions
