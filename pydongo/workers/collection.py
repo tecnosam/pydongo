@@ -10,6 +10,8 @@ from pydongo.expressions.sort import CollectionSortExpression
 from pydongo.drivers.base import AbstractSyncMongoDBDriver, AbstractAsyncMongoDBDriver
 from pydongo.utils.serializer import restore_unserializable_fields
 
+from .document import DocumentWorker, AsyncDocumentWorker, BaseDocumentWorker
+
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -36,7 +38,9 @@ class CollectionWorker(Generic[T]):
             else SyncCollectionResponseBuilder
         )
 
-    def find_one(self, expression: CollectionFilterExpression) -> Optional[T]:
+    def find_one(
+        self, expression: CollectionFilterExpression
+    ) -> Optional[DocumentWorker]:
         """
         Takes in filter expression, queries the database and returns a pydantic
         model if found
@@ -47,9 +51,20 @@ class CollectionWorker(Generic[T]):
                 "Use the afind_one method instead as you're using an async driver"
             )
         result = self.driver.find_one(self.collection_name, expression.serialize())
-        return self.pydantic_model(**result) if result else None  # type: ignore
 
-    async def afind_one(self, expression: CollectionFilterExpression) -> Optional[T]:
+        return (
+            CollectionResponseBuilder.serialize_document(  # type: ignore
+                document=result,  # type: ignore
+                document_worker_class=DocumentWorker,
+                pydantic_model=self.pydantic_model,
+            )
+            if result
+            else None
+        )
+
+    async def afind_one(
+        self, expression: CollectionFilterExpression
+    ) -> Optional[AsyncDocumentWorker]:
         """
         Takes in filter expression, queries the database and returns a pydantic
         model if found
@@ -62,7 +77,16 @@ class CollectionWorker(Generic[T]):
         result = await self.driver.find_one(
             self.collection_name, expression.serialize()
         )  # type: ignore
-        return self.pydantic_model(**result) if result else None
+
+        return (
+            CollectionResponseBuilder.serialize_document(  # type: ignore
+                document=result,  # type: ignore
+                document_worker_class=AsyncDocumentWorker,
+                pydantic_model=self.pydantic_model,
+            )
+            if result
+            else None
+        )
 
     def find(
         self, expression: Optional[CollectionFilterExpression] = None
@@ -150,6 +174,18 @@ class CollectionResponseBuilder(ABC, Generic[T]):
             "limit": self._limit,
         }
 
+    @classmethod
+    def serialize_document(
+        cls,
+        document: dict,
+        document_worker_class: Type[BaseDocumentWorker],
+        pydantic_model: Type[T],
+    ) -> BaseDocumentWorker:
+        deserialized_doc = restore_unserializable_fields(document=document)
+        pydantic_object = pydantic_model(**deserialized_doc)
+        objectId = deserialized_doc.get("_id")
+        return document_worker_class(pydantic_object=pydantic_object, objectId=objectId)
+
 
 class SyncCollectionResponseBuilder(CollectionResponseBuilder):
     def __init__(
@@ -183,7 +219,7 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
 
         return self.driver.count(self.collection_name, self._expression.serialize())  # type: ignore
 
-    def all(self) -> Iterable[T]:
+    def all(self) -> Iterable[DocumentWorker]:
         """
         Returns an iteratable element of all the documents marshaled with
         the pydantic model.
@@ -195,8 +231,11 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
         documents = self.driver.find_many(collection=self.collection_name, **kwargs)  # type: ignore
 
         for doc in documents:  # type: ignore
-            deserialized_doc = restore_unserializable_fields(doc)
-            yield self.model(**deserialized_doc)
+            yield self.serialize_document(
+                document=doc,
+                document_worker_class=DocumentWorker,
+                pydantic_model=self.model,
+            )  # type: ignore
 
     def paginate(self, page_size: int, page_number: int) -> Iterable[T]:
         """
@@ -208,8 +247,7 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
         self.skip((page_number - 1) * page_size)
         self.limit(page_size)
 
-        return self.all()
-        # TODO: return type should be PaginatedResponse[T] containing page information and data
+        return []
 
 
 class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
@@ -244,7 +282,7 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
             self.collection_name, self._expression.serialize()
         )  # type: ignore
 
-    async def all(self) -> Iterable[T]:
+    async def all(self) -> Iterable[AsyncDocumentWorker]:
         """
         Returns an iteratable element of all the documents marshaled with
         the pydantic model.
@@ -254,11 +292,12 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
             collection=self.collection_name, **kwargs
         )  # type: ignore
 
-        result = []
-        async for doc in documents:
-            deserialized_doc = restore_unserializable_fields(doc)
-            result.append(self.model(**deserialized_doc))
-        return result
+        return [
+            self.serialize_document(
+                document, AsyncDocumentWorker, pydantic_model=self.model
+            )  # type: ignore
+            async for document in documents
+        ]
 
     async def paginate(self, page_size: int, page_number: int) -> Iterable[Iterable[T]]:
         """
@@ -266,4 +305,3 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
         """
 
         return []
-        # TODO: return type should be PaginatedResponse[T] containing page information and data
