@@ -20,15 +20,6 @@ def as_document(
     return DocumentWorker(pydantic_object=pydantic_object, driver=driver)  # type: ignore
 
 
-class SaveResponse(BaseModel):
-    inserted_id: Optional[str] = None
-    modified_id: Optional[str] = None
-
-
-class DeleteResponse(BaseModel):
-    delete_count: int = 0
-
-
 class BaseDocumentWorker(Generic[T]):
     def __init__(
         self, pydantic_object: T, objectId: Optional[str] = None, *args, **kwargs
@@ -77,9 +68,7 @@ class DocumentWorker(BaseDocumentWorker):
         super().__init__(pydantic_object=pydantic_object, objectId=objectId)
         self.driver = driver
 
-    def save(self):
-        # TODO: sanity check for non-json serializable fields
-
+    def save(self) -> dict:
         payload = self.serialize()
         if self.objectId is None:
             response = self.driver.insert_one(self.collection_name, payload)
@@ -90,12 +79,12 @@ class DocumentWorker(BaseDocumentWorker):
                 self.collection_name, query=query, update=payload
             )
 
-    def delete(self) -> DeleteResponse:
+        return response
+
+    def delete(self) -> dict:
         query = self.get_query()
         response = self.driver.delete_one(collection=self.collection_name, query=query)
-        # TODO: this should return the correct delete count
-        # TODO: update DeleteResponse to contain reference to deleted object
-        return DeleteResponse(delete_count=1)
+        return response
 
 
 class AsyncDocumentWorker(BaseDocumentWorker):
@@ -119,12 +108,11 @@ class AsyncDocumentWorker(BaseDocumentWorker):
                 self.collection_name, query=query, update=payload
             )
 
-    async def delete(self) -> DeleteResponse:
+        return response
+
+    async def delete(self) -> dict:
         query = self.get_query()
         response = await self.driver.delete_one(
             collection=self.collection_name, query=query
         )
-
-        # TODO: this should return the correct delete count
-        # TODO: update DeleteResponse to contain reference to deleted object
-        return DeleteResponse(delete_count=1)
+        return response
