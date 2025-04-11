@@ -57,6 +57,11 @@ class BaseDocumentWorker(Generic[T]):
     def __getattr__(self, name: str) -> Any:
         return getattr(self.pydantic_object, name)
 
+    def __setattr__(self, name, value):
+        if not hasattr(self.pydantic_object, name):
+            raise AttributeError(f"{self.pydantic_object} has no attribute {name}")
+        setattr(self.pydantic_object, name, value)
+
 
 class DocumentWorker(BaseDocumentWorker):
     def __init__(
