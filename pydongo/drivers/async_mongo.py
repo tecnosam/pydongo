@@ -62,7 +62,7 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
         if limit:
             cursor = cursor.limit(limit)
 
-        return [doc async for doc in cursor]
+        return cursor  # type: ignore
 
     async def update_one(
         self,
