@@ -91,18 +91,14 @@ async def test_async():
     PostCollectionWorker = as_collection(Post, driver=driver)
 
     print("Get the list of posts made by the user, sort in decending order of likes")
-    posts = (
-        await (
-            PostCollectionWorker.find(PostCollectionWorker.user_id == user_id)
-            # .sort(PostCollectionWorker.n_likes)
-            .all()
-        )
-    )
+    posts = await PostCollectionWorker.find(
+        PostCollectionWorker.user_id == user_id
+    ).all()
     print(posts)
 
-    print("More Complex querying")
-    posts = PostCollectionWorker.find(
-        (PostCollectionWorker.user_id == user_id) & (PostCollectionWorker.n_likes == 0)
+    print("Sorting")
+    posts = PostCollectionWorker.find().sort(
+        [PostCollectionWorker.created_at, -PostCollectionWorker.n_likes]
     )
     print(await posts.all())
 
