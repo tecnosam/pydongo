@@ -268,11 +268,11 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
         driver: AbstractAsyncMongoDBDriver,
         collection_name: str,
     ):
+        super().__init__(expression, pydantic_model, driver, collection_name)
         if issubclass(type(self.driver), AbstractSyncMongoDBDriver):
             raise AttributeError(
                 "Use the SyncCollectionResponseBuilder instead as you're using a sync driver"
             )
-        super().__init__(expression, pydantic_model, driver, collection_name)
 
     async def exists(self) -> bool:
         """
