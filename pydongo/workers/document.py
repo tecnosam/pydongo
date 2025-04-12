@@ -60,6 +60,9 @@ class BaseDocumentWorker(Generic[T]):
     def __getattr__(self, name: str) -> Any:
         return getattr(self.pydantic_object, name)
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(<{self.pydantic_object}>)"
+
     # def __setattr__(self, name, value):
 
     #     if not hasattr(self.pydantic_object, name):
