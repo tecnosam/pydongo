@@ -47,14 +47,14 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
         self,
         collection: str,
         query: Dict[str, Any],
-        sort_criteria: Dict[str, Any],
+        sort_criteria: Dict[str, int],
         offset: Optional[int] = None,
         limit: Optional[int] = None,
     ) -> Iterable[Dict[str, Any]]:
         cursor = self.db[collection].find(query)
 
         if sort_criteria:
-            cursor = cursor.sort([(k, v) for k, v in sort_criteria.items()])
+            cursor = cursor.sort(sort_criteria)
 
         if offset:
             cursor = cursor.skip(offset)

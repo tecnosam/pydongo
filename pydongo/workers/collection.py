@@ -1,11 +1,9 @@
 from abc import ABC
-from typing import Generic, Iterable, Optional, Type, TypeVar, Union
+from typing import Generic, Iterable, Optional, Sequence, Type, TypeVar, Union
 from pydantic import BaseModel
 
 from pydongo.expressions.field import FieldExpression
 from pydongo.expressions.filter import CollectionFilterExpression
-
-from pydongo.expressions.sort import CollectionSortExpression
 
 from pydongo.drivers.base import (
     AbstractMongoDBDriver,
@@ -145,7 +143,7 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         collection_name: str,
     ):
         self._expression = expression
-        self._sort_criteria: Optional[CollectionSortExpression] = None
+        self._sort_criteria: Sequence[FieldExpression] = []
         self._limit: Optional[int] = None
         self._offset: Optional[int] = None
 
@@ -162,9 +160,13 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         return self
 
     def sort(
-        self, sort_criteria: CollectionSortExpression
+        self, sort_criteria: Union[FieldExpression, Sequence[FieldExpression]]
     ) -> "CollectionResponseBuilder":
-        self._sort_criteria = sort_criteria
+        self._sort_criteria = (
+            [sort_criteria]
+            if isinstance(sort_criteria, FieldExpression)
+            else sort_criteria
+        )
         return self
 
     def build_kwargs(self) -> dict:
@@ -172,7 +174,11 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         Return a dictionary consisting of all the information needed to query the database
         """
         query = self._expression.serialize()
-        sortby = self._sort_criteria.serialize() if self._sort_criteria else None
+        sortby = {
+            expr.field_name: 1 if expr.sort_ascending else -1
+            for expr in self._sort_criteria
+        }
+
         return {
             "query": query,
             "sort_criteria": sortby,

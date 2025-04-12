@@ -3,9 +3,10 @@ from pydongo.expressions.filter import CollectionFilterExpression
 
 
 class FieldExpression:
-    def __init__(self, field_name: str, field_model=None):
+    def __init__(self, field_name: str, field_model=None, sort_ascending: bool = True):
         self.field_name = field_name
         self.field_model = field_model
+        self.sort_ascending = sort_ascending
 
     def __eq__(self, other: Any) -> "CollectionFilterExpression":  # type: ignore
         return CollectionFilterExpression().with_expression(
@@ -35,6 +36,13 @@ class FieldExpression:
     def __le__(self, other: Any) -> "CollectionFilterExpression":
         return CollectionFilterExpression().with_expression(
             self.field_name, "$lte", other
+        )
+
+    def __neg__(self):
+        return FieldExpression(
+            field_name=self.field_name,
+            field_model=self.field_model,
+            sort_ascending=not self.sort_ascending,
         )
 
 
