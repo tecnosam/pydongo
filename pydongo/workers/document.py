@@ -1,6 +1,8 @@
 from typing import Any, Generic, TypeVar, Optional, Union
 from pydantic import BaseModel
 
+from bson import ObjectId
+
 from pydongo.drivers.base import (
     AbstractSyncMongoDBDriver,
     AbstractAsyncMongoDBDriver,
@@ -25,7 +27,7 @@ class BaseDocumentWorker(Generic[T]):
         self, pydantic_object: T, objectId: Optional[str] = None, *args, **kwargs
     ):
         self.pydantic_object = pydantic_object
-        self.objectId = objectId
+        self.objectId = ObjectId(objectId) if objectId else None
 
     @property
     def collection_name(self):
@@ -45,16 +47,15 @@ class BaseDocumentWorker(Generic[T]):
         """
 
         if self.objectId:
-            return {"_id": self.objectId}
-        return self.pydantic_object.model_dump()
+            return {"_id": ObjectId(self.objectId)}
+        return self.serialize()
 
     def serialize(self) -> dict:
         """
         Returns a JSON serializable dictionary of the pydantic object
         """
-
-        clean_object = replace_unserializable_fields(self.pydantic_object)
-        return clean_object.model_dump()
+        dump = self.pydantic_object.model_dump()
+        return replace_unserializable_fields(dump)
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.pydantic_object, name)
@@ -80,9 +81,9 @@ class DocumentWorker(BaseDocumentWorker):
         payload = self.serialize()
         if self.objectId is None:
             response = self.driver.insert_one(self.collection_name, payload)
-            self.objectId = response.get("insertion_id")
+            self.objectId = response.get("inserted_id")
         else:
-            query = {"_id": self.objectId}
+            query = {"_id": ObjectId(self.objectId)}
             response = self.driver.update_one(
                 self.collection_name, query=query, update={"$set": payload}
             )
@@ -107,13 +108,14 @@ class AsyncDocumentWorker(BaseDocumentWorker):
 
     async def save(self):
         payload = self.serialize()
+
         if self.objectId is None:
             response = await self.driver.insert_one(self.collection_name, payload)
-            self.objectId = response.get("insertion_id")
+            self.objectId = response.get("inserted_id")
         else:
-            query = {"_id": self.objectId}
+            query = {"_id": ObjectId(self.objectId)}
             response = await self.driver.update_one(
-                self.collection_name, query=query, update=payload
+                self.collection_name, query=query, update={"$set": payload}
             )
 
         return response

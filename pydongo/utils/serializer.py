@@ -2,6 +2,7 @@ import datetime
 
 from typing import Any, Mapping, TypeVar
 from abc import ABC, abstractmethod
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -31,22 +32,38 @@ class DateSerializer(BaseTypeSerializer):
         return value.date()
 
 
-HANDLER_MAPPING: Mapping[Any, BaseTypeSerializer] = {datetime.date: DateSerializer()}
+class UUIDSerializer(BaseTypeSerializer):
+    @staticmethod
+    def serialize(value: UUID) -> str:
+        return str(value)
+
+    @staticmethod
+    def deserialize(value: str) -> UUID:
+        return UUID(value)
 
 
-def replace_unserializable_fields(pydantic_object: T) -> T:
-    for field_name in pydantic_object.__class__.model_fields.keys():
-        value = getattr(pydantic_object, field_name)
-        value_type = type(value)
+HANDLER_MAPPING: Mapping[Any, BaseTypeSerializer] = {
+    datetime.date: DateSerializer(),
+    UUID: UUIDSerializer(),
+}
 
+
+def replace_unserializable_fields(document: dict) -> dict:
+    def serialize(val: Any) -> Any:
+        value_type = type(val)
         if value_type in HANDLER_MAPPING:
-            handler = HANDLER_MAPPING[value_type]
-            setattr(pydantic_object, field_name, handler.serialize(value))
+            val = HANDLER_MAPPING[value_type].serialize(val)
+        return val
 
-        if issubclass(value_type.__class__, BaseModel):
-            setattr(pydantic_object, field_name, replace_unserializable_fields(value))
+    for key, value in document.items():
+        if isinstance(value, dict):
+            document[key] = replace_unserializable_fields(value)
+        elif isinstance(value, (list, tuple, set)):
+            document[key] = [serialize(element) for element in value]
+        else:
+            document[key] = serialize(value)
 
-    return pydantic_object
+    return document
 
 
 def restore_unserializable_fields(document: dict) -> dict:
