@@ -1,8 +1,18 @@
 from abc import ABC
-from typing import Generic, Iterable, Optional, Sequence, Type, TypeVar, Union
+from typing import (
+    Generic,
+    Iterable,
+    Optional,
+    Sequence,
+    Set,
+    Type,
+    TypeVar,
+    Union,
+    get_origin,
+)
 from pydantic import BaseModel
 
-from pydongo.expressions.field import FieldExpression
+from pydongo.expressions.field import ArrayFieldExpression, FieldExpression
 from pydongo.expressions.filter import CollectionFilterExpression
 
 from pydongo.drivers.base import (
@@ -114,6 +124,11 @@ class CollectionWorker(Generic[T]):
                 f"'{self.pydantic_model.__name__}' has no field named '{name}'"
             )
         annotation = self.pydantic_model.model_fields[name].annotation
+
+        # TODO: handle Optional fields or Unions elegantly
+        data_type = get_origin(annotation) or annotation
+        if issubclass(data_type, (Sequence, Set)):  # type: ignore
+            return ArrayFieldExpression(name, annotation=annotation)
         return FieldExpression(name, annotation=annotation)
 
     @property

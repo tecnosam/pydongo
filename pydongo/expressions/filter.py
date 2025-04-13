@@ -27,14 +27,8 @@ class CollectionFilterExpression(BaseExpression):
 
         self.expression = expression or {}
 
-    def with_expression(
-        self, field_name: str, operator: str, value: Any
-    ) -> "CollectionFilterExpression":
-        value_class = type(value)
-        if value_class in HANDLER_MAPPING:
-            value = HANDLER_MAPPING[value_class].serialize(value)
-
-        self.expression[field_name] = {operator: value}
+    def with_expression(self, expression: dict) -> "CollectionFilterExpression":
+        self.expression.update(expression)
         return self
 
     def serialize(self) -> dict:
