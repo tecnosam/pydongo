@@ -113,9 +113,8 @@ class CollectionWorker(Generic[T]):
             raise AttributeError(
                 f"'{self.pydantic_model.__name__}' has no field named '{name}'"
             )
-        field_model = self.pydantic_model.model_fields[name].annotation
-        field_model = field_model if issubclass(type(field_model), BaseModel) else None
-        return FieldExpression(name, field_model=field_model)
+        annotation = self.pydantic_model.model_fields[name].annotation
+        return FieldExpression(name, annotation=annotation)
 
     @property
     def collection_name(self):

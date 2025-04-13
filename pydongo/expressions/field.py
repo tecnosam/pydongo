@@ -1,11 +1,13 @@
 from typing import Any, List
+
+from pydantic import BaseModel
 from pydongo.expressions.filter import CollectionFilterExpression
 
 
 class FieldExpression:
-    def __init__(self, field_name: str, field_model=None, sort_ascending: bool = True):
-        self.field_name = field_name
-        self.field_model = field_model
+    def __init__(self, field_name: str, annotation=None, sort_ascending: bool = True):
+        self._field_name = field_name
+        self.annotation = annotation
         self.sort_ascending = sort_ascending
 
     def __eq__(self, other: Any) -> "CollectionFilterExpression":  # type: ignore
@@ -41,43 +43,50 @@ class FieldExpression:
     def __neg__(self):
         return FieldExpression(
             field_name=self.field_name,
-            field_model=self.field_model,
+            annotation=self.annotation,
             sort_ascending=not self.sort_ascending,
         )
 
+    @property
+    def field_name(self):
+        return self._field_name
 
-class NestedObjectExpression(FieldExpression):
     def __getattr__(self, name: str) -> "FieldExpression":
-        if not self.field_model:
+        if not issubclass(self.annotation, BaseModel):
             raise AttributeError(
-                f"'{self.field_model.__name__}' is not an object but a scalar value"
+                f"'{self.annotation.__name__}' is not an object but a scalar value"
             )
 
-        if name not in self.field_model.model_fields:
+        if name not in self.annotation.model_fields:
             raise AttributeError(
-                f"'{self.field_model.__name__}' has no field named '{name}'"
+                f"'{self.annotation.__name__}' has no field named '{name}'"
             )
-        return FieldExpression(name)
+
+        field_name = ".".join((self.field_name, name))
+        annotation = self.annotation.model_fields[name].annotation
+        return FieldExpression(field_name=field_name, annotation=annotation)
 
 
 class ArrayExpression(FieldExpression):
     def __len__(self) -> FieldExpression:
         """
-        Return a field expression of the length of the array.
+        Return a CollectionFilterExpression of the length of the array.
         """
-        # todo: return a modified expression that resolves to the length of the array
-        return FieldExpression(self.field_name, self.field_model)
 
-    def includes(self, value: Any) -> FieldExpression:
+    def __contains__(self, value: Any) -> CollectionFilterExpression:
         """
-        Used to check if value is present inside an array
+        Used to check if value is present inside an array.
+        Value can be an object or an array.
         """
-        # todo: return a modified expression that resolves to the $in operation
-        return FieldExpression(self.field_name, self.field_model)
 
-    def matches(self, value: List[Any], match_order: bool = False) -> FieldExpression:
+    def matches(
+        self, value: List[Any], match_order: bool = False
+    ) -> CollectionFilterExpression:
         """
         Check if the array field directly matches an array of values wit
         """
-        # todo: return a modified expression that resolves to the $all operation
-        return FieldExpression(self.field_name, self.field_model)
+
+    def __getattr__(self, name: str) -> "FieldExpression":
+        """
+        Return a field expression to match the sub key
+        """
