@@ -2,22 +2,43 @@
 name = "pydongo"
 version = "0.1.0"
 description = "A lightweight ORM for MongoDB using Pydantic models."
-authors = ["Samuel Abolo <ikabolo59@gmil.com>"]
+authors = ["Samuel Abolo <ikabolo59@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+packages = [
+  { include = "pydongo" }
+]
+homepage = "https://github.com/samuelabolo/pydongo"
+repository = "https://github.com/samuelabolo/pydongo"
+documentation = "https://samuelabolo.github.io/pydongo/"
+keywords = ["mongodb", "pydantic", "orm", "async", "motor"]
 
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Database",
+  "Topic :: Software Development :: Libraries",
+  "Typing :: Typed"
+]
 
 [tool.poetry.dependencies]
 python = ">=3.9"
-pymongo = "^4.11.3"
-pydantic = "^2.10.6"
-motor = "^3.7.0"
+pymongo = "~4.11"
+pydantic = "~2.10"
+motor = "~3.7"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "1.15.0"
 ruff = "^0.11.0"
-# pymongo = "^4.11.3"
-# pydantic = "^2.10.6"
+pytest = "^7.4.0"
+pytest-asyncio = "^0.23.0"
+coverage = "^7.4.0"
 
 [build-system]
 requires = ["poetry-core>=1.8.0,<3.0.0"]
