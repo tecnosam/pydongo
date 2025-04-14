@@ -97,7 +97,7 @@ class ArrayFieldExpression(FieldExpression):
         Check if the array field directly matches an array of values
         """
         if match_order:
-            CollectionFilterExpression().with_expression(
+            return CollectionFilterExpression().with_expression(
                 {self.field_name: list(values)}
             )
 
