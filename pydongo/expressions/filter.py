@@ -47,3 +47,6 @@ class CollectionFilterExpression(BaseExpression):
     def __invert__(self) -> "CollectionFilterExpression":
         expression = {"$not": self.expression}
         return CollectionFilterExpression(expression=expression)
+
+    def __repr__(self):
+        return f"<CollectionFilterExpression {self.serialize()}>"
