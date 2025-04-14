@@ -285,18 +285,6 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
                 driver=self.driver,
             )  # type: ignore
 
-    def paginate(self, page_size: int, page_number: int) -> Iterable[T]:
-        """
-        Returns the response from mongodb in an iterator for the data paginated (in batches)
-
-        Could be synchronous or asynchronous
-        """
-
-        self.skip((page_number - 1) * page_size)
-        self.limit(page_size)
-
-        return []
-
 
 class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
     def __init__(
@@ -349,10 +337,3 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
             )  # type: ignore
             async for document in documents
         ]
-
-    async def paginate(self, page_size: int, page_number: int) -> Iterable[Iterable[T]]:
-        """
-        Returns the response from mongodb in an iterator for the data paginated (in batches)
-        """
-
-        return []
