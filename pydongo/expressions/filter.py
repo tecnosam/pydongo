@@ -9,7 +9,7 @@ class CollectionFilterExpression(BaseExpression):
     CollectionWorker.field == scalar.
 
     FilterExpressions can be combined with other filter expressions to form
-    another fileter expression:
+    another filter expression:
 
         1. or: FilterExpression | FilterExpression -> FilterExpression
         2. and: FilterExpression & FilterExpression -> FilterExpression
