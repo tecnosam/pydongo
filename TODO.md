@@ -1,12 +1,12 @@
 0. Use serialization helper in `CollectionWorker` and `CollectionResponseBuilder` (done)
 1. Save / Upsert mechanism (done)
-2. Test `find_one` and `afind_one`
-3. Test Filter expressions (Ensure that it's generating the correct filter query)
-4. Work on sort expressions
-    - Sort method should also support taking in a FieldExpression as long as it's a scalar
-5. Work on field expressions
-6. Work on Expressions with Nested objects
-7. Work on expressions with Array objects
+2. Test `find_one` and `afind_one` (done)
+3. Singleton pattern for managing state context for driver
+4. Test Filter expressions (Ensure that it's generating the correct filter query) (done)
+5. Work on field expressions (done)
+6. Work on Expressions with Nested objects (done)
+7. Work on expressions with Array objects (done)
+7. Work on special type annotations: `Union` and `Optional` (done)
 8. Write unit tests for expressions
 9. Write unit tests for workers (document and collection)
 10. Work on V1 documentation
@@ -21,3 +21,10 @@
     - Create release tag
     - semantic versioning
     - unit tests
+13. Resource Benchmarking
+    - Profile memory overhead
+    - Profile CPU overhead
+14. Future Enhancements
+    - Optimized query generation from filter expressions
+    - Support for _Aggregation Workers_
+    - Support for _Indexed Fields_
