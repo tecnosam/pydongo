@@ -56,7 +56,7 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
         if sort_criteria:
             cursor = cursor.sort(sort_criteria)
 
-        if offset:
+        if offset is not None:
             cursor = cursor.skip(offset)
 
         if limit:
