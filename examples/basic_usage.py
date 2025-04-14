@@ -40,7 +40,7 @@ class Post(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now())
 
 
-cs = "mongodb+srv://kopal:isaac1023@cluster0.tsyn9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+cs = ""
 
 
 def test_sync():
