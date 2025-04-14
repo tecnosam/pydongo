@@ -1,5 +1,7 @@
 from abc import ABC
 from typing import (
+    Annotated,
+    Any,
     Generic,
     Iterable,
     Optional,
@@ -9,6 +11,7 @@ from typing import (
     TypeVar,
     Union,
     get_origin,
+    get_args,
 )
 from pydantic import BaseModel
 
@@ -124,12 +127,27 @@ class CollectionWorker(Generic[T]):
                 f"'{self.pydantic_model.__name__}' has no field named '{name}'"
             )
         annotation = self.pydantic_model.model_fields[name].annotation
+        annotation = self._resolve_annotation(annotation=annotation)
 
-        # TODO: handle Optional fields or Unions elegantly
-        data_type = get_origin(annotation) or annotation
-        if issubclass(data_type, (Sequence, Set)):  # type: ignore
+        dtype = get_origin(annotation) or annotation
+        if isinstance(dtype, type) and issubclass(dtype, (Sequence, Set)):  # type: ignore
             return ArrayFieldExpression(name, annotation=annotation)
         return FieldExpression(name, annotation=annotation)
+
+    @staticmethod
+    def _resolve_annotation(annotation: Any):
+        """
+        We use this function to handle Union types or Optional.
+        """
+        origin = get_origin(annotation)
+        if origin is Union or origin is Optional:
+            args = get_args(annotation)
+            non_none_args = [arg for arg in args if arg is not type(None)]
+            return non_none_args[0] if non_none_args else annotation
+        if origin is Annotated:
+            annotation = get_args(annotation)[0]
+
+        return annotation
 
     @property
     def collection_name(self):

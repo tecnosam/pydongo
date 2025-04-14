@@ -35,7 +35,7 @@ class Post(BaseModel):
     image_url: str
 
     n_likes: int = 0
-    comments: List[Comment]
+    comments: Optional[List[Comment]]
     comment: Comment
     created_at: datetime = Field(default_factory=lambda: datetime.now())
 
@@ -92,7 +92,7 @@ async def test_async():
 
     print("Get the list of posts made by the user, sort in decending order of likes")
     posts = await PostCollectionWorker.find(
-        PostCollectionWorker.user_id == user_id
+        PostCollectionWorker.comments.n_likes > 0
     ).all()
     print(posts)
 
