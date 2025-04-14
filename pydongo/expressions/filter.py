@@ -1,11 +1,5 @@
-from typing import Any, Optional
+from typing import Optional
 from pydongo.expressions.base import BaseExpression
-from pydongo.utils.serializer import HANDLER_MAPPING
-
-
-# todo: support for field expression on deep nested fields and array fields
-# todo: expression values in CollectionFilterExpression should be json serializable data.
-# todo: query should be optimized
 
 
 class CollectionFilterExpression(BaseExpression):

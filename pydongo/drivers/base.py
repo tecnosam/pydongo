@@ -69,14 +69,12 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         Returns:
             bool: True if connection was successful.
         """
-        pass
 
     @abstractmethod
     def close(self) -> None:
         """
         Close the connection to the MongoDB server.
         """
-        pass
 
     @abstractmethod
     def insert_one(self, collection: str, document: Dict[str, Any]) -> Dict[str, Any]:
@@ -90,7 +88,6 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         Returns:
             dict: Result of the insert operation.
         """
-        pass
 
     @abstractmethod
     def insert_many(
@@ -106,7 +103,6 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         Returns:
             dict: Result of the insert operation.
         """
-        pass
 
     @abstractmethod
     def find_one(
@@ -122,7 +118,6 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         Returns:
             dict or None: The found document or None if not found.
         """
-        pass
 
     @abstractmethod
     def find_many(
@@ -146,7 +141,6 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         Returns:
             iterator for result: Iterable sequence of matching documents.
         """
-        pass
 
     @abstractmethod
     def update_one(
@@ -167,7 +161,6 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         Returns:
             dict: Result of the update operation.
         """
-        pass
 
     @abstractmethod
     def delete_one(self, collection: str, query: Dict[str, Any]) -> Dict[str, Any]:
@@ -181,7 +174,6 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         Returns:
             dict: Result of the delete operation.
         """
-        pass
 
     @abstractmethod
     def count(self, collection: str, query: dict[str, Any]) -> int:
@@ -271,14 +263,12 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         Returns:
             bool: True if connection was successful.
         """
-        pass
 
     @abstractmethod
     async def close(self) -> None:
         """
         Close the connection to the MongoDB server.
         """
-        pass
 
     @abstractmethod
     async def insert_one(
@@ -294,7 +284,6 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         Returns:
             dict: Result of the insert operation.
         """
-        pass
 
     @abstractmethod
     async def insert_many(
@@ -310,7 +299,6 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         Returns:
             dict: Result of the insert operation.
         """
-        pass
 
     @abstractmethod
     async def find_one(
@@ -326,7 +314,6 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         Returns:
             dict or None: The found document or None if not found.
         """
-        pass
 
     @abstractmethod
     async def find_many(
@@ -350,7 +337,6 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         Returns:
             iterable sequence: Iterable sequence of matching documents.
         """
-        pass
 
     @abstractmethod
     async def update_one(
@@ -371,7 +357,6 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         Returns:
             dict: Result of the update operation.
         """
-        pass
 
     @abstractmethod
     async def delete_one(
@@ -387,7 +372,6 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         Returns:
             dict: Result of the delete operation.
         """
-        pass
 
     @abstractmethod
     async def count(self, collection: str, query: dict[str, Any]) -> int:

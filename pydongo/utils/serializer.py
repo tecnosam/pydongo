@@ -6,8 +6,6 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from pydongo.models.serializable_types import Datetime
-
 
 T = TypeVar("T", bound=BaseModel)
 
