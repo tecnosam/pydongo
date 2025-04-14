@@ -39,6 +39,15 @@ def as_collection(
 
 
 class CollectionWorker(Generic[T]):
+    """
+    Entry point for querying and interacting with a MongoDB collection.
+
+    Wraps a Pydantic model and MongoDB driver, and exposes queryable field expressions
+    and high-level `find_one`, `afind_one`, and `find` methods.
+
+    Supports both sync and async drivers via conditional branching.
+    """
+
     def __init__(
         self,
         pydantic_model: Type[T],
@@ -57,8 +66,14 @@ class CollectionWorker(Generic[T]):
         self, expression: CollectionFilterExpression
     ) -> Optional[DocumentWorker]:
         """
-        Takes in filter expression, queries the database and returns a pydantic
-        model if found
+        Query the database for a single document that matches the filter expression.
+        Only works with a synchronous driver.
+
+        Args:
+            expression (CollectionFilterExpression): The MongoDB-style filter expression.
+
+        Returns:
+            Optional[DocumentWorker]: A wrapped Pydantic object if found, otherwise None.
         """
 
         if issubclass(type(self.driver), AbstractAsyncMongoDBDriver):
@@ -82,8 +97,14 @@ class CollectionWorker(Generic[T]):
         self, expression: CollectionFilterExpression
     ) -> Optional[AsyncDocumentWorker]:
         """
-        Takes in filter expression, queries the database and returns a pydantic
-        model if found
+        Asynchronously query the database for a single document matching the filter expression.
+        Only works with an async driver.
+
+        Args:
+            expression (CollectionFilterExpression): The MongoDB-style filter expression.
+
+        Returns:
+            Optional[AsyncDocumentWorker]: A wrapped Pydantic object if found, otherwise None.
         """
 
         if issubclass(type(self.driver), AbstractSyncMongoDBDriver):
@@ -109,8 +130,13 @@ class CollectionWorker(Generic[T]):
         self, expression: Optional[CollectionFilterExpression] = None
     ) -> "CollectionResponseBuilder":
         """
-        Takes in a filter expression, and returns a CollectionResponseBuilder
-        that can be used to fetch the actual results from the database
+        Initiates a fluent response builder chain for querying multiple documents.
+
+        Args:
+            expression (Optional[CollectionFilterExpression]): Optional filter expression.
+
+        Returns:
+            CollectionResponseBuilder: Builder for fluent chaining (e.g., .limit(), .sort()).
         """
         expression = expression or CollectionFilterExpression({})
 
@@ -122,6 +148,19 @@ class CollectionWorker(Generic[T]):
         )
 
     def __getattr__(self, name: str) -> FieldExpression:
+        """
+        Returns a field expression object to enable DSL-style querying using comparison
+        operators or dot notation for nested objects.
+
+        Args:
+            name (str): Field name in the Pydantic model.
+
+        Returns:
+            FieldExpression: Expression object tied to the field.
+
+        Raises:
+            AttributeError: If the field does not exist on the model.
+        """
         if name not in self.pydantic_model.model_fields:
             raise AttributeError(
                 f"'{self.pydantic_model.__name__}' has no field named '{name}'"
@@ -137,7 +176,13 @@ class CollectionWorker(Generic[T]):
     @staticmethod
     def _resolve_annotation(annotation: Any):
         """
-        We use this function to handle Union types or Optional.
+        Helper function to resolve actual data types from Optional, Union, or Annotated wrappers.
+
+        Args:
+            annotation (Any): Type annotation from the Pydantic model.
+
+        Returns:
+            Any: The resolved base type annotation.
         """
         origin = get_origin(annotation)
         if origin is Union or origin is Optional:
@@ -152,8 +197,10 @@ class CollectionWorker(Generic[T]):
     @property
     def collection_name(self):
         """
-        Figure out the right collection name based on the pydantic
-        model parsed.
+        Derives the MongoDB collection name from the model or falls back to the class name.
+
+        Returns:
+            str: The name of the collection.
         """
         if hasattr(self.pydantic_model, "collection_name"):
             return self.pydantic_model.collection_name
@@ -164,7 +211,9 @@ class CollectionWorker(Generic[T]):
 
 class CollectionResponseBuilder(ABC, Generic[T]):
     """
-    Used to stack response commands like sort(), limit(), find()
+    Fluent builder for composing queries and retrieving lists of documents.
+
+    Can build the final MongoDB query structure with sort, skip, and limit options.
     """
 
     def __init__(
@@ -184,16 +233,43 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         self.collection_name = collection_name
 
     def skip(self, offset: int) -> "CollectionResponseBuilder":
+        """
+        Skip the first N documents in the query result.
+
+        Args:
+            offset (int): Number of documents to skip.
+
+        Returns:
+            CollectionResponseBuilder: For chaining.
+        """
         self._offset = offset
         return self
 
     def limit(self, limit_value: int) -> "CollectionResponseBuilder":
+        """
+        Limit the number of documents returned.
+
+        Args:
+            limit_value (int): Maximum number of documents to return.
+
+        Returns:
+            CollectionResponseBuilder: For chaining.
+        """
         self._limit = limit_value
         return self
 
     def sort(
         self, sort_criteria: Union[FieldExpression, Sequence[FieldExpression]]
     ) -> "CollectionResponseBuilder":
+        """
+        Apply sort criteria to the query.
+
+        Args:
+            sort_criteria (Union[FieldExpression, Sequence[FieldExpression]]): Sort instructions.
+
+        Returns:
+            CollectionResponseBuilder: For chaining.
+        """
         self._sort_criteria = (
             [sort_criteria]
             if isinstance(sort_criteria, FieldExpression)
@@ -203,7 +279,10 @@ class CollectionResponseBuilder(ABC, Generic[T]):
 
     def build_kwargs(self) -> dict:
         """
-        Return a dictionary consisting of all the information needed to query the database
+        Assembles the query, sort, offset, and limit into a single dictionary.
+
+        Returns:
+            dict: MongoDB-compatible query parameters.
         """
         query = self._expression.serialize()
         sortby = {
@@ -226,6 +305,18 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         pydantic_model: Type[T],
         driver: AbstractMongoDBDriver,
     ) -> BaseDocumentWorker:
+        """
+        Deserialize a raw MongoDB document and wrap it in a DocumentWorker.
+
+        Args:
+            document (dict): Raw document from the database.
+            document_worker_class (Type): Either DocumentWorker or AsyncDocumentWorker.
+            pydantic_model (Type): Model class to hydrate.
+            driver (AbstractMongoDBDriver): Driver used to perform operations.
+
+        Returns:
+            BaseDocumentWorker: Wrapped document instance.
+        """
         deserialized_doc = restore_unserializable_fields(document=document)
         pydantic_object = pydantic_model(**deserialized_doc)
         objectId = deserialized_doc.get("_id")
@@ -235,6 +326,12 @@ class CollectionResponseBuilder(ABC, Generic[T]):
 
 
 class SyncCollectionResponseBuilder(CollectionResponseBuilder):
+    """
+    Response builder for synchronous drivers.
+
+    Provides direct methods to count, check existence, and iterate documents.
+    """
+
     def __init__(
         self,
         expression: CollectionFilterExpression,
@@ -250,28 +347,30 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
 
     def exists(self) -> bool:
         """
-        Check the database to see if an object that matches the filter exists
+        Check if any document matches the filter expression.
 
-        Could be synchronous or asynchronous
+        Returns:
+            bool: True if at least one document exists.
         """
 
         return self.driver.exists(self.collection_name, self._expression.serialize())  # type: ignore
 
     def count(self) -> int:
         """
-        Count the number of documents that match the filter.
+        Count how many documents match the filter expression.
 
-        Could be synchronous or asynchronous
+        Returns:
+            int: Number of matching documents.
         """
 
         return self.driver.count(self.collection_name, self._expression.serialize())  # type: ignore
 
     def all(self) -> Iterable[DocumentWorker]:
         """
-        Returns an iteratable element of all the documents marshaled with
-        the pydantic model.
+        Retrieve all documents that match the current query builder state.
 
-        Could be synchronous or asynchronous
+        Returns:
+            Iterable[DocumentWorker]: Generator of hydrated documents.
         """
 
         kwargs = self.build_kwargs()
@@ -287,6 +386,12 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
 
 
 class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
+    """
+    Response builder for asynchronous drivers.
+
+    Supports async versions of exists, count, and all().
+    """
+
     def __init__(
         self,
         expression: CollectionFilterExpression,
@@ -302,7 +407,10 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
 
     async def exists(self) -> bool:
         """
-        Check the database to see if an object that matches the filter exists
+        Asynchronously check if any document matches the filter.
+
+        Returns:
+            bool: True if a match exists.
         """
 
         return await self.driver.exists(
@@ -311,7 +419,10 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
 
     async def count(self) -> int:
         """
-        Count the number of documents that match the filter.
+        Asynchronously count how many documents match the filter.
+
+        Returns:
+            int: Number of matching documents.
         """
 
         return await self.driver.count(
@@ -320,8 +431,10 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
 
     async def all(self) -> Iterable[AsyncDocumentWorker]:
         """
-        Returns an iteratable element of all the documents marshaled with
-        the pydantic model.
+        Asynchronously retrieve all matching documents.
+
+        Returns:
+            Iterable[AsyncDocumentWorker]: List of wrapped async document objects.
         """
         kwargs = self.build_kwargs()
         documents = await self.driver.find_many(
