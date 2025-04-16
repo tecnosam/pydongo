@@ -2,6 +2,7 @@
 
 from pydongo.drivers.mock import MockMongoDBDriver
 
+
 def test_insert_and_find_one():
     driver = MockMongoDBDriver()
     driver.connect()
@@ -14,6 +15,7 @@ def test_insert_and_find_one():
     found = driver.find_one("users", {"name": "Alice"})
     assert found is not None
     assert found["age"] == 30
+
 
 def test_update_and_delete():
     driver = MockMongoDBDriver()

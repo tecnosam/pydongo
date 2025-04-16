@@ -33,6 +33,4 @@ def test_not_inverts_expression():
     expr = CollectionFilterExpression({"age": {"$gt": 18}})
     negated = ~expr
 
-    assert negated.serialize() == {
-        "$not": {"age": {"$gt": 18}}
-    }
+    assert negated.serialize() == {"$not": {"age": {"$gt": 18}}}

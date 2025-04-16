@@ -1,7 +1,11 @@
 import pytest
 from pydantic import BaseModel
 from typing import List, Optional
-from pydongo.expressions.field import FieldExpression, ArrayFieldExpression, ArraySizeFieldExpression
+from pydongo.expressions.field import (
+    FieldExpression,
+    ArrayFieldExpression,
+    ArraySizeFieldExpression,
+)
 from pydongo.expressions.filter import CollectionFilterExpression
 
 
@@ -11,12 +15,12 @@ class DummyModel(BaseModel):
     tags: List[str]
     friends: List["Friend"]
 
+
 class Friend(BaseModel):
     username: str
 
 
 class User(BaseModel):
-
     best_friend: Optional[Friend]
     close_friend: Friend
 

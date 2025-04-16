@@ -31,12 +31,7 @@ def test_collection_builder_sort_limit_skip_multi_sort():
     assert kwargs3["sort_criteria"] == {"age": 1, "joined": -1}
 
     # 4. Sort + skip + limit together
-    q4 = (
-        collection.find(collection.age > 21)
-        .sort(collection.name)
-        .limit(10)
-        .skip(3)
-    )
+    q4 = collection.find(collection.age > 21).sort(collection.name).limit(10).skip(3)
     kwargs4 = q4.build_kwargs()
 
     assert kwargs4["query"] == {"age": {"$gt": 21}}
@@ -54,7 +49,7 @@ def test_collection_builder_null_state_defaults():
 
     kwargs = query.build_kwargs()
 
-    assert kwargs["query"] == {}                      # no filter
-    assert kwargs["sort_criteria"] == {}              # no sort
-    assert kwargs.get("limit") is None                # no limit
-    assert kwargs.get("offset") is None               # no skip
+    assert kwargs["query"] == {}  # no filter
+    assert kwargs["sort_criteria"] == {}  # no sort
+    assert kwargs.get("limit") is None  # no limit
+    assert kwargs.get("offset") is None  # no skip

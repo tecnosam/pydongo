@@ -7,6 +7,7 @@ from pydongo.utils.serializer import (
     HANDLER_MAPPING,
 )
 
+
 def test_date_serialization():
     today = datetime.date.today()
     document = {"created_at": today}
@@ -31,7 +32,7 @@ def test_nested_serialization():
             "created_at": datetime.date.today(),
             "uuid": uuid.uuid4(),
         },
-        "tags": [uuid.uuid4(), uuid.uuid4()]
+        "tags": [uuid.uuid4(), uuid.uuid4()],
     }
 
     serialized = replace_unserializable_fields(data.copy())
