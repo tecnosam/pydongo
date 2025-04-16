@@ -1,0 +1,44 @@
+name: Code Quality Checks
+
+on:
+  pull_request:
+    branches:
+      - stable
+
+jobs:
+  test:
+    name: Run Tests, Lint, Mypy, and Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Install Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: "1.8.2"
+
+      - name: 🔧 Install dependencies
+        run: poetry install
+
+      - name: ✅ Run Pytest
+        run: poetry run pytest --cov=src --cov-report=xml
+
+      - name: 🧹 Run Ruff Linter
+        run: poetry run ruff check .
+
+      - name: 🔍 Run Mypy
+        run: poetry run mypy src
+
+      - name: 📈 Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}  # Optional if public repo
