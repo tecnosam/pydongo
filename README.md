@@ -118,7 +118,7 @@ asyncio.run(main())
 
 ## Documentation
 
-For more detailed usage, advanced features, and API reference, visit the [Pydongo Documentation](https://samuelabolo.github.io/pydongo/). The documentation covers additional examples, configuration options, and deeper dives into the query syntax and driver interfaces.
+For more detailed usage, advanced features, and API reference, visit the [Pydongo Documentation](https://tecnosam.github.io/pydongo/). The documentation covers additional examples, configuration options, and deeper dives into the query syntax and driver interfaces.
 
 ## Contributing
 

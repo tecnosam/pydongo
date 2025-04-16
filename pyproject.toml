@@ -10,7 +10,7 @@ packages = [
 ]
 homepage = "https://github.com/samuelabolo/pydongo"
 repository = "https://github.com/samuelabolo/pydongo"
-documentation = "https://samuelabolo.github.io/pydongo/"
+documentation = "https://tecnosam.github.io/pydongo/"
 keywords = ["mongodb", "pydantic", "orm", "async", "motor"]
 
 classifiers = [
