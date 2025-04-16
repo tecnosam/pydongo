@@ -30,8 +30,7 @@ Define your data schema as a Pydantic model, then use Pydongo's driver and query
 
 ```python
 from pydantic import BaseModel
-from pydongo.drivers.sync_mongo import DefaultMongoDBDriver
-from pydongo import as_collection, as_document
+from pydongo import DefaultMongoDBDriver, as_collection, as_document
 
 # 1. Create a MongoDB driver (synchronous)
 driver = DefaultMongoDBDriver("mongodb://localhost:27017", "mydatabase")
@@ -75,8 +74,7 @@ driver.close()  # Close the connection when done
 ```python
 import asyncio
 from pydantic import BaseModel
-from pydongo.drivers.async_mongo import DefaultAsyncMongoDBDriver
-from pydongo import as_collection, as_document
+from pydongo import DefaultAsyncMongoDBDriver, as_collection, as_document
 
 # Define a Pydantic model (same as before)
 class Product(BaseModel):
