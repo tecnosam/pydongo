@@ -1,0 +1,1 @@
+extend-exclude = ["tests", "pydongo/__init__.py"]
