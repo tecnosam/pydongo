@@ -29,9 +29,10 @@ jobs:
         python -m pip install --upgrade pip
         pipx install poetry
         poetry install
-    - name: Lint with ruff
+    - name: Code Quality Checks
       run: |
-      poetry run ruff check .
+        poetry run ruff check .
+        poetry run mypy pydongo 
     - name: Test with pytest
       run: |
-        poetry run mypy pydongo
+        pytest
