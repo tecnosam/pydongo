@@ -15,8 +15,8 @@ def resolve_annotation(annotation: Any) -> Any:
     if origin is Union or origin is Optional:
         args = get_args(annotation)
         non_none_args = [arg for arg in args if arg is not type(None)]
-        return non_none_args[0] if non_none_args else annotation
+        return resolve_annotation(non_none_args[0] if non_none_args else annotation)
     if origin is Annotated:
-        annotation = get_args(annotation)[0]
+        annotation = resolve_annotation(get_args(annotation)[0])
 
     return annotation
