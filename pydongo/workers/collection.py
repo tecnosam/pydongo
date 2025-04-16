@@ -1,17 +1,12 @@
 from abc import ABC
 from typing import (
-    Annotated,
-    Any,
     Generic,
     Iterable,
     Optional,
     Sequence,
-    Set,
     Type,
     TypeVar,
     Union,
-    get_origin,
-    get_args,
 )
 from pydantic import BaseModel
 
@@ -168,10 +163,7 @@ class CollectionWorker(Generic[T]):
             )
         annotation = self.pydantic_model.model_fields[name].annotation
         annotation = resolve_annotation(annotation=annotation)
-        dtype = get_origin(annotation) or annotation
-        if isinstance(dtype, type) and issubclass(dtype, (Sequence, Set)):  # type: ignore
-            return ArrayFieldExpression(name, annotation=annotation)
-        return FieldExpression(name, annotation=annotation)
+        return FieldExpression.get_field_expression(name, annotation)
 
     @property
     def collection_name(self):

@@ -112,8 +112,8 @@ class FieldExpression:
         """
         return self._getattr(self.field_name, self.annotation, name)
 
-    @staticmethod
-    def _getattr(field_name: str, annotation: Any, name: str) -> "FieldExpression":
+    @classmethod
+    def _getattr(cls, field_name: str, annotation: Any, name: str) -> "FieldExpression":
         """
         Helper to resolve nested fields.
 
@@ -129,6 +129,7 @@ class FieldExpression:
             AttributeError: If the annotation is not a Pydantic model or field is invalid.
         """
         annotation = resolve_annotation(annotation=annotation)
+        field_name = ".".join((field_name, name))
 
         if not issubclass(annotation, BaseModel):
             raise AttributeError(
@@ -137,8 +138,11 @@ class FieldExpression:
         if name not in annotation.model_fields:
             raise AttributeError(f"'{annotation.__name__}' has no field named '{name}'")
 
-        field_name = ".".join((field_name, name))
         annotation = annotation.model_fields[name].annotation
+        return cls.get_field_expression(field_name, annotation)
+
+    @staticmethod
+    def get_field_expression(field_name: str, annotation: Any) -> "FieldExpression":
         dtype = get_origin(annotation) or annotation
         if isinstance(dtype, type) and issubclass(dtype, (Sequence, Set)):  # type: ignore
             return ArrayFieldExpression(field_name, annotation=annotation)

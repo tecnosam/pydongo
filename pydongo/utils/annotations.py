@@ -1,7 +1,7 @@
 from typing import Annotated, Any, Optional, Union, get_args, get_origin
 
 
-def resolve_annotation(annotation: Any):
+def resolve_annotation(annotation: Any) -> Any:
     """
     Helper function to resolve actual data types from Optional, Union, or Annotated wrappers.
 
