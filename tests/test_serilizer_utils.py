@@ -3,8 +3,6 @@ import uuid
 
 from pydongo.utils.serializer import (
     replace_unserializable_fields,
-    restore_unserializable_fields,
-    HANDLER_MAPPING,
 )
 
 

@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
     - uses: actions/checkout@v4
@@ -29,9 +29,10 @@ jobs:
         python -m pip install --upgrade pip
         pipx install poetry
         poetry install
-    - name: Lint with ruff
+    - name: Code Quality Checks
       run: |
-      poetry run ruff check .
+        poetry run ruff check .
+        poetry run mypy pydongo 
     - name: Test with pytest
       run: |
-        poetry run mypy pydongo
+        poetry run pytest

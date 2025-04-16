@@ -10,7 +10,7 @@ from typing import (
 )
 from pydantic import BaseModel
 
-from pydongo.expressions.field import ArrayFieldExpression, FieldExpression
+from pydongo.expressions.field import FieldExpression
 from pydongo.expressions.filter import CollectionFilterExpression
 
 from pydongo.drivers.base import (

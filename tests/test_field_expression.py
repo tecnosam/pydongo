@@ -1,4 +1,3 @@
-import pytest
 from pydantic import BaseModel
 from typing import List, Optional
 from pydongo.expressions.field import (

@@ -1,4 +1,3 @@
-import pytest
 from pydongo.expressions.filter import CollectionFilterExpression
 
 
