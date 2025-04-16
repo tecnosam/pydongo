@@ -35,4 +35,4 @@ jobs:
         poetry run mypy pydongo 
     - name: Test with pytest
       run: |
-        pytest
+        poetry run pytest
