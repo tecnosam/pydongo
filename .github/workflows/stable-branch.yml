@@ -1,4 +1,4 @@
-name: Code Quality Checks
+name: Stable Branch Deployment & Release CI
 
 on:
   pull_request:
@@ -41,3 +41,32 @@ jobs:
         with:
           files: ./coverage.xml
           fail_ci_if_error: true
+
+  release:
+    name: 🚀 Publish to PyPI
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/stable'
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Install Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: "1.8.2"
+
+      - name: 🔧 Install dependencies
+        run: poetry install
+
+      - name: 🗝 Set up PyPI token
+        run: poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
+
+      - name: 🚀 Publish to PyPI
+        run: poetry publish --build
