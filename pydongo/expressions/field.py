@@ -1,7 +1,8 @@
-from typing import Any, Iterable, get_args
+from typing import Any, Iterable, get_args, get_origin, Sequence, Set
 
 from pydantic import BaseModel
 from pydongo.expressions.filter import CollectionFilterExpression
+from pydongo.utils.annotations import resolve_annotation
 from pydongo.utils.serializer import HANDLER_MAPPING
 
 
@@ -45,13 +46,13 @@ class FieldExpression:
 
         return {self.field_name: {operator: value}}
 
-    def __eq__(self, other: Any) -> "CollectionFilterExpression":
+    def __eq__(self, other: Any) -> "CollectionFilterExpression":  # type: ignore
         """Build an equality expression (`==`)."""
         return CollectionFilterExpression().with_expression(
             self._get_comparative_expression("$eq", other)
         )
 
-    def __ne__(self, other: Any) -> "CollectionFilterExpression":
+    def __ne__(self, other: Any) -> "CollectionFilterExpression":  # type: ignore
         """Build an inequality expression (`!=`)."""
         return CollectionFilterExpression().with_expression(
             self._get_comparative_expression("$ne", other)
@@ -127,17 +128,21 @@ class FieldExpression:
         Raises:
             AttributeError: If the annotation is not a Pydantic model or field is invalid.
         """
+        annotation = resolve_annotation(annotation=annotation)
+
         if not issubclass(annotation, BaseModel):
             raise AttributeError(
                 f"'{annotation.__name__}' is not an object but a scalar value"
             )
-
         if name not in annotation.model_fields:
             raise AttributeError(f"'{annotation.__name__}' has no field named '{name}'")
 
         field_name = ".".join((field_name, name))
         annotation = annotation.model_fields[name].annotation
-        return FieldExpression(field_name=field_name, annotation=annotation)
+        dtype = get_origin(annotation) or annotation
+        if isinstance(dtype, type) and issubclass(dtype, (Sequence, Set)):  # type: ignore
+            return ArrayFieldExpression(field_name, annotation=annotation)
+        return FieldExpression(field_name, annotation=annotation)
 
 
 class ArraySizeFieldExpression(FieldExpression):

@@ -23,6 +23,7 @@ from pydongo.drivers.base import (
     AbstractSyncMongoDBDriver,
     AbstractAsyncMongoDBDriver,
 )
+from pydongo.utils.annotations import resolve_annotation
 from pydongo.utils.serializer import restore_unserializable_fields
 
 from .document import DocumentWorker, AsyncDocumentWorker, BaseDocumentWorker
@@ -166,33 +167,11 @@ class CollectionWorker(Generic[T]):
                 f"'{self.pydantic_model.__name__}' has no field named '{name}'"
             )
         annotation = self.pydantic_model.model_fields[name].annotation
-        annotation = self._resolve_annotation(annotation=annotation)
-
+        annotation = resolve_annotation(annotation=annotation)
         dtype = get_origin(annotation) or annotation
         if isinstance(dtype, type) and issubclass(dtype, (Sequence, Set)):  # type: ignore
             return ArrayFieldExpression(name, annotation=annotation)
         return FieldExpression(name, annotation=annotation)
-
-    @staticmethod
-    def _resolve_annotation(annotation: Any):
-        """
-        Helper function to resolve actual data types from Optional, Union, or Annotated wrappers.
-
-        Args:
-            annotation (Any): Type annotation from the Pydantic model.
-
-        Returns:
-            Any: The resolved base type annotation.
-        """
-        origin = get_origin(annotation)
-        if origin is Union or origin is Optional:
-            args = get_args(annotation)
-            non_none_args = [arg for arg in args if arg is not type(None)]
-            return non_none_args[0] if non_none_args else annotation
-        if origin is Annotated:
-            annotation = get_args(annotation)[0]
-
-        return annotation
 
     @property
     def collection_name(self):
