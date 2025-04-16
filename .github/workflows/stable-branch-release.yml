@@ -1,7 +1,7 @@
 name: Stable Branch Deployment & Release CI
 
 on:
-  pull_request:
+  push:
     branches:
       - stable
 
