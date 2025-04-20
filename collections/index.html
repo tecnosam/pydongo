@@ -1,0 +1,781 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../documents/">
+      
+      
+        <link rel="next" href="../dsl-querying/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.12">
+    
+    
+      
+        <title>Working with Collections - Pydongo</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.2afb09e1.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#working-with-collections" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Pydongo" class="md-header__button md-logo" aria-label="Pydongo" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Pydongo
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Working with Collections
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Pydongo" class="md-nav__button md-logo" aria-label="Pydongo" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Pydongo
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quickstart
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../drivers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Drivers & Extensibility
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../documents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Documents
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Working with Collections
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Collections
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-collection-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      📥 Creating a Collection Interface
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#finding-documents" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔍 Finding Documents
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔍 Finding Documents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#find_one-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      .find_one() (Sync)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#await-afind_one-async" class="md-nav__link">
+    <span class="md-ellipsis">
+      await afind_one() (Async)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fluent-query-builder-find" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔁 Fluent Query Builder (.find())
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-query-builder-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✨ Other Query Builder Features
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧠 Notes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-combining-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Example: Combining Filters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Summary
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dsl-querying/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Querying with the DSL
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-collection-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      📥 Creating a Collection Interface
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#finding-documents" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔍 Finding Documents
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔍 Finding Documents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#find_one-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      .find_one() (Sync)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#await-afind_one-async" class="md-nav__link">
+    <span class="md-ellipsis">
+      await afind_one() (Async)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fluent-query-builder-find" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔁 Fluent Query Builder (.find())
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-query-builder-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✨ Other Query Builder Features
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧠 Notes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-combining-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Example: Combining Filters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Summary
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="working-with-collections">Working with Collections<a class="headerlink" href="#working-with-collections" title="Permanent link">&para;</a></h1>
+<p>The <code>CollectionWorker</code> and its response builders provide a powerful yet intuitive API to query, filter, and iterate over documents in a MongoDB collection — all while keeping your data model as a clean Pydantic class.</p>
+<hr />
+<h2 id="creating-a-collection-interface">📥 Creating a Collection Interface<a class="headerlink" href="#creating-a-collection-interface" title="Permanent link">&para;</a></h2>
+<p>You don't interact directly with <code>CollectionWorker</code>. Instead, use the <code>as_collection()</code> helper:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_collection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydongo.drivers.sync_mongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultMongoDBDriver</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">age</span><span class="p">:</span> <span class="nb">int</span>
+
+<span class="n">driver</span> <span class="o">=</span> <span class="n">DefaultMongoDBDriver</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">)</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="n">collection</span> <span class="o">=</span> <span class="n">as_collection</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
+</code></pre></div>
+<p>By default, the collection name is inferred from the model class (<code>User</code> → <code>"user"</code>).</p>
+<hr />
+<h2 id="finding-documents">🔍 Finding Documents<a class="headerlink" href="#finding-documents" title="Permanent link">&para;</a></h2>
+<h3 id="find_one-sync"><code>.find_one()</code> (Sync)<a class="headerlink" href="#find_one-sync" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="n">user</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find_one</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;Alice&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">pydantic_object</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="await-afind_one-async"><code>await afind_one()</code> (Async)<a class="headerlink" href="#await-afind_one-async" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">collection</span><span class="o">.</span><span class="n">afind_one</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">25</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">pydantic_object</span><span class="o">.</span><span class="n">age</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="fluent-query-builder-find">🔁 Fluent Query Builder (<code>.find()</code>)<a class="headerlink" href="#fluent-query-builder-find" title="Permanent link">&para;</a></h2>
+<p>For multiple documents and advanced queries, use <code>.find()</code> to build a query:</p>
+<div class="highlight"><pre><span></span><code><span class="n">results</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">age</span><span class="p">)</span>
+</code></pre></div>
+<p>Async version:</p>
+<div class="highlight"><pre><span></span><code><span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="o">-</span><span class="n">collection</span><span class="o">.</span><span class="n">age</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">age</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="other-query-builder-features">✨ Other Query Builder Features<a class="headerlink" href="#other-query-builder-features" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.find(expr)</code></td>
+<td>Filter query</td>
+</tr>
+<tr>
+<td><code>.sort(field)</code></td>
+<td>Sort by one or more fields</td>
+</tr>
+<tr>
+<td><code>.limit(n)</code></td>
+<td>Limit results</td>
+</tr>
+<tr>
+<td><code>.skip(n)</code></td>
+<td>Offset results</td>
+</tr>
+<tr>
+<td><code>.all()</code> / <code>await .all()</code></td>
+<td>Fetch all documents</td>
+</tr>
+<tr>
+<td><code>.count()</code> / <code>await .count()</code></td>
+<td>Count matching documents</td>
+</tr>
+<tr>
+<td><code>.exists()</code> / <code>await .exists()</code></td>
+<td>Check if any document exists</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="notes">🧠 Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
+<ul>
+<li>All results returned from <code>.find()</code> and <code>.find_one()</code> are wrapped in <code>DocumentWorker</code> or <code>AsyncDocumentWorker</code></li>
+<li>You can use <code>doc.pydantic_object</code> to access or mutate the model</li>
+<li>The query language supports <code>==</code>, <code>!=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&amp;</code>, <code>|</code>, and <code>~</code></li>
+</ul>
+<hr />
+<h2 id="example-combining-filters">✅ Example: Combining Filters<a class="headerlink" href="#example-combining-filters" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="n">query</span> <span class="o">=</span> <span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">18</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;Bob&quot;</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+<p>Or async:</p>
+<div class="highlight"><pre><span></span><code><span class="n">query</span> <span class="o">=</span> <span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">18</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;Bob&quot;</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="summary">✅ Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Use <code>as_collection()</code> to query a MongoDB collection</li>
+<li>Works for both sync and async workflows</li>
+<li>Returns <code>DocumentWorker</code>/<code>AsyncDocumentWorker</code> instances</li>
+<li>Supports fluent chaining and expressive filter logic</li>
+</ul>
+<p>Pydongo gives you clean Mongo-style querying with the structure of Pydantic — no inheritance, no decorators, just Python.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>

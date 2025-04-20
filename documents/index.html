@@ -1,0 +1,865 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../drivers/">
+      
+      
+        <link rel="next" href="../collections/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.12">
+    
+    
+      
+        <title>Working with Documents - Pydongo</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.2afb09e1.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#working-with-documents" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Pydongo" class="md-header__button md-logo" aria-label="Pydongo" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Pydongo
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Working with Documents
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Pydongo" class="md-nav__button md-logo" aria-label="Pydongo" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Pydongo
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quickstart
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../drivers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Drivers & Extensibility
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Working with Documents
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Documents
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧱 How It Works
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Supported Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="✅ Supported Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#save" class="md-nav__link">
+    <span class="md-ellipsis">
+      .save()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      .delete()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accessing-data-from-the-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔁 Accessing Data from the Document
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔁 Accessing Data from the Document">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#field-access-shortcut" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧾 Field Access Shortcut
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Summary
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-documentworker-is-a-clean-abstraction-for-managing-the-lifecycle-of-a-single-document-designed-for-devs-who-prefer-explicit-control-and-clean-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      The DocumentWorker is a clean abstraction for managing the lifecycle of a single document — designed for devs who prefer explicit control and clean models.
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-asyncdocumentworker" class="md-nav__link">
+    <span class="md-ellipsis">
+      🌐 Using AsyncDocumentWorker
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🌐 Using AsyncDocumentWorker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key differences:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summary-async" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Summary (Async)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../collections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Collections
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dsl-querying/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Querying with the DSL
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧱 How It Works
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Supported Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="✅ Supported Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#save" class="md-nav__link">
+    <span class="md-ellipsis">
+      .save()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      .delete()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accessing-data-from-the-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔁 Accessing Data from the Document
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔁 Accessing Data from the Document">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#field-access-shortcut" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧾 Field Access Shortcut
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Summary
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-documentworker-is-a-clean-abstraction-for-managing-the-lifecycle-of-a-single-document-designed-for-devs-who-prefer-explicit-control-and-clean-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      The DocumentWorker is a clean abstraction for managing the lifecycle of a single document — designed for devs who prefer explicit control and clean models.
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-asyncdocumentworker" class="md-nav__link">
+    <span class="md-ellipsis">
+      🌐 Using AsyncDocumentWorker
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🌐 Using AsyncDocumentWorker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key differences:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summary-async" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Summary (Async)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="working-with-documents">Working with Documents<a class="headerlink" href="#working-with-documents" title="Permanent link">&para;</a></h1>
+<p>The <code>DocumentWorker</code> class in Pydongo provides a convenient interface to perform CRUD operations on a single document, while preserving your original Pydantic model structure.</p>
+<p>This is one of the core patterns of Pydongo — it enables persistence <strong>without requiring your models to inherit from any base class</strong>.</p>
+<hr />
+<h2 id="how-it-works">🧱 How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>To work with a document, you wrap a Pydantic model using <code>as_document()</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_document</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydongo.drivers.sync_mongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultMongoDBDriver</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">age</span><span class="p">:</span> <span class="nb">int</span>
+
+<span class="n">driver</span> <span class="o">=</span> <span class="n">DefaultMongoDBDriver</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">)</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">doc</span> <span class="o">=</span> <span class="n">as_document</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
+
+<span class="n">doc</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>  <span class="c1"># inserts into the &#39;user&#39; collection</span>
+</code></pre></div>
+<p>By default, Pydongo will infer the collection name from the model class name (<code>User</code> → <code>"user"</code>).</p>
+<hr />
+<h2 id="supported-operations">✅ Supported Operations<a class="headerlink" href="#supported-operations" title="Permanent link">&para;</a></h2>
+<h3 id="save"><code>.save()</code><a class="headerlink" href="#save" title="Permanent link">&para;</a></h3>
+<ul>
+<li>If the document does not exist in the database, it will be <strong>inserted</strong></li>
+<li>If it already exists (i.e. <code>objectId</code> is set), it will be <strong>updated</strong></li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">doc</span><span class="o">.</span><span class="n">pydantic_object</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="mi">31</span>
+<span class="n">doc</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>  <span class="c1"># Updates the document</span>
+</code></pre></div>
+<h3 id="delete"><code>.delete()</code><a class="headerlink" href="#delete" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Deletes the document from the database based on <code>objectId</code></li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">doc</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+</code></pre></div>
+<hr />
+<h2 id="accessing-data-from-the-document">🔁 Accessing Data from the Document<a class="headerlink" href="#accessing-data-from-the-document" title="Permanent link">&para;</a></h2>
+<p>Every <code>DocumentWorker</code> exposes the original Pydantic model via <code>.pydantic_object</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">pydantic_object</span><span class="p">,</span> <span class="n">User</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">pydantic_object</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+<p>This is useful when you need to:
+- re-serialize the model (<code>.model_dump()</code>)
+- re-validate or transform the data
+- pass the object to other parts of your app</p>
+<hr />
+<h3 id="field-access-shortcut">🧾 Field Access Shortcut<a class="headerlink" href="#field-access-shortcut" title="Permanent link">&para;</a></h3>
+<p>You can also directly access <strong>read-only fields</strong> of the underlying model:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">doc</span><span class="o">.</span><span class="n">age</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</code></pre></div>
+<p>This is purely for convenience and <strong>read-only access</strong>.<br />
+To mutate data, modify <code>doc.pydantic_object</code> directly:</p>
+<div class="highlight"><pre><span></span><code><span class="n">doc</span><span class="o">.</span><span class="n">pydantic_object</span><span class="o">.</span><span class="n">age</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="n">doc</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</code></pre></div>
+<hr />
+<h2 id="summary">✅ Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.save()</code></td>
+<td>Insert or update the document</td>
+</tr>
+<tr>
+<td><code>.delete()</code></td>
+<td>Remove from database</td>
+</tr>
+<tr>
+<td><code>.pydantic_object</code></td>
+<td>Access the underlying Pydantic model</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-documentworker-is-a-clean-abstraction-for-managing-the-lifecycle-of-a-single-document-designed-for-devs-who-prefer-explicit-control-and-clean-models">The <code>DocumentWorker</code> is a clean abstraction for managing the lifecycle of a single document — designed for devs who prefer <strong>explicit control and clean models</strong>.<a class="headerlink" href="#the-documentworker-is-a-clean-abstraction-for-managing-the-lifecycle-of-a-single-document-designed-for-devs-who-prefer-explicit-control-and-clean-models" title="Permanent link">&para;</a></h2>
+<h2 id="using-asyncdocumentworker">🌐 Using AsyncDocumentWorker<a class="headerlink" href="#using-asyncdocumentworker" title="Permanent link">&para;</a></h2>
+<p>Pydongo also supports asynchronous workflows using <code>AsyncDocumentWorker</code>, which behaves similarly to the sync version but with <code>async</code> methods.</p>
+<p>You don’t need to construct it manually — Pydongo will automatically return an <code>AsyncDocumentWorker</code> when used with an async driver:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_document</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydongo.drivers.async_mongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultAsyncMongoDBDriver</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">age</span><span class="p">:</span> <span class="nb">int</span>
+
+<span class="n">driver</span> <span class="o">=</span> <span class="n">DefaultAsyncMongoDBDriver</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">driver</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">28</span><span class="p">)</span>
+<span class="n">doc</span> <span class="o">=</span> <span class="n">as_document</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
+
+<span class="k">await</span> <span class="n">doc</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>  <span class="c1"># Insert</span>
+<span class="k">await</span> <span class="n">doc</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>  <span class="c1"># Delete</span>
+</code></pre></div>
+<h3 id="key-differences">Key differences:<a class="headerlink" href="#key-differences" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Methods like <code>.save()</code> and <code>.delete()</code> are <code>async</code></li>
+<li>Can be used inside <code>FastAPI</code>, <code>asyncio</code>, and other async frameworks</li>
+<li>You access <code>.pydantic_object</code> and read-only fields the same way as the sync version</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">doc</span><span class="o">.</span><span class="n">age</span><span class="p">)</span>
+<span class="n">doc</span><span class="o">.</span><span class="n">pydantic_object</span><span class="o">.</span><span class="n">age</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="k">await</span> <span class="n">doc</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</code></pre></div>
+<hr />
+<h3 id="summary-async">✅ Summary (Async)<a class="headerlink" href="#summary-async" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>await .save()</code></td>
+<td>Insert or update the document</td>
+</tr>
+<tr>
+<td><code>await .delete()</code></td>
+<td>Remove from database</td>
+</tr>
+<tr>
+<td><code>.pydantic_object</code></td>
+<td>Access the underlying Pydantic model</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>AsyncDocumentWorker</code> is your go-to for async MongoDB workflows — with the same structure and ergonomics as the sync API.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>

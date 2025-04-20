@@ -12,9 +12,11 @@
         <link rel="prev" href="../installation/">
       
       
+        <link rel="next" href="../drivers/">
+      
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.12">
     
     
       
@@ -22,7 +24,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.2afb09e1.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -51,7 +56,12 @@
   </head>
   
   
-    <body dir="ltr">
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -103,8 +113,8 @@
       </div>
     </div>
     
+      
     
-      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -349,6 +359,94 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../drivers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Drivers & Extensibility
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../documents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Documents
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../collections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Collections
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dsl-querying/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Querying with the DSL
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -455,24 +553,24 @@
 <p>This guide walks you through creating and interacting with MongoDB documents using <code>Pydongo</code> — covering both Document and Collection workers.</p>
 <hr />
 <h3 id="step-1-define-a-pydantic-model">🧱 Step 1: Define a Pydantic Model<a class="headerlink" href="#step-1-define-a-pydantic-model" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">age</span><span class="p">:</span> <span class="nb">int</span>
-</code></pre></div>
 
+    <span class="n">collection_name</span> <span class="o">=</span> <span class="s2">&quot;users&quot;</span>
+</code></pre></div>
 <hr />
 <h3 id="step-2-connect-to-mongodb">🔌 Step 2: Connect to MongoDB<a class="headerlink" href="#step-2-connect-to-mongodb" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydongo.drivers.sync_mongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultMongoDBDriver</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydongo.drivers.sync_mongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultMongoDBDriver</span>
 
 <span class="n">driver</span> <span class="o">=</span> <span class="n">DefaultMongoDBDriver</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">)</span>
 <span class="n">driver</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 </code></pre></div>
-
 <hr />
 <h3 id="step-3-use-the-document-worker-create-update-delete">📄 Step 3: Use the Document Worker (create, update, delete)<a class="headerlink" href="#step-3-use-the-document-worker-create-update-delete" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_document</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_document</span>
 
 <span class="c1"># Create and save a new user</span>
 <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
@@ -486,10 +584,9 @@
 <span class="c1"># Delete user</span>
 <span class="n">doc</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
 </code></pre></div>
-
 <hr />
 <h3 id="step-4-use-the-collection-worker-query-read">📦 Step 4: Use the Collection Worker (query, read)<a class="headerlink" href="#step-4-use-the-collection-worker-query-read" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_collection</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_collection</span>
 
 <span class="n">collection</span> <span class="o">=</span> <span class="n">as_collection</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
 
@@ -516,12 +613,10 @@
 <span class="k">if</span> <span class="n">bob</span><span class="p">:</span>
     <span class="n">bob</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
 </code></pre></div>
-
 <hr />
 <h3 id="step-5-close-the-driver">✅ Step 5: Close the driver<a class="headerlink" href="#step-5-close-the-driver" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span><code><span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div>
-
 <hr />
 <p>This covers <strong>basic CRUD</strong> using:
 - <code>as_document()</code> for direct document operations
@@ -575,7 +670,7 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
