@@ -27,7 +27,6 @@ from pydongo.drivers.sync_mongo import DefaultMongoDBDriver
 class User(BaseModel):
     name: str
     age: int
-    collection_name = "users"
 
 driver = DefaultMongoDBDriver("mongodb://localhost:27017", "mydb")
 driver.connect()
