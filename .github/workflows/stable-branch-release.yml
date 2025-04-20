@@ -64,3 +64,25 @@ jobs:
 
       - name: 🚀 Publish to PyPI
         run: poetry publish --build
+
+  docs:
+    name: 📘 Deploy Documentation
+    needs: release
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/stable'
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Install dependencies for docs
+        run: |
+          pip install mkdocs mkdocs-material pymdown-extensions
+
+      - name: 🚀 Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force
