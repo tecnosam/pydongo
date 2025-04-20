@@ -13,7 +13,6 @@ class User(BaseModel):
     name: str
     age: int
 
-    collection_name = "users"
 ```
 
 ---
