@@ -40,8 +40,6 @@ driver.connect()  # Establish connection to MongoDB
 class User(BaseModel):
     name: str
     age: int
-    # Optionally specify a custom collection name (defaults to class name if not set)
-    collection_name = "users"
 
 # 3. Insert a new document using the document interface
 new_user = User(name="Alice", age=30)
