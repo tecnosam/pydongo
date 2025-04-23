@@ -1,8 +1,9 @@
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
-from typing import List, Dict, Any, Optional, Iterable
+from typing import List, Dict, Any, Optional, Iterable, Tuple
 
 from pydongo.drivers.base import AbstractSyncMongoDBDriver
+from pydongo.expressions.index import IndexExpression
 
 
 class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
@@ -192,3 +193,25 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
             bool: True if a matching document exists.
         """
         return self.db[collection].count_documents(query, limit=1) > 0
+
+    def create_index(self, collection: str, index: Tuple[IndexExpression]):
+        """
+        Create an index on a collection in the MongoDB Database
+
+        Args:
+            collection (str): The collection name.
+            index (tuple[IndexExpression]):
+                A tuple of IndexExpression objects representing the index to create
+                NOTE: Muiltiple elements in tuple indicate a single multikey index
+                not multiple indexes
+
+        """
+
+        index_key: List[tuple] = []
+        final_kwargs = {}
+
+        for expr in index:
+            index_key.extend(expr.serialize().items())
+            final_kwargs.update(expr.build_kwargs())
+
+        self.db[collection].create_index(index_key, **final_kwargs)

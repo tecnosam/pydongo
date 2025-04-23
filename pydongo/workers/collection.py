@@ -396,7 +396,7 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
         if self._indexes_created:
             return
         for index in self._indexes:
-            self.driver.create_index(index)
+            self.driver.create_index(self.collection_name, index)
         self._indexes_created = True
 
 
@@ -479,5 +479,5 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
         if self._indexes_created:
             return
         for index in self._indexes:
-            await self.driver.create_index(index)
+            await self.driver.create_index(self.collection_name, index)
         self._indexes_created = True
