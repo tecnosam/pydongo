@@ -28,3 +28,7 @@
     - Optimized query generation from filter expressions
     - Support for _Aggregation Workers_
     - Support for _Indexed Fields_
+
+
+
+## Indexes, Create a Driver `create_index` method
