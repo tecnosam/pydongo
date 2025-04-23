@@ -5,6 +5,8 @@ from typing import (
     Optional,
     Sequence,
     Type,
+    Tuple,
+    Set,
     TypeVar,
     Union,
 )
@@ -12,6 +14,7 @@ from pydantic import BaseModel
 
 from pydongo.expressions.field import FieldExpression
 from pydongo.expressions.filter import CollectionFilterExpression
+from pydongo.expressions.index import IndexExpression
 
 from pydongo.drivers.base import (
     AbstractMongoDBDriver,
@@ -51,6 +54,7 @@ class CollectionWorker(Generic[T]):
     ):
         self.pydantic_model = pydantic_model
         self.driver = driver
+        self._indexes: Set[Tuple[IndexExpression]] = set()
 
         self.response_builder_class = (
             AsyncCollectionResponseBuilder
@@ -141,7 +145,29 @@ class CollectionWorker(Generic[T]):
             pydantic_model=self.pydantic_model,
             driver=self.driver,  # type: ignore
             collection_name=self.collection_name,
+            indexes=self._indexes,  # type: ignore
         )
+
+    def use_index(
+        self,
+        index: Union[IndexExpression, Tuple[IndexExpression]],
+    ):
+        """
+        Registers an index (or compound index) on the collection.
+
+        Accepts FieldExpression(s) or IndexExpression(s), automatically converting fields
+        to basic index expressions.
+
+        Args:
+            index: A single FieldExpression/IndexExpression, or a tuple of them.
+
+        Returns:
+            CollectionWorker: Self, for method chaining.
+        """
+
+        index = (index,) if isinstance(index, IndexExpression) else index
+        self._indexes.add(index)
+        return self
 
     def __getattr__(self, name: str) -> FieldExpression:
         """
@@ -193,11 +219,15 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         pydantic_model: Type[T],
         driver: Union[AbstractSyncMongoDBDriver, AbstractAsyncMongoDBDriver],
         collection_name: str,
+        indexes: Iterable[Tuple[FieldExpression]],
     ):
         self._expression = expression
         self._sort_criteria: Sequence[FieldExpression] = []
         self._limit: Optional[int] = None
         self._offset: Optional[int] = None
+
+        self._indexes = indexes
+        self._indexes_created = False
 
         self.model = pydantic_model
         self.driver = driver
@@ -309,12 +339,13 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
         pydantic_model: Type[T],
         driver: AbstractSyncMongoDBDriver,
         collection_name: str,
+        indexes: Iterable[Tuple[FieldExpression]],
     ):
         if issubclass(type(driver), AbstractAsyncMongoDBDriver):
             raise AttributeError(
                 "Use the AsyncCollectionResponseBuilder instead as you're using an async driver"
             )
-        super().__init__(expression, pydantic_model, driver, collection_name)
+        super().__init__(expression, pydantic_model, driver, collection_name, indexes)
 
     def exists(self) -> bool:
         """
@@ -324,6 +355,7 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
             bool: True if at least one document exists.
         """
 
+        self.create_indexes()
         return self.driver.exists(self.collection_name, self._expression.serialize())  # type: ignore
 
     def count(self) -> int:
@@ -334,6 +366,7 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
             int: Number of matching documents.
         """
 
+        self.create_indexes()
         return self.driver.count(self.collection_name, self._expression.serialize())  # type: ignore
 
     def all(self) -> Iterable[DocumentWorker]:
@@ -344,6 +377,7 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
             Iterable[DocumentWorker]: Generator of hydrated documents.
         """
 
+        self.create_indexes()
         kwargs = self.build_kwargs()
         documents = self.driver.find_many(collection=self.collection_name, **kwargs)  # type: ignore
 
@@ -354,6 +388,17 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
                 pydantic_model=self.model,
                 driver=self.driver,
             )  # type: ignore
+
+    def create_indexes(self):
+        """
+        Creates indexes on the MongoDB database.
+        """
+
+        if self._indexes_created:
+            return
+        for index in self._indexes:
+            self.driver.create_index(index)
+        self._indexes_created = True
 
 
 class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
@@ -369,8 +414,9 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
         pydantic_model: Type[T],
         driver: AbstractAsyncMongoDBDriver,
         collection_name: str,
+        indexes: Iterable[Tuple[FieldExpression]],
     ):
-        super().__init__(expression, pydantic_model, driver, collection_name)
+        super().__init__(expression, pydantic_model, driver, collection_name, indexes)
         if issubclass(type(self.driver), AbstractSyncMongoDBDriver):
             raise AttributeError(
                 "Use the SyncCollectionResponseBuilder instead as you're using a sync driver"
@@ -384,6 +430,7 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
             bool: True if a match exists.
         """
 
+        await self.create_indexes()
         return await self.driver.exists(
             self.collection_name, self._expression.serialize()
         )  # type: ignore
@@ -396,6 +443,7 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
             int: Number of matching documents.
         """
 
+        await self.create_indexes()
         return await self.driver.count(
             self.collection_name, self._expression.serialize()
         )  # type: ignore
@@ -407,6 +455,8 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
         Returns:
             Iterable[AsyncDocumentWorker]: List of wrapped async document objects.
         """
+
+        await self.create_indexes()
         kwargs = self.build_kwargs()
         documents = await self.driver.find_many(
             collection=self.collection_name, **kwargs
@@ -421,3 +471,14 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
             )  # type: ignore
             async for document in documents
         ]
+
+    async def create_indexes(self):
+        """
+        Asynchronously creates indexes on the MongoDB database.
+        """
+
+        if self._indexes_created:
+            return
+        for index in self._indexes:
+            await self.driver.create_index(index)
+        self._indexes_created = True
