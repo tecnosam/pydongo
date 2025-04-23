@@ -145,7 +145,7 @@ class CollectionWorker(Generic[T]):
             pydantic_model=self.pydantic_model,
             driver=self.driver,  # type: ignore
             collection_name=self.collection_name,
-            indexes=self._indexes,  # type: ignore
+            indexes=self._indexes,
         )
 
     def use_index(
@@ -219,7 +219,7 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         pydantic_model: Type[T],
         driver: Union[AbstractSyncMongoDBDriver, AbstractAsyncMongoDBDriver],
         collection_name: str,
-        indexes: Iterable[Tuple[FieldExpression]],
+        indexes: Iterable[Tuple[IndexExpression]],
     ):
         self._expression = expression
         self._sort_criteria: Sequence[FieldExpression] = []
@@ -339,7 +339,7 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
         pydantic_model: Type[T],
         driver: AbstractSyncMongoDBDriver,
         collection_name: str,
-        indexes: Iterable[Tuple[FieldExpression]],
+        indexes: Iterable[Tuple[IndexExpression]],
     ):
         if issubclass(type(driver), AbstractAsyncMongoDBDriver):
             raise AttributeError(
@@ -414,7 +414,7 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
         pydantic_model: Type[T],
         driver: AbstractAsyncMongoDBDriver,
         collection_name: str,
-        indexes: Iterable[Tuple[FieldExpression]],
+        indexes: Iterable[Tuple[IndexExpression]],
     ):
         super().__init__(expression, pydantic_model, driver, collection_name, indexes)
         if issubclass(type(self.driver), AbstractSyncMongoDBDriver):
