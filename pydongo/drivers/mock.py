@@ -1,8 +1,11 @@
 import uuid
-from typing import List, Dict, Any, Optional
+
+from collections import defaultdict
+from typing import List, Dict, Any, Optional, Tuple
 from copy import deepcopy
 
 from pydongo.drivers.base import AbstractSyncMongoDBDriver, AbstractAsyncMongoDBDriver
+from pydongo.expressions.index import IndexExpression
 
 
 class MockMongoDBDriver(AbstractSyncMongoDBDriver):
@@ -23,6 +26,7 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
         """
         super().__init__(connection_string, database_name)
         self._collections: Dict[str, List[Dict[str, Any]]] = {}
+        self.indexes: defaultdict = defaultdict(lambda: [])
 
     def connect(self) -> bool:
         """
@@ -195,6 +199,21 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
             for doc in self._collections.get(collection, [])
         )
 
+    def create_index(self, collection: str, index: Tuple[IndexExpression]):
+        """
+        Create an index on a collection in the MongoDB Database
+
+        Args:
+            collection (str): The collection name.
+            index (tuple[IndexExpression]):
+                A tuple of IndexExpression objects representing the index to create
+                NOTE: Muiltiple elements in tuple indicate a single multikey index
+                not multiple indexes
+
+        """
+
+        self.indexes[collection].append(index)
+
 
 class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
     """
@@ -214,6 +233,7 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
         """
         super().__init__(connection_string, database_name)
         self._collections: Dict[str, List[Dict[str, Any]]] = {}
+        self.indexes: defaultdict = defaultdict(lambda: [])
 
     async def connect(self) -> bool:
         """
@@ -389,3 +409,18 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
             all(doc.get(k) == v for k, v in query.items())
             for doc in self._collections.get(collection, [])
         )
+
+    async def create_index(self, collection: str, index: Tuple[IndexExpression]):
+        """
+        Create an index on a collection in the MongoDB Database
+
+        Args:
+            collection (str): The collection name.
+            index (tuple[IndexExpression]):
+                A tuple of IndexExpression objects representing the index to create
+                NOTE: Muiltiple elements in tuple indicate a single multikey index
+                not multiple indexes
+
+        """
+
+        self.indexes[collection].append(index)
