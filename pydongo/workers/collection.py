@@ -155,11 +155,10 @@ class CollectionWorker(Generic[T]):
         """
         Registers an index (or compound index) on the collection.
 
-        Accepts FieldExpression(s) or IndexExpression(s), automatically converting fields
-        to basic index expressions.
+        Accepts IndexExpression(s)
 
         Args:
-            index: A single FieldExpression/IndexExpression, or a tuple of them.
+            index: A single IndexExpression, or a tuple of them.
 
         Returns:
             CollectionWorker: Self, for method chaining.
