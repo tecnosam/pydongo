@@ -15,6 +15,7 @@ nav:
   - Working with Documents: documents.md
   - Working with Collections: collections.md
   - Querying with the DSL: dsl-querying.md
+  - MongoDB Indexing: indexing.md
 
 markdown_extensions:
   - admonition
