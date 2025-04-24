@@ -63,7 +63,9 @@ class FieldExpression:
             sort_order=sort_order
         )
 
-        if issubclass(self.annotation, str):
+        datatype = get_origin(self.annotation) or self.annotation
+
+        if issubclass(datatype, str):
             return builder.use_index_type(IndexType.TEXT)
 
         return builder
