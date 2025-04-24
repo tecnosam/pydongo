@@ -2,6 +2,12 @@ from typing import Any, Iterable, get_args, get_origin, Sequence, Set
 
 from pydantic import BaseModel
 from pydongo.expressions.filter import CollectionFilterExpression
+from pydongo.expressions.index import (
+    IndexExpression,
+    IndexSortOrder,
+    IndexType,
+    IndexExpressionBuilder,
+)
 from pydongo.utils.annotations import resolve_annotation
 from pydongo.utils.serializer import HANDLER_MAPPING
 
@@ -28,6 +34,41 @@ class FieldExpression:
         self._field_name = field_name
         self.annotation = annotation
         self.sort_ascending = sort_ascending
+
+    def to_index(self) -> IndexExpression:
+        """
+        Returns a complete, ready-to-use `IndexExpression` for this field.
+
+        This is a convenience method for quickly generating a basic index configuration
+        using the default sort order and inferred index type (e.g., TEXT for strings).
+        """
+
+        return self.as_index().build_index()
+
+    def as_index(self) -> IndexExpressionBuilder:
+        """
+        Returns an `IndexExpressionBuilder` initialized with this field.
+
+        This allows users to customize the index further, such as adding uniqueness,
+        TTL, collation, or partial filter expressions—before building the final index object.
+        """
+
+        sort_order = (
+            IndexSortOrder.ASCENDING
+            if self.sort_ascending
+            else IndexSortOrder.DESCENDING
+        )
+
+        builder = IndexExpressionBuilder(field_name=self.field_name).use_sort_order(
+            sort_order=sort_order
+        )
+
+        datatype = get_origin(self.annotation) or self.annotation
+
+        if issubclass(datatype, str):
+            return builder.use_index_type(IndexType.TEXT)
+
+        return builder
 
     def _get_comparative_expression(self, operator: str, value: Any) -> dict:
         """

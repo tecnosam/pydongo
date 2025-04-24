@@ -1,14 +1,28 @@
 site_name: Pydongo
 theme:
   name: material
+  palette:
+    scheme: default
+  features:
+    - content.code.copy
+    - content.code.annotate
 
 nav:
   - Home: index.md
   - Installation: installation.md
   - Quickstart: quickstart.md
+  - Drivers & Extensibility: drivers.md
+  - Working with Documents: documents.md
+  - Working with Collections: collections.md
+  - Querying with the DSL: dsl-querying.md
+  - MongoDB Indexing: indexing.md
 
 markdown_extensions:
   - admonition
-  - codehilite
+  - codehilite:
+      guess_lang: false
   - toc:
       permalink: true
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences

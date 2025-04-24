@@ -22,8 +22,6 @@ class Patient(BaseModel):
     age: int
     prescriptions: List[Prescription] = []
 
-    collection_name = "patients"
-
 
 # === DB SETUP ===
 

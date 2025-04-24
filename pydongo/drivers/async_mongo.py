@@ -1,8 +1,9 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import PyMongoError
-from typing import List, Dict, Any, Optional, Iterable
+from typing import List, Dict, Any, Optional, Iterable, Tuple
 
 from pydongo.drivers.base import AbstractAsyncMongoDBDriver
+from pydongo.expressions.index import IndexExpression
 
 
 class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
@@ -196,3 +197,24 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
             bool: True if a matching document exists.
         """
         return await self.db[collection].count_documents(query, limit=1) > 0
+
+    async def create_index(self, collection: str, index: Tuple[IndexExpression]):
+        """
+        Create an index on a collection in the MongoDB Database (Async version using Motor).
+
+        Args:
+            collection (str): The collection name.
+            index (tuple[IndexExpression]):
+                A tuple of IndexExpression objects representing the index to create.
+                NOTE: Multiple elements in the tuple indicate a single compound index,
+                not multiple separate indexes.
+        """
+
+        index_key: List[tuple] = []
+        final_kwargs = {}
+
+        for expr in index:
+            index_key.extend(expr.serialize().items())
+            final_kwargs.update(expr.build_kwargs())
+
+        await self.db[collection].create_index(index_key, **final_kwargs)
