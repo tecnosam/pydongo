@@ -43,6 +43,25 @@ pytest-asyncio = "^0.23.0"
 coverage = "^7.4.0"
 mkdocs = "^1.6.1"
 mkdocs-material = "^9.6.12"
+pylint = "^3.3.6"
+poethepoet = "^0.34.0"
+
+# Poe Tasks
+[tool.poe.tasks]
+_ruff_sort = "ruff check pydongo/ tests/ --fix --select I"
+_ruff_lint = "ruff check pydongo/ tests/ --fix"
+_ruff_fmt = "ruff format pydongo/ tests/"
+_pylint_lint = "pylint pydongo/ tests/"
+_type_check = "mypy pydongo/ tests/"
+
+lint = [
+    "_ruff_sort",
+    "_ruff_lint",
+    "_ruff_fmt",
+    "_pylint_lint",
+    "_type_check",
+]
+
 
 [build-system]
 requires = ["poetry-core>=1.8.0,<3.0.0"]
