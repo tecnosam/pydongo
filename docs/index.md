@@ -57,10 +57,10 @@ driver.close()
 ## 💬 Get Involved
 
 Contributions welcome!  
-Check out the [contributing guide](https://github.com/samuelabolo/pydongo/blob/main/CONTRIBUTING.md) or open an issue on GitHub.
+Check out the [contributing guide](https://github.com/tecnosam/pydongo/blob/main/CONTRIBUTING.md) or open an issue on GitHub.
 
 ---
 
 ## 🧾 License
 
-Pydongo is open source under the [MIT License](https://github.com/samuelabolo/pydongo/blob/main/LICENSE).
+Pydongo is open source under the [MIT License](https://github.com/tecnosam/pydongo/blob/main/LICENSE).
