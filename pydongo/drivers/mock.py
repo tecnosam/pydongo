@@ -207,7 +207,7 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
             collection (str): The collection name.
             index (tuple[IndexExpression]):
                 A tuple of IndexExpression objects representing the index to create
-                NOTE: Muiltiple elements in tuple indicate a single compound index
+                NOTE: Multiple elements in tuple indicate a single compound index
                 not multiple indexes
 
         """
