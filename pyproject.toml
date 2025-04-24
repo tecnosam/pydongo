@@ -54,7 +54,7 @@ _type_check = "mypy pydongo/ tests/"
 _coverage_test = "coverage run -m pytest tests/"
 _coverage_report = "coverage html -d coverage"
 
-# Call only task below!
+# Call only below tasks!
 lint = ["_ruff_sort", "_ruff_lint", "_ruff_fmt", "_pylint_lint", "_type_check"]
 test = ["_coverage_test", "_coverage_report"]
 
