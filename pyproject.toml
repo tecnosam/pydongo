@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pydongo"
-version = "0.1.0"
+version = "0.2.0"
 description = "A lightweight ORM for MongoDB using Pydantic models."
 authors = ["Samuel Abolo <ikabolo59@gmail.com>"]
 license = "MIT"
@@ -8,8 +8,8 @@ readme = "README.md"
 packages = [
   { include = "pydongo" }
 ]
-homepage = "https://github.com/samuelabolo/pydongo"
-repository = "https://github.com/samuelabolo/pydongo"
+homepage = "https://github.com/tecnosam/pydongo"
+repository = "https://github.com/tecnosam/pydongo"
 documentation = "https://tecnosam.github.io/pydongo/"
 keywords = ["mongodb", "pydantic", "orm", "async", "motor"]
 

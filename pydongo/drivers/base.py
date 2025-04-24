@@ -1,6 +1,8 @@
 import contextvars
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional, Iterable
+from typing import List, Dict, Any, Optional, Iterable, Tuple
+
+from pydongo.expressions.index import IndexExpression
 
 
 class AbstractMongoDBDriver(ABC):
@@ -202,6 +204,18 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
             bool: True if a document exists and False if it doesn't
         """
 
+    @abstractmethod
+    def create_index(self, collection: str, index: Tuple[IndexExpression]):
+        """
+        Create an index on a collection in the MongoDB Database
+
+        Args:
+            collection (str): The collection name.
+            index (tuple[IndexExpression]):
+                A tuple of IndexExpression objects representing the index to create
+                NOTE: Multiple elements in tuple indicate a single compound index
+        """
+
 
 class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
     """
@@ -398,4 +412,17 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
 
         Returns:
             bool: True if a document exists and False if it doesn't
+        """
+
+    @abstractmethod
+    async def create_index(self, collection: str, index: Tuple[IndexExpression]):
+        """
+        Create an index on a collection in the MongoDB Database
+
+        Args:
+            collection (str): The collection name.
+            index (tuple[IndexExpression]):
+                A tuple of IndexExpression objects representing the index to create
+                NOTE: Muiltiple elements in tuple indicate a single compound index
+                not multiple indexes
         """
