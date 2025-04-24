@@ -63,6 +63,8 @@ Pydongo supports the following MongoDB index options:
 
 | Option            | Method                      |
 |-------------------|------------------------------|
+| `Index Type`      | `.use_index_type(IndexType)` |
+| `sort order`      | `.use_sort_order(IndexSortOrder)` |
 | `unique`          | `.use_unique()`              |
 | `sparse`          | `.use_sparse()`              |
 | `ttl`             | `.use_ttl(seconds)`          |
