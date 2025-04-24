@@ -5,9 +5,7 @@ description = "A lightweight ORM for MongoDB using Pydantic models."
 authors = ["Samuel Abolo <ikabolo59@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [
-  { include = "pydongo" }
-]
+packages = [{ include = "pydongo" }]
 homepage = "https://github.com/tecnosam/pydongo"
 repository = "https://github.com/tecnosam/pydongo"
 documentation = "https://tecnosam.github.io/pydongo/"
@@ -24,7 +22,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Topic :: Database",
   "Topic :: Software Development :: Libraries",
-  "Typing :: Typed"
+  "Typing :: Typed",
 ]
 
 [tool.poetry.dependencies]
@@ -53,15 +51,12 @@ _ruff_lint = "ruff check pydongo/ tests/ --fix"
 _ruff_fmt = "ruff format pydongo/ tests/"
 _pylint_lint = "pylint pydongo/ tests/"
 _type_check = "mypy pydongo/ tests/"
+_coverage_test = "coverage run -m pytest tests/"
+_coverage_report = "coverage html -d coverage"
 
-lint = [
-    "_ruff_sort",
-    "_ruff_lint",
-    "_ruff_fmt",
-    "_pylint_lint",
-    "_type_check",
-]
-
+# Call only task below!
+lint = ["_ruff_sort", "_ruff_lint", "_ruff_fmt", "_pylint_lint", "_type_check"]
+test = ["_coverage_test", "_coverage_report"]
 
 [build-system]
 requires = ["poetry-core>=1.8.0,<3.0.0"]
