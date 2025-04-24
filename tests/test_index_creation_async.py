@@ -1,5 +1,6 @@
 import pytest
 import pytest_asyncio
+from typing import List
 from pydantic import BaseModel, Field
 from pydongo import as_collection
 from pydongo.expressions.index import (
@@ -16,7 +17,7 @@ class DemoModel(BaseModel):
     email: str
     bio: str
     hash_id: str
-    latlon: list[float] = Field(default_factory=lambda: [0.0, 0.0])
+    latlon: List[float] = Field(default_factory=lambda: [0.0, 0.0])
     point: dict = Field(
         default_factory=lambda: {"type": "Point", "coordinates": [0.0, 0.0]}
     )
