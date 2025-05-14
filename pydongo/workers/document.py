@@ -15,7 +15,9 @@ T = TypeVar("T", bound=BaseModel)
 
 
 def as_document(
-    pydantic_object: T, driver: AbstractMongoDBDriver
+    pydantic_object: T,
+    driver: AbstractMongoDBDriver,
+    collection_name: Optional[str] = None,
 ) -> Union["DocumentWorker", "AsyncDocumentWorker"]:
     """
     Wraps a Pydantic object in either a synchronous or asynchronous document worker,
@@ -29,8 +31,16 @@ def as_document(
         Union[DocumentWorker, AsyncDocumentWorker]: A document wrapper with persistence methods.
     """
     if issubclass(driver.__class__, AbstractAsyncMongoDBDriver):
-        return AsyncDocumentWorker(pydantic_object=pydantic_object, driver=driver)  # type: ignore
-    return DocumentWorker(pydantic_object=pydantic_object, driver=driver)  # type: ignore
+        return AsyncDocumentWorker(
+            pydantic_object=pydantic_object,
+            driver=driver,  # type: ignore
+            collection_name=collection_name,
+        )
+    return DocumentWorker(
+        pydantic_object=pydantic_object,
+        driver=driver,  # type: ignore
+        collection_name=collection_name,
+    )
 
 
 class BaseDocumentWorker(Generic[T]):
@@ -41,7 +51,12 @@ class BaseDocumentWorker(Generic[T]):
     """
 
     def __init__(
-        self, pydantic_object: T, objectId: Optional[str] = None, *args, **kwargs
+        self,
+        pydantic_object: T,
+        objectId: Optional[str] = None,
+        collection_name: Optional[str] = None,
+        *args,
+        **kwargs,
     ):
         """
         Initialize the document wrapper.
@@ -49,23 +64,31 @@ class BaseDocumentWorker(Generic[T]):
         Args:
             pydantic_object (T): The Pydantic model to wrap.
             objectId (Optional[str]): Optional MongoDB ObjectId of the document.
+            collection_name (Optional[str]): Optionally set the name of the collection to persist the document to
         """
         self.pydantic_object = pydantic_object
         self.objectId = ObjectId(objectId) if objectId else None
 
+        self.__collection_name = collection_name
+
     @property
-    def collection_name(self):
+    def collection_name(self) -> str:
         """
         Returns the MongoDB collection name associated with the model.
 
         Returns:
             str: The collection name.
         """
-        if hasattr(self.pydantic_object, "collection_name"):
-            return self.pydantic_object.collection_name
 
-        # todo: find a nicer way to do this
-        return self.pydantic_object.__class__.__name__
+        if self.__collection_name is None:
+            self.__collection_name = str(
+                self.pydantic_object.model_config.get(
+                    "collection_name",
+                    self.pydantic_object.__class__.__name__.lower().rstrip("s") + "s",
+                )
+            )
+
+        return self.__collection_name
 
     def get_query(self) -> dict:
         """
@@ -129,6 +152,7 @@ class DocumentWorker(BaseDocumentWorker):
         pydantic_object: T,
         driver: AbstractSyncMongoDBDriver,
         objectId: Optional[str] = None,
+        collection_name: Optional[str] = None,
     ):
         """
         Initialize the sync document worker.
@@ -138,7 +162,11 @@ class DocumentWorker(BaseDocumentWorker):
             driver (AbstractSyncMongoDBDriver): The sync MongoDB driver.
             objectId (Optional[str]): Optional ObjectId for the document.
         """
-        super().__init__(pydantic_object=pydantic_object, objectId=objectId)
+        super().__init__(
+            pydantic_object=pydantic_object,
+            objectId=objectId,
+            collection_name=collection_name,
+        )
         self.driver = driver
 
     def save(self) -> dict:
@@ -185,6 +213,7 @@ class AsyncDocumentWorker(BaseDocumentWorker):
         pydantic_object: T,
         driver: AbstractAsyncMongoDBDriver,
         objectId: Optional[str] = None,
+        collection_name: Optional[str] = None,
     ):
         """
         Initialize the async document worker.
@@ -194,7 +223,11 @@ class AsyncDocumentWorker(BaseDocumentWorker):
             driver (AbstractAsyncMongoDBDriver): The async MongoDB driver.
             objectId (Optional[str]): Optional ObjectId for the document.
         """
-        super().__init__(pydantic_object=pydantic_object, objectId=objectId)
+        super().__init__(
+            pydantic_object=pydantic_object,
+            objectId=objectId,
+            collection_name=collection_name,
+        )
         self.driver = driver
 
     async def save(self):
