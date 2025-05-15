@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pydongo"
-version = "0.2.0"
+version = "0.3.0"
 description = "A lightweight ORM for MongoDB using Pydantic models."
 authors = ["Samuel Abolo <ikabolo59@gmail.com>"]
 license = "MIT"
