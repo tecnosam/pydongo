@@ -368,6 +368,39 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="📥 Creating a Collection Interface">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-override-at-runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Override at runtime
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-use-pydantic-configdict" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Use Pydantic ConfigDict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-fallback-to-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Fallback to default
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -478,6 +511,28 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../indexing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MongoDB Indexing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -510,6 +565,39 @@
       📥 Creating a Collection Interface
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="📥 Creating a Collection Interface">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-override-at-runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Override at runtime
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-use-pydantic-configdict" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Use Pydantic ConfigDict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-fallback-to-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Fallback to default
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -626,6 +714,21 @@
 <span class="n">collection</span> <span class="o">=</span> <span class="n">as_collection</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
 </code></pre></div>
 <p>By default, the collection name is inferred from the model class (<code>User</code> → <code>"user"</code>).</p>
+<p>You can customize the collection name in three ways:</p>
+<h3 id="1-override-at-runtime">1. Override at runtime<a class="headerlink" href="#1-override-at-runtime" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="n">collection</span> <span class="o">=</span> <span class="n">as_collection</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">collection_name</span><span class="o">=</span><span class="s2">&quot;myusers&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="2-use-pydantic-configdict">2. Use Pydantic <code>ConfigDict</code><a class="headerlink" href="#2-use-pydantic-configdict" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigDict</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">age</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">collection_name</span><span class="o">=</span><span class="s2">&quot;customusers&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="3-fallback-to-default">3. Fallback to default<a class="headerlink" href="#3-fallback-to-default" title="Permanent link">&para;</a></h3>
+<p>If neither is set, the collection name is derived from the model class: <code>User</code> → <code>"users"</code>.</p>
 <hr />
 <h2 id="finding-documents">🔍 Finding Documents<a class="headerlink" href="#finding-documents" title="Permanent link">&para;</a></h2>
 <h3 id="find_one-sync"><code>.find_one()</code> (Sync)<a class="headerlink" href="#find_one-sync" title="Permanent link">&para;</a></h3>
@@ -721,6 +824,10 @@
 <li>Works for both sync and async workflows</li>
 <li>Returns <code>DocumentWorker</code>/<code>AsyncDocumentWorker</code> instances</li>
 <li>Supports fluent chaining and expressive filter logic</li>
+<li>Custom collection names can be set via:</li>
+<li><code>collection_name</code> argument</li>
+<li><code>model_config = ConfigDict(collection_name=...)</code></li>
+<li>Class name fallback</li>
 </ul>
 <p>Pydongo gives you clean Mongo-style querying with the structure of Pydantic — no inheritance, no decorators, just Python.</p>
 

@@ -9,10 +9,8 @@
       
       
       
-        <link rel="prev" href="../collections/">
+        <link rel="prev" href="../dsl-querying/">
       
-      
-        <link rel="next" href="../indexing/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -20,7 +18,7 @@
     
     
       
-        <title>Querying with the DSL - Pydongo</title>
+        <title>MongoDB Indexing - Pydongo</title>
       
     
     
@@ -70,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#using-the-query-dsl" class="md-skip">
+        <a href="#indexing-in-pydongo" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Querying with the DSL
+              MongoDB Indexing
             
           </span>
         </div>
@@ -331,6 +329,28 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../dsl-querying/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Querying with the DSL
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -348,7 +368,7 @@
   
   
   <span class="md-ellipsis">
-    Querying with the DSL
+    MongoDB Indexing
     
   </span>
   
@@ -361,7 +381,7 @@
   
   
   <span class="md-ellipsis">
-    Querying with the DSL
+    MongoDB Indexing
     
   </span>
   
@@ -384,45 +404,63 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#field-expressions" class="md-nav__link">
+  <a href="#basic-usage" class="md-nav__link">
     <span class="md-ellipsis">
-      📐 Field Expressions
+      🚀 Basic Usage
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#logical-composition" class="md-nav__link">
+  <a href="#compound-indexes" class="md-nav__link">
     <span class="md-ellipsis">
-      🔁 Logical Composition
+      🧱 Compound Indexes
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#array-field-expressions" class="md-nav__link">
+  <a href="#supported-index-types" class="md-nav__link">
     <span class="md-ellipsis">
-      📌 Array Field Expressions
+      🔍 Supported Index Types
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#nested-fields" class="md-nav__link">
+  <a href="#index-options" class="md-nav__link">
     <span class="md-ellipsis">
-      ⚙️ Nested Fields
+      ⚙️ Index Options
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#serialization" class="md-nav__link">
+  <a href="#automatic-index-type-inference" class="md-nav__link">
     <span class="md-ellipsis">
-      📤 Serialization
+      🪄 Automatic Index Type Inference
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-indexes" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧪 Testing Indexes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#index-creation-timing" class="md-nav__link">
+    <span class="md-ellipsis">
+      🛠 Index Creation Timing
     </span>
   </a>
   
@@ -441,28 +479,6 @@
   
 </nav>
       
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../indexing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    MongoDB Indexing
-    
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -494,45 +510,63 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#field-expressions" class="md-nav__link">
+  <a href="#basic-usage" class="md-nav__link">
     <span class="md-ellipsis">
-      📐 Field Expressions
+      🚀 Basic Usage
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#logical-composition" class="md-nav__link">
+  <a href="#compound-indexes" class="md-nav__link">
     <span class="md-ellipsis">
-      🔁 Logical Composition
+      🧱 Compound Indexes
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#array-field-expressions" class="md-nav__link">
+  <a href="#supported-index-types" class="md-nav__link">
     <span class="md-ellipsis">
-      📌 Array Field Expressions
+      🔍 Supported Index Types
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#nested-fields" class="md-nav__link">
+  <a href="#index-options" class="md-nav__link">
     <span class="md-ellipsis">
-      ⚙️ Nested Fields
+      ⚙️ Index Options
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#serialization" class="md-nav__link">
+  <a href="#automatic-index-type-inference" class="md-nav__link">
     <span class="md-ellipsis">
-      📤 Serialization
+      🪄 Automatic Index Type Inference
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-indexes" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧪 Testing Indexes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#index-creation-timing" class="md-nav__link">
+    <span class="md-ellipsis">
+      🛠 Index Creation Timing
     </span>
   </a>
   
@@ -563,102 +597,130 @@
 
 
 
-<h1 id="using-the-query-dsl">Using the Query DSL<a class="headerlink" href="#using-the-query-dsl" title="Permanent link">&para;</a></h1>
-<p>Pydongo's query engine is built on top of Python-native expressions, making MongoDB queries feel natural and type-safe using your Pydantic models.</p>
-<p>This page covers how to use <code>FieldExpression</code> and <code>CollectionFilterExpression</code> to write expressive, composable queries — without writing raw MongoDB dictionaries.</p>
+<h1 id="indexing-in-pydongo">Indexing in Pydongo<a class="headerlink" href="#indexing-in-pydongo" title="Permanent link">&para;</a></h1>
+<p>Pydongo supports expressive and declarative indexing to help you build performant MongoDB queries effortlessly. You can register single-field or compound indexes using a fluent builder-style API, or define them directly from your model's fields.</p>
 <hr />
-<h2 id="field-expressions">📐 Field Expressions<a class="headerlink" href="#field-expressions" title="Permanent link">&para;</a></h2>
-<p>Every field on your model becomes a <code>FieldExpression</code> in a collection:</p>
+<h2 id="basic-usage">🚀 Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h2>
+<p>To define and register indexes for your model:</p>
 <div class="highlight"><pre><span></span><code><span class="n">collection</span> <span class="o">=</span> <span class="n">as_collection</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
-<span class="n">collection</span><span class="o">.</span><span class="n">age</span>  <span class="c1"># FieldExpression</span>
+
+<span class="c1"># Defining a simple index on the field</span>
+<span class="n">collection</span><span class="o">.</span><span class="n">use_index</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">email</span><span class="o">.</span><span class="n">to_index</span><span class="p">())</span>
+
+<span class="c1"># Defining a unique index</span>
+<span class="n">index</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">email</span><span class="o">.</span><span class="n">as_index</span><span class="p">()</span><span class="o">.</span><span class="n">use_unique</span><span class="p">()</span><span class="o">.</span><span class="n">build_index</span><span class="p">()</span>
+<span class="n">collection</span><span class="o">.</span><span class="n">use_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
 </code></pre></div>
-<p>This enables query expressions like:</p>
-<div class="highlight"><pre><span></span><code><span class="n">collection</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">25</span>
-<span class="n">collection</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;Alice&quot;</span>
-<span class="n">collection</span><span class="o">.</span><span class="n">age</span> <span class="o">&lt;=</span> <span class="mi">60</span>
+<p>This creates a <strong>unique index</strong> on the <code>email</code> field.</p>
+<hr />
+<h2 id="compound-indexes">🧱 Compound Indexes<a class="headerlink" href="#compound-indexes" title="Permanent link">&para;</a></h2>
+<p>You can also create compound indexes by passing a tuple of <code>IndexExpression</code>s:</p>
+<div class="highlight"><pre><span></span><code><span class="n">index1</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">as_index</span><span class="p">()</span><span class="o">.</span><span class="n">use_sort_order</span><span class="p">(</span><span class="n">IndexSortOrder</span><span class="o">.</span><span class="n">ASCENDING</span><span class="p">)</span><span class="o">.</span><span class="n">build_index</span><span class="p">()</span>
+<span class="n">index2</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">email</span><span class="o">.</span><span class="n">as_index</span><span class="p">()</span><span class="o">.</span><span class="n">use_sort_order</span><span class="p">(</span><span class="n">IndexSortOrder</span><span class="o">.</span><span class="n">DESCENDING</span><span class="p">)</span><span class="o">.</span><span class="n">build_index</span><span class="p">()</span>
+
+<span class="n">collection</span><span class="o">.</span><span class="n">use_index</span><span class="p">((</span><span class="n">index1</span><span class="p">,</span> <span class="n">index2</span><span class="p">))</span>
 </code></pre></div>
-<p>You can use these in <code>.find()</code> or <code>.find_one()</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">)</span>
-<span class="n">collection</span><span class="o">.</span><span class="n">find_one</span><span class="p">((</span><span class="n">collection</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;Bob&quot;</span><span class="p">))</span>
+<p>This defines a compound index on <code>(name ASC, email DESC)</code>.</p>
+<hr />
+<h2 id="supported-index-types">🔍 Supported Index Types<a class="headerlink" href="#supported-index-types" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>ASCENDING</code> and <code>DESCENDING</code> (default if no type is set)</li>
+<li><code>TEXT</code> (automatically inferred for string fields)</li>
+<li><code>HASHED</code></li>
+<li><code>2d</code> (for legacy geospatial indexing)</li>
+<li><code>2dsphere</code> (for modern geospatial indexing)</li>
+</ul>
+<p>You can explicitly set index type:</p>
+<div class="highlight"><pre><span></span><code><span class="n">collection</span><span class="o">.</span><span class="n">bio</span><span class="o">.</span><span class="n">as_index</span><span class="p">()</span><span class="o">.</span><span class="n">use_index_type</span><span class="p">(</span><span class="n">IndexType</span><span class="o">.</span><span class="n">TEXT</span><span class="p">)</span><span class="o">.</span><span class="n">build_index</span><span class="p">()</span>
 </code></pre></div>
 <hr />
-<h2 id="logical-composition">🔁 Logical Composition<a class="headerlink" href="#logical-composition" title="Permanent link">&para;</a></h2>
-<p>All field expressions produce a <code>CollectionFilterExpression</code>, which can be composed:</p>
+<h2 id="index-options">⚙️ Index Options<a class="headerlink" href="#index-options" title="Permanent link">&para;</a></h2>
+<p>Pydongo supports the following MongoDB index options:</p>
 <table>
 <thead>
 <tr>
-<th>Operator</th>
-<th>Description</th>
+<th>Option</th>
+<th>Method</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>&amp;</code></td>
-<td>Logical AND</td>
+<td><code>Index Type</code></td>
+<td><code>.use_index_type(IndexType)</code></td>
 </tr>
 <tr>
-<td><code>|</code></td>
-<td>Logical OR</td>
+<td><code>sort order</code></td>
+<td><code>.use_sort_order(IndexSortOrder)</code></td>
 </tr>
 <tr>
-<td><code>~</code></td>
-<td>Logical NOT</td>
+<td><code>unique</code></td>
+<td><code>.use_unique()</code></td>
+</tr>
+<tr>
+<td><code>sparse</code></td>
+<td><code>.use_sparse()</code></td>
+</tr>
+<tr>
+<td><code>ttl</code></td>
+<td><code>.use_ttl(seconds)</code></td>
+</tr>
+<tr>
+<td><code>collation</code></td>
+<td><code>.use_collation(locale, strength)</code></td>
+</tr>
+<tr>
+<td><code>hidden</code></td>
+<td><code>.use_hidden()</code></td>
+</tr>
+<tr>
+<td><code>partial index</code></td>
+<td><code>.use_partial_expression()</code></td>
+</tr>
+<tr>
+<td><code>custom name</code></td>
+<td><code>.use_index_name("my_index")</code></td>
 </tr>
 </tbody>
 </table>
-<div class="highlight"><pre><span></span><code><span class="n">expr</span> <span class="o">=</span> <span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">18</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;Bob&quot;</span><span class="p">)</span>
-<span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="n">collection</span><span class="o">.</span><span class="n">email</span><span class="o">.</span><span class="n">as_index</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">use_unique</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">use_ttl</span><span class="p">(</span><span class="mi">3600</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">use_collation</span><span class="p">(</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">CollationStrength</span><span class="o">.</span><span class="n">SECONDARY</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">build_index</span><span class="p">()</span>
 </code></pre></div>
+<p>Note: TTL is not supported for <code>TEXT</code> and <code>HASHED</code> indexes.</p>
 <hr />
-<h2 id="array-field-expressions">📌 Array Field Expressions<a class="headerlink" href="#array-field-expressions" title="Permanent link">&para;</a></h2>
-<p>Array fields get additional operators via <code>ArrayFieldExpression</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-
-<span class="n">collection</span> <span class="o">=</span> <span class="n">as_collection</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
-<span class="n">collection</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;admin&quot;</span><span class="p">)</span>
-<span class="n">collection</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">excludes</span><span class="p">(</span><span class="s2">&quot;guest&quot;</span><span class="p">)</span>
-<span class="n">collection</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">matches</span><span class="p">([</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span> <span class="s2">&quot;moderator&quot;</span><span class="p">])</span>
-<span class="n">collection</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">2</span>
-</code></pre></div>
-<p>Supported:
-- <code>contains(value)</code> → <code>$in</code>
-- <code>excludes(value)</code> → <code>$nin</code>
-- <code>matches(list)</code> → <code>$all</code> or exact match
-- <code>size() &gt; 2</code> → <code>$expr: {$gt: [{$size: "$tags"}, 2]}</code></p>
+<h2 id="automatic-index-type-inference">🪄 Automatic Index Type Inference<a class="headerlink" href="#automatic-index-type-inference" title="Permanent link">&para;</a></h2>
+<p>When you call <code>.as_index()</code> on a field:
+- If the field is a <code>str</code>, it automatically uses <code>TEXT</code> index
+- Otherwise defaults to <code>ASCENDING</code></p>
+<p>You can override the default by calling <code>.use_index_type()</code> explicitly.</p>
 <hr />
-<h2 id="nested-fields">⚙️ Nested Fields<a class="headerlink" href="#nested-fields" title="Permanent link">&para;</a></h2>
-<p>You can access subfields using dot notation automatically:</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Address</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">city</span><span class="p">:</span> <span class="nb">str</span>
-
-<span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">address</span><span class="p">:</span> <span class="n">Address</span>
-
-<span class="n">collection</span> <span class="o">=</span> <span class="n">as_collection</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
-<span class="n">collection</span><span class="o">.</span><span class="n">address</span><span class="o">.</span><span class="n">city</span> <span class="o">==</span> <span class="s2">&quot;Lagos&quot;</span>
-</code></pre></div>
-<p>This will generate:
-<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;address.city&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;$eq&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Lagos&quot;</span><span class="p">}}</span>
+<h2 id="testing-indexes">🧪 Testing Indexes<a class="headerlink" href="#testing-indexes" title="Permanent link">&para;</a></h2>
+<p>To verify indexes are correctly registered, you can:</p>
+<ul>
+<li>Assert against <code>collection._indexes</code></li>
+<li>Check the contents of <code>driver.indexes[collection_name]</code></li>
+</ul>
+<p>Example:
+<div class="highlight"><pre><span></span><code><span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">_indexes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="k">assert</span> <span class="p">(</span><span class="n">index</span><span class="p">,)</span> <span class="ow">in</span> <span class="n">driver</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="n">collection</span><span class="o">.</span><span class="n">collection_name</span><span class="p">]</span>
 </code></pre></div></p>
 <hr />
-<h2 id="serialization">📤 Serialization<a class="headerlink" href="#serialization" title="Permanent link">&para;</a></h2>
-<p>All expressions can be turned into MongoDB queries via <code>.serialize()</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="n">expr</span> <span class="o">=</span> <span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">18</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;Alice&quot;</span><span class="p">)</span>
-<span class="n">query</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
-<span class="c1"># { &quot;$and&quot;: [{&quot;age&quot;: {&quot;$gt&quot;: 18}}, {&quot;name&quot;: {&quot;$eq&quot;: &quot;Alice&quot;}}] }</span>
-</code></pre></div>
+<h2 id="index-creation-timing">🛠 Index Creation Timing<a class="headerlink" href="#index-creation-timing" title="Permanent link">&para;</a></h2>
+<p>Indexes are lazily created when you call any terminal query method like:
+- <code>.count()</code>
+- <code>.exists()</code>
+- <code>.all()</code></p>
+<p>This ensures indexes are only created if actually used.</p>
 <hr />
 <h2 id="summary">✅ Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Use Python syntax for building MongoDB queries</li>
-<li>Supports scalar fields, arrays, and nested structures</li>
-<li>Output is always a valid MongoDB filter object</li>
-<li>Integrates seamlessly with <code>collection.find()</code>, <code>find_one()</code>, and <code>.count()</code></li>
-</ul>
-<p>Pydongo’s DSL gives you clean, powerful Mongo filters — without ever writing a manual <code>$and</code>, <code>$gt</code>, or <code>$in</code>.</p>
+<p>Pydongo gives you expressive control over MongoDB indexes with:
+- A fluent API
+- Full support for compound and special index types
+- Integration into both sync and async query flows</p>
+<p>Define them once, and they’ll be created just in time.</p>
 
 
 
