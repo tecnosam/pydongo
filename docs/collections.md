@@ -1,3 +1,4 @@
+
 # Working with Collections
 
 The `CollectionWorker` and its response builders provide a powerful yet intuitive API to query, filter, and iterate over documents in a MongoDB collection — all while keeping your data model as a clean Pydantic class.
@@ -24,6 +25,30 @@ collection = as_collection(User, driver)
 ```
 
 By default, the collection name is inferred from the model class (`User` → `"user"`).
+
+You can customize the collection name in three ways:
+
+### 1. Override at runtime
+
+```python
+collection = as_collection(User, driver, collection_name="myusers")
+```
+
+### 2. Use Pydantic `ConfigDict`
+
+```python
+from pydantic import ConfigDict
+
+class User(BaseModel):
+    name: str
+    age: int
+
+    model_config = ConfigDict(collection_name="customusers")
+```
+
+### 3. Fallback to default
+
+If neither is set, the collection name is derived from the model class: `User` → `"users"`.
 
 ---
 
@@ -119,5 +144,9 @@ for user in results:
 - Works for both sync and async workflows
 - Returns `DocumentWorker`/`AsyncDocumentWorker` instances
 - Supports fluent chaining and expressive filter logic
+- Custom collection names can be set via:
+  - `collection_name` argument
+  - `model_config = ConfigDict(collection_name=...)`
+  - Class name fallback
 
 Pydongo gives you clean Mongo-style querying with the structure of Pydantic — no inheritance, no decorators, just Python.

@@ -33,8 +33,13 @@ T = TypeVar("T", bound=BaseModel)
 def as_collection(
     pydantic_model: Type[T],
     driver: Union[AbstractSyncMongoDBDriver, AbstractAsyncMongoDBDriver],
+    collection_name: Optional[str] = None,
 ) -> "CollectionWorker":
-    return CollectionWorker(pydantic_model=pydantic_model, driver=driver)
+    return CollectionWorker(
+        pydantic_model=pydantic_model,
+        driver=driver,
+        collection_name=collection_name,
+    )
 
 
 class CollectionWorker(Generic[T]):
@@ -51,10 +56,12 @@ class CollectionWorker(Generic[T]):
         self,
         pydantic_model: Type[T],
         driver: Union[AbstractSyncMongoDBDriver, AbstractAsyncMongoDBDriver],
+        collection_name: Optional[str] = None,
     ):
         self.pydantic_model = pydantic_model
         self.driver = driver
         self._indexes: Set[Tuple[IndexExpression]] = set()
+        self.__collection_name = collection_name
 
         self.response_builder_class = (
             AsyncCollectionResponseBuilder
@@ -191,18 +198,23 @@ class CollectionWorker(Generic[T]):
         return FieldExpression.get_field_expression(name, annotation)
 
     @property
-    def collection_name(self):
+    def collection_name(self) -> str:
         """
         Derives the MongoDB collection name from the model or falls back to the class name.
 
         Returns:
             str: The name of the collection.
         """
-        if hasattr(self.pydantic_model, "collection_name"):
-            return self.pydantic_model.collection_name
 
-        # todo: find a nicer way to do this
-        return self.pydantic_model.__name__
+        if self.__collection_name is None:
+            self.__collection_name = str(
+                self.pydantic_model.model_config.get(
+                    "collection_name",
+                    self.pydantic_model.__name__.lower().rstrip("s") + "s",
+                )
+            )
+
+        return self.__collection_name
 
 
 class CollectionResponseBuilder(ABC, Generic[T]):
