@@ -1,30 +1,18 @@
-from pydantic import BaseModel
-from typing import List, Optional
+"""Test field expressions."""
+
+
+
 from pydongo.expressions.field import (
-    FieldExpression,
     ArrayFieldExpression,
     ArraySizeFieldExpression,
+    FieldExpression,
 )
 from pydongo.expressions.filter import CollectionFilterExpression
+from tests.resources import Friend, User
 
 
-class DummyModel(BaseModel):
-    name: str
-    age: int
-    tags: List[str]
-    friends: List["Friend"]
-
-
-class Friend(BaseModel):
-    username: str
-
-
-class User(BaseModel):
-    best_friend: Optional[Friend]
-    close_friend: Friend
-
-
-def test_comparative_operators_resolve_correct_queries():
+def test_comparative_operators_resolve_correct_queries() -> None:
+    """Test that comparative operators resolve to the correct MongoDB queries."""
     field = FieldExpression("age")
 
     eq_expr = (field == 30).serialize()
@@ -42,7 +30,8 @@ def test_comparative_operators_resolve_correct_queries():
     assert lte_expr == {"age": {"$lte": 65}}
 
 
-def test_nested_fields():
+def test_nested_fields() -> None:
+    """Test nested fields in field expressions."""
     parent = FieldExpression("friend", annotation=Friend)
     child = parent.username
     assert isinstance(child, FieldExpression)
@@ -60,15 +49,17 @@ def test_nested_fields():
     assert child.field_name == "user.best_friend.username"
 
 
-def test_array_field_size_expression():
-    tags = ArrayFieldExpression("tags", annotation=List[str])
+def test_array_field_size_expression() -> None:
+    """Test size expression on an array field."""
+    tags = ArrayFieldExpression("tags", annotation=list[str])
     size_expr = tags.size() > 2
     assert isinstance(size_expr, CollectionFilterExpression)
     assert size_expr.serialize() == {"$expr": {"$gt": [{"$size": "$tags"}, 2]}}
 
 
-def test_array_field_contains_and_excludes():
-    tags = ArrayFieldExpression("tags", annotation=List[str])
+def test_array_field_contains_and_excludes() -> None:
+    """Test contains and excludes expressions on an array field."""
+    tags = ArrayFieldExpression("tags", annotation=list[str])
     contains_expr = tags.contains("python")
     excludes_expr = tags.excludes("java")
 
@@ -76,8 +67,9 @@ def test_array_field_contains_and_excludes():
     assert excludes_expr.serialize() == {"tags": {"$nin": "java"}}
 
 
-def test_array_field_matches_with_and_without_order():
-    tags = ArrayFieldExpression("tags", annotation=List[str])
+def test_array_field_matches_with_and_without_order() -> None:
+    """Test matches expressions on an array field."""
+    tags = ArrayFieldExpression("tags", annotation=list[str])
     expr_ordered = tags.matches(["a", "b"], match_order=True)
     expr_unordered = tags.matches(["a", "b"], match_order=False)
 
@@ -85,8 +77,9 @@ def test_array_field_matches_with_and_without_order():
     assert expr_unordered.serialize() == {"tags": {"$all": ["a", "b"]}}
 
 
-def test_len_and_contains_sugar():
-    tags = ArrayFieldExpression("tags", annotation=List[str])
+def test_len_and_contains_sugar() -> None:
+    """Test length and contains sugar syntax."""
+    tags = ArrayFieldExpression("tags", annotation=list[str])
     assert isinstance(tags.size(), ArraySizeFieldExpression)
 
     expr = tags.contains("python")

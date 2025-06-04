@@ -1,48 +1,30 @@
+"""Test index creation."""
+
+from typing import Any
+
 import pytest
-from pydantic import BaseModel, Field
-from pydongo import as_collection
+
+from pydongo.drivers.mock import MockMongoDBDriver
 from pydongo.expressions.index import (
+    CollationStrength,
+    IndexExpression,
+    IndexExpressionBuilder,
     IndexSortOrder,
     IndexType,
-    CollationStrength,
-    IndexExpressionBuilder,
 )
-from pydongo.expressions.index import IndexExpression
-from pydongo.drivers.mock import MockMongoDBDriver
+from pydongo.workers.collection import CollectionWorker
 
 
-class DemoModel(BaseModel):
-    name: str
-    email: str
-    bio: str
-    hash_id: str
-    latlon: list[float] = Field(default_factory=lambda: [0.0, 0.0])
-    point: dict = Field(
-        default_factory=lambda: {"type": "Point", "coordinates": [0.0, 0.0]}
-    )
+def _assert_index_registered(collection: CollectionWorker, driver: MockMongoDBDriver, expected_count: int) -> None:
+    """Assert that the index is registered in the collection and driver."""
+    assert len(collection._indexes) == expected_count, ("Index should be registered in collection")
+    assert len(driver.indexes[collection.collection_name]) == expected_count, ("Driver should contain the index")
+    assert all(isinstance(ix, IndexExpression) for index in collection._indexes for ix in index)
 
 
-def _setup():
-    driver = MockMongoDBDriver()
-    driver.connect()
-    collection = as_collection(DemoModel, driver)
-    return collection, driver
-
-
-def _assert_index_registered(collection, driver, expected_count):
-    assert len(collection._indexes) == expected_count, (
-        "Index should be registered in collection"
-    )
-    assert len(driver.indexes[collection.collection_name]) == expected_count, (
-        "Driver should contain the index"
-    )
-    assert all(
-        isinstance(ix, IndexExpression) for index in collection._indexes for ix in index
-    )
-
-
-def test_single_key_index():
-    collection, driver = _setup()
+def test_single_key_index(setup: tuple[CollectionWorker[Any], MockMongoDBDriver]) -> None:
+    """Test creation of a single key index."""
+    collection, driver = setup
     index = collection.name.as_index().use_unique().build_index()
 
     assert isinstance(index, IndexExpression)
@@ -52,8 +34,9 @@ def test_single_key_index():
     _assert_index_registered(collection, driver, 1)
 
 
-def test_compound_index():
-    collection, driver = _setup()
+def test_compound_index(setup: tuple[CollectionWorker[Any], MockMongoDBDriver]) -> None:
+    """Test creation of a compound index with multiple fields."""
+    collection, driver = setup
 
     index1 = (
         collection.name.as_index()
@@ -78,8 +61,9 @@ def test_compound_index():
     assert len(compound) == 2
 
 
-def test_text_and_hash_index():
-    collection, driver = _setup()
+def test_text_and_hash_index(setup: tuple[CollectionWorker[Any], MockMongoDBDriver],) -> None:
+    """Test creation of text and hash indexes."""
+    collection, driver = setup
 
     text_index = collection.bio.as_index().use_index_type(IndexType.TEXT).build_index()
     hash_index = (
@@ -102,8 +86,9 @@ def test_text_and_hash_index():
     assert IndexType.HASHED in index_types
 
 
-def test_geo_index_types():
-    collection, driver = _setup()
+def test_geo_index_types(setup: tuple[CollectionWorker[Any], MockMongoDBDriver]) -> None:
+    """Test creation of 2D and 2D Sphere geo indexes."""
+    collection, driver = setup
 
     index_2d = (
         collection.latlon.as_index()
@@ -132,8 +117,9 @@ def test_geo_index_types():
     assert IndexType.TWO_DIMENSIONAL_SPHERE in index_types
 
 
-def test_index_with_special_kwargs():
-    collection, driver = _setup()
+def test_index_with_special_kwargs(setup: tuple[CollectionWorker[Any], MockMongoDBDriver]) -> None:
+    """Test creation of an index with special kwargs like unique, sparse, and collation."""
+    collection, driver = setup
 
     index = (
         collection.email.as_index()
@@ -161,7 +147,7 @@ def test_index_with_special_kwargs():
 
 
 @pytest.mark.parametrize(
-    "index_type, expect_ttl",
+    ("index_type", "expect_ttl"),
     [
         (IndexType.TEXT, False),
         (IndexType.HASHED, False),
@@ -170,7 +156,8 @@ def test_index_with_special_kwargs():
         (None, True),  # regular ascending/descending index
     ],
 )
-def test_ttl_behavior_for_text_and_other_index_types(index_type, expect_ttl):
+def test_ttl_behavior_for_text_and_other_index_types(index_type: IndexType, expect_ttl: bool) -> None:
+    """Test TTL behavior for different index types."""
     builder = IndexExpressionBuilder(field_name="test_field").use_ttl(3600)
 
     if index_type:
