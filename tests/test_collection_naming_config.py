@@ -1,24 +1,14 @@
-from pydantic import BaseModel, ConfigDict
-from pydongo import as_collection, as_document
+"""Test collection naming configuration."""
+
+
 from pydongo.drivers.mock import MockMongoDBDriver
+from pydongo.workers.collection import as_collection
+from pydongo.workers.document import as_document
+from tests.resources import User, UserWithModelConfig
 
 
-class UserWithModelConfig(BaseModel):
-
-    age: int = 19
-    n_likes: int = 0
-
-    model_config = ConfigDict(collection_name="customusers")
-
-
-class User(BaseModel):
-
-    age: int = 19
-    n_likes: int = 0
-
-
-def test_default_collection_name_set_correctly(driver):
-
+def test_default_collection_name_set_correctly(driver: MockMongoDBDriver) -> None:
+    """Test that the default collection name is set correctly for a Pydantic model."""
     expected_collection_name = "users"
 
     collection = as_collection(User, driver)
@@ -28,8 +18,8 @@ def test_default_collection_name_set_correctly(driver):
     assert document.collection_name == expected_collection_name
 
 
-def test_configured_collection_name_set_correctly(driver):
-
+def test_configured_collection_name_set_correctly(driver: MockMongoDBDriver) -> None:
+    """Test that the collection name set in the model config is used correctly."""
     expected_collection_name = "customusers"
     collection = as_collection(UserWithModelConfig, driver)
     assert collection.collection_name == expected_collection_name
@@ -38,16 +28,20 @@ def test_configured_collection_name_set_correctly(driver):
     assert document.collection_name == expected_collection_name
 
 
-def test_custom_collection_name_set_correctly(driver):
-
+def test_custom_collection_name_set_correctly(driver: MockMongoDBDriver) -> None:
+    """Test that a custom collection name can be set correctly."""
     collection_name = "myusers"
 
     collection = as_collection(User, driver=driver, collection_name=collection_name)
     assert collection.collection_name == collection_name
-    collection = as_collection(UserWithModelConfig, driver=driver, collection_name=collection_name)
+    collection = as_collection(
+        UserWithModelConfig, driver=driver, collection_name=collection_name
+    )
     assert collection.collection_name == collection_name
 
     document = as_document(User(), driver=driver, collection_name=collection_name)
     assert document.collection_name == collection_name
-    document = as_document(UserWithModelConfig(), driver=driver, collection_name=collection_name)
+    document = as_document(
+        UserWithModelConfig(), driver=driver, collection_name=collection_name
+    )
     assert document.collection_name == collection_name

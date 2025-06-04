@@ -1,21 +1,22 @@
+"""Test serializer utils."""
+
 import datetime
 import uuid
 
-from pydongo.utils.serializer import (
-    replace_unserializable_fields,
-)
+from pydongo.utils.serializer import replace_unserializable_fields
 
 
-def test_date_serialization():
-    today = datetime.date.today()
-    document = {"created_at": today}
+def test_date_serialization(current_date: datetime.date) -> None:
+    """Test serialization of datetime.date."""
+    document = {"created_at": current_date}
     serialized = replace_unserializable_fields(document.copy())
 
     assert isinstance(serialized["created_at"], datetime.datetime)
-    assert serialized["created_at"].date() == today
+    assert serialized["created_at"].date() == current_date
 
 
-def test_uuid_serialization():
+def test_uuid_serialization() -> None:
+    """Test serialization of UUID fields."""
     test_uuid = uuid.uuid4()
     document = {"id": test_uuid}
     serialized = replace_unserializable_fields(document.copy())
@@ -24,10 +25,11 @@ def test_uuid_serialization():
     assert serialized["id"] == str(test_uuid)
 
 
-def test_nested_serialization():
+def test_nested_serialization(current_date: datetime.date) -> None:
+    """Test serialization of nested fields with datetime and UUID."""
     data = {
         "meta": {
-            "created_at": datetime.date.today(),
+            "created_at": current_date,
             "uuid": uuid.uuid4(),
         },
         "tags": [uuid.uuid4(), uuid.uuid4()],

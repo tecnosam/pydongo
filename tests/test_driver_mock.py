@@ -1,9 +1,10 @@
-# tests/test_driver_mock.py
+"""Test driver mock functionality."""
 
 from pydongo.drivers.mock import MockMongoDBDriver
 
 
-def test_insert_and_find_one():
+def test_insert_and_find_one() -> None:
+    """Test inserting and finding a document."""
     driver = MockMongoDBDriver()
     driver.connect()
 
@@ -17,7 +18,8 @@ def test_insert_and_find_one():
     assert found["age"] == 30
 
 
-def test_update_and_delete():
+def test_update_and_delete() -> None:
+    """Test updating and deleting a document."""
     driver = MockMongoDBDriver()
     driver.connect()
 
