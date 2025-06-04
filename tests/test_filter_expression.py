@@ -17,9 +17,7 @@ def test_and_combines_two_expressions() -> None:
     expr2 = CollectionFilterExpression({"age": {"$gt": 20}})
     combined = expr1 & expr2
 
-    assert combined.serialize() == {
-        "$and": [{"name": {"$eq": "Alice"}}, {"age": {"$gt": 20}}]
-    }
+    assert combined.serialize() == {"$and": [{"name": {"$eq": "Alice"}}, {"age": {"$gt": 20}}]}
 
 
 def test_or_combines_two_expressions() -> None:
@@ -28,9 +26,7 @@ def test_or_combines_two_expressions() -> None:
     expr2 = CollectionFilterExpression({"name": {"$eq": "Bob"}})
     combined = expr1 | expr2
 
-    assert combined.serialize() == {
-        "$or": [{"name": {"$eq": "Alice"}}, {"name": {"$eq": "Bob"}}]
-    }
+    assert combined.serialize() == {"$or": [{"name": {"$eq": "Alice"}}, {"name": {"$eq": "Bob"}}]}
 
 
 def test_not_inverts_expression() -> None:

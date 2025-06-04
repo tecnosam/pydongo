@@ -40,7 +40,8 @@ def setup(driver: MockMongoDBDriver) -> tuple["CollectionWorker", MockMongoDBDri
 
 @pytest_asyncio.fixture
 async def setup_async_collection(
-    async_driver: MockAsyncMongoDBDriver) -> tuple[CollectionWorker[Any], MockAsyncMongoDBDriver]:
+    async_driver: MockAsyncMongoDBDriver,
+) -> tuple[CollectionWorker[Any], MockAsyncMongoDBDriver]:
     """."""
     # driver = MockAsyncMongoDBDriver()
     await async_driver.connect()

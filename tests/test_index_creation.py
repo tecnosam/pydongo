@@ -17,8 +17,8 @@ from pydongo.workers.collection import CollectionWorker
 
 def _assert_index_registered(collection: CollectionWorker, driver: MockMongoDBDriver, expected_count: int) -> None:
     """Assert that the index is registered in the collection and driver."""
-    assert len(collection._indexes) == expected_count, ("Index should be registered in collection")
-    assert len(driver.indexes[collection.collection_name]) == expected_count, ("Driver should contain the index")
+    assert len(collection._indexes) == expected_count, "Index should be registered in collection"
+    assert len(driver.indexes[collection.collection_name]) == expected_count, "Driver should contain the index"
     assert all(isinstance(ix, IndexExpression) for index in collection._indexes for ix in index)
 
 
@@ -38,16 +38,8 @@ def test_compound_index(setup: tuple[CollectionWorker[Any], MockMongoDBDriver]) 
     """Test creation of a compound index with multiple fields."""
     collection, driver = setup
 
-    index1 = (
-        collection.name.as_index()
-        .use_sort_order(IndexSortOrder.ASCENDING)
-        .build_index()
-    )
-    index2 = (
-        collection.email.as_index()
-        .use_sort_order(IndexSortOrder.DESCENDING)
-        .build_index()
-    )
+    index1 = collection.name.as_index().use_sort_order(IndexSortOrder.ASCENDING).build_index()
+    index2 = collection.email.as_index().use_sort_order(IndexSortOrder.DESCENDING).build_index()
 
     assert isinstance(index1, IndexExpression)
     assert isinstance(index2, IndexExpression)
@@ -61,14 +53,14 @@ def test_compound_index(setup: tuple[CollectionWorker[Any], MockMongoDBDriver]) 
     assert len(compound) == 2
 
 
-def test_text_and_hash_index(setup: tuple[CollectionWorker[Any], MockMongoDBDriver],) -> None:
+def test_text_and_hash_index(
+    setup: tuple[CollectionWorker[Any], MockMongoDBDriver],
+) -> None:
     """Test creation of text and hash indexes."""
     collection, driver = setup
 
     text_index = collection.bio.as_index().use_index_type(IndexType.TEXT).build_index()
-    hash_index = (
-        collection.hash_id.as_index().use_index_type(IndexType.HASHED).build_index()
-    )
+    hash_index = collection.hash_id.as_index().use_index_type(IndexType.HASHED).build_index()
 
     assert isinstance(text_index, IndexExpression)
     assert isinstance(hash_index, IndexExpression)
@@ -79,9 +71,7 @@ def test_text_and_hash_index(setup: tuple[CollectionWorker[Any], MockMongoDBDriv
 
     _assert_index_registered(collection, driver, 2)
 
-    index_types = [
-        ix[0].index_type for ix in driver.indexes[collection.collection_name]
-    ]
+    index_types = [ix[0].index_type for ix in driver.indexes[collection.collection_name]]
     assert IndexType.TEXT in index_types
     assert IndexType.HASHED in index_types
 
@@ -90,16 +80,8 @@ def test_geo_index_types(setup: tuple[CollectionWorker[Any], MockMongoDBDriver])
     """Test creation of 2D and 2D Sphere geo indexes."""
     collection, driver = setup
 
-    index_2d = (
-        collection.latlon.as_index()
-        .use_index_type(IndexType.TWO_DIMENSIONAL)
-        .build_index()
-    )
-    index_2dsphere = (
-        collection.point.as_index()
-        .use_index_type(IndexType.TWO_DIMENSIONAL_SPHERE)
-        .build_index()
-    )
+    index_2d = collection.latlon.as_index().use_index_type(IndexType.TWO_DIMENSIONAL).build_index()
+    index_2dsphere = collection.point.as_index().use_index_type(IndexType.TWO_DIMENSIONAL_SPHERE).build_index()
 
     assert isinstance(index_2d, IndexExpression)
     assert isinstance(index_2dsphere, IndexExpression)
@@ -110,9 +92,7 @@ def test_geo_index_types(setup: tuple[CollectionWorker[Any], MockMongoDBDriver])
 
     _assert_index_registered(collection, driver, 2)
 
-    index_types = [
-        ix[0].index_type for ix in driver.indexes[collection.collection_name]
-    ]
+    index_types = [ix[0].index_type for ix in driver.indexes[collection.collection_name]]
     assert IndexType.TWO_DIMENSIONAL in index_types
     assert IndexType.TWO_DIMENSIONAL_SPHERE in index_types
 

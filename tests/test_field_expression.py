@@ -1,7 +1,5 @@
 """Test field expressions."""
 
-
-
 from pydongo.expressions.field import (
     ArrayFieldExpression,
     ArraySizeFieldExpression,
