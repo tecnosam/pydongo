@@ -12,17 +12,17 @@ documentation = "https://tecnosam.github.io/pydongo/"
 keywords = ["mongodb", "pydantic", "orm", "async", "motor"]
 
 classifiers = [
-  "Development Status :: 4 - Beta",
-  "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
-  "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Topic :: Database",
-  "Topic :: Software Development :: Libraries",
-  "Typing :: Typed",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries",
+    "Typing :: Typed",
 ]
 
 ###   Ruff   ###
@@ -64,16 +64,14 @@ ignore = [
     "SIM118", # in-dict-keys
     "G004",   # logging-fstring-interpolation
     # "E501",   # line too long
-    "B008",   # do not perform function calls in argument defaults
-    "B904",   # Allow raising exceptions without from e, for HTTPException
+    "B008", # do not perform function calls in argument defaults
+    "B904", # Allow raising exceptions without from e, for HTTPException
 ]
 
 [tool.ruff.lint.per-file-ignores]
 # Ignore `E402` (import violations) in all `__init__.py` files.
-# "__init__.py" = ["E402"]
-
-# Ignore Mixed-case-variable-in-class-scope
-"app/factories/credit_info.py" = ["N815"]
+# Ignore `F401` (unused imports) in all `__init__.py` files
+"__init__.py" = ["E402", "F401"]
 
 # Ignore `D` rules everywhere except for the `src/` directory.
 # "!src/**.py" = ["D"]
@@ -133,7 +131,7 @@ warn_unreachable = true
 warn_unused_ignores = true
 disallow_subclassing_any = false
 plugins = "pydantic.mypy"
-exclude = [".venv", "alembic", ".pixi"]
+exclude = [".venv"]
 disable_error_code = ["union-attr", "misc"]
 
 [tool.pydantic-mypy] # https://pydantic-docs.helpmanual.io/mypy_plugin/#configuring-the-plugin

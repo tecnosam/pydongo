@@ -1,16 +1,12 @@
-from pydantic import BaseModel
-from pydongo import as_collection
+"""Test collection builder core functionality."""
+
 from pydongo.drivers.mock import MockMongoDBDriver
+from pydongo.workers.collection import as_collection
+from tests.resources import User
 
 
-class User(BaseModel):
-    name: str
-    age: int
-    joined: int
-
-
-def test_collection_builder_sort_limit_skip_multi_sort():
-    driver = MockMongoDBDriver()
+def test_collection_builder_sort_limit_skip_multi_sort(driver: MockMongoDBDriver) -> None:
+    """Test sorting, limiting, and skipping functionality."""
     driver.connect()
 
     collection = as_collection(User, driver)
@@ -40,8 +36,8 @@ def test_collection_builder_sort_limit_skip_multi_sort():
     assert kwargs4["offset"] == 3
 
 
-def test_collection_builder_null_state_defaults():
-    driver = MockMongoDBDriver()
+def test_collection_builder_null_state_defaults(driver: MockMongoDBDriver) -> None:
+    """Test that the collection builder defaults to no filters, sorts, limits, or skips."""
     driver.connect()
 
     collection = as_collection(User, driver)
