@@ -2,7 +2,7 @@
 set -e
 
 echo "🧹 Cleaning previous builds..."
-rm -rf dist/ build/ *.egg-info
+rm -rf dist/ build/ ./*.egg-info
 
 echo "🏗️  Building package..."
 uv build
