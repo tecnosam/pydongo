@@ -225,7 +225,7 @@ git push origin feat/awesome-feature
 
 We use:
 
-- [**ruff**](https://docs.astral.sh/ruff/) and [**pylint**](https://pylint.readthedocs.io/en/stable/) for linting and formatting
+- [**ruff**](https://docs.astral.sh/ruff/) for linting and formatting
 - [**mypy**](https://mypy-lang.org/) for type checking
 
 ---

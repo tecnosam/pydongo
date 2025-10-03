@@ -40,7 +40,6 @@ dev = [
     "mkdocs-material>=9.6.21",
     "mypy>=1.18.2",
     "poethepoet>=0.37.0",
-    "pylint>=3.3.8",
     "pymdown-extensions>=10.16.1",
     "pytest>=8.4.2",
     "pytest-asyncio>=1.2.0",
@@ -209,30 +208,6 @@ exclude = ["*.pyi", "*.ipynb"]
 
 #------------------------
 
-###   Pylint
-
-#------------------------
-
-###   Pylint   ###
-[tool.pylint]
-max-line-length = 120
-disable = """no-member"""
-
-[tool.pylint.similarities]
-# Default value is 4.
-min-similarity-lines = 100
-# Ignore comments when computing similarities.
-ignore-comments = true
-# Ignore docstrings when computing similarities.
-ignore-docstrings = true
-# Ignore imports when computing similarities.
-ignore-imports = true
-# Ignore signatures when computing similarities.
-ignore-signatures = true
-
-
-#------------------------
-
 ###   MyPy
 
 #------------------------
@@ -313,13 +288,12 @@ executor.type = "uv"
 _ruff_sort = "ruff check src/ tests/ --fix --select I"
 _ruff_lint = "ruff check src/ tests/ --fix"
 _ruff_fmt = "ruff format src/ tests/"
-_pylint_lint = "pylint src/ tests/"
 _type_check = "mypy src/ tests/"
 _coverage_test = "coverage run -m pytest tests/"
 _coverage_report = "coverage html -d coverage"
 
 # Call only below tasks!
-lint = ["_ruff_sort", "_ruff_lint", "_ruff_fmt", "_pylint_lint", "_type_check"]
+lint = ["_ruff_sort", "_ruff_lint", "_ruff_fmt", "_type_check"]
 test = ["_coverage_test", "_coverage_report"]
 
 
