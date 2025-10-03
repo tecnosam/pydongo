@@ -14,7 +14,7 @@ You can install Pydongo from PyPI using **pip** or **uv**:
 pip install pydongo
 ```
 
-**Using UV:**
+**Using uv:**
 
 ```bash
 uv add pydongo
