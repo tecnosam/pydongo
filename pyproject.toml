@@ -129,6 +129,7 @@ select = [
     "RUF",   # ruff-specific rules
 ]
 ignore = [
+    "ANN401", # allow-any-type
     "FIX",    # fixme, todo, hack, xxx
     "PTH123", # builtin-open
     "SIM118", # in-dict-keys
@@ -160,7 +161,7 @@ ignore = [
 force-single-line = true
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["D", "PT011", "S"]
+"tests/*" = ["D", "PT011", "S", "PLR2004"]
 
 # # Ignore `E402` (import violations) in all `__init__.py` files.
 # # Ignore `F401` (unused imports) in all `__init__.py` files
