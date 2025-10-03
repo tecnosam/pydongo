@@ -1,4 +1,3 @@
-
 name: Create GitHub Release
 
 on:
@@ -13,31 +12,63 @@ jobs:
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # Fetch all history for changelog generation
 
       - name: 🧰 Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: 🏷️ Get version from pyproject.toml
         id: get_version
         run: |
-          VERSION=$(grep '^version =' pyproject.toml | sed -E "s/.*\"(.*)\"/\\1/")
+          VERSION=$(grep -m 1 '^version = ' pyproject.toml | sed -E 's/version = "(.*)"/\1/')
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Version: $VERSION"
+
+      - name: 🔍 Check if tag exists
+        id: check_tag
+        run: |
+          if git rev-parse "v${{ steps.get_version.outputs.VERSION }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "⚠️  Tag v${{ steps.get_version.outputs.VERSION }} already exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "✅ Tag v${{ steps.get_version.outputs.VERSION }} does not exist"
+          fi
 
       - name: 📝 Generate Changelog
+        if: steps.check_tag.outputs.exists == 'false'
         id: changelog
         run: |
-          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
-          git log --pretty=format:"* %s" --no-merges $(git describe --tags --abbrev=0)..HEAD >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          # Get the latest tag, or use initial commit if no tags exist
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)
+          echo "Generating changelog from $LATEST_TAG to HEAD"
+
+          {
+            echo "CHANGELOG<<EOF"
+            echo "## What's Changed"
+            echo ""
+            git log --pretty=format:"* %s (%h)" --no-merges $LATEST_TAG..HEAD
+            echo ""
+            echo ""
+            echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/$LATEST_TAG...v${{ steps.get_version.outputs.VERSION }}"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
 
       - name: 🚀 Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.get_version.outputs.VERSION }}
           name: Release v${{ steps.get_version.outputs.VERSION }}
           body: ${{ steps.changelog.outputs.CHANGELOG }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: ⏭️ Skip Release
+        if: steps.check_tag.outputs.exists == 'true'
+        run: |
+          echo "::notice::Release v${{ steps.get_version.outputs.VERSION }} already exists. Skipping release creation."

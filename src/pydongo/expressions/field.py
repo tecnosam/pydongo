@@ -1,20 +1,23 @@
-from typing import Any, Iterable, get_args, get_origin, Sequence, Set
+from collections.abc import Iterable
+from collections.abc import Sequence
+from typing import Any
+from typing import Set
+from typing import get_args
+from typing import get_origin
 
 from pydantic import BaseModel
+
 from pydongo.expressions.filter import CollectionFilterExpression
-from pydongo.expressions.index import (
-    IndexExpression,
-    IndexSortOrder,
-    IndexType,
-    IndexExpressionBuilder,
-)
+from pydongo.expressions.index import IndexExpression
+from pydongo.expressions.index import IndexExpressionBuilder
+from pydongo.expressions.index import IndexSortOrder
+from pydongo.expressions.index import IndexType
 from pydongo.utils.annotations import resolve_annotation
 from pydongo.utils.serializer import HANDLER_MAPPING
 
 
 class FieldExpression:
-    """
-    Represents a scalar field in a MongoDB query.
+    """Represents a scalar field in a MongoDB query.
 
     This class supports operator overloading to build query expressions using:
         ==, !=, >, >=, <, <=
@@ -23,8 +26,7 @@ class FieldExpression:
     """
 
     def __init__(self, field_name: str, annotation=None, sort_ascending: bool = True):
-        """
-        Initialize a field expression.
+        """Initialize a field expression.
 
         Args:
             field_name (str): The full dot-path name of the field.
@@ -36,23 +38,19 @@ class FieldExpression:
         self.sort_ascending = sort_ascending
 
     def to_index(self) -> IndexExpression:
-        """
-        Returns a complete, ready-to-use `IndexExpression` for this field.
+        """Returns a complete, ready-to-use `IndexExpression` for this field.
 
         This is a convenience method for quickly generating a basic index configuration
         using the default sort order and inferred index type (e.g., TEXT for strings).
         """
-
         return self.as_index().build_index()
 
     def as_index(self) -> IndexExpressionBuilder:
-        """
-        Returns an `IndexExpressionBuilder` initialized with this field.
+        """Returns an `IndexExpressionBuilder` initialized with this field.
 
         This allows users to customize the index further, such as adding uniqueness,
         TTL, collation, or partial filter expressions—before building the final index object.
         """
-
         sort_order = (
             IndexSortOrder.ASCENDING
             if self.sort_ascending
@@ -71,8 +69,7 @@ class FieldExpression:
         return builder
 
     def _get_comparative_expression(self, operator: str, value: Any) -> dict:
-        """
-        Build a MongoDB filter expression using the given operator and value.
+        """Build a MongoDB filter expression using the given operator and value.
 
         Args:
             operator (str): MongoDB comparison operator (e.g., "$gt").
@@ -87,13 +84,13 @@ class FieldExpression:
 
         return {self.field_name: {operator: value}}
 
-    def __eq__(self, other: Any) -> "CollectionFilterExpression":  # type: ignore
+    def __eq__(self, other: object) -> "CollectionFilterExpression":  # type: ignore
         """Build an equality expression (`==`)."""
         return CollectionFilterExpression().with_expression(
             self._get_comparative_expression("$eq", other)
         )
 
-    def __ne__(self, other: Any) -> "CollectionFilterExpression":  # type: ignore
+    def __ne__(self, other: object) -> "CollectionFilterExpression":  # type: ignore
         """Build an inequality expression (`!=`)."""
         return CollectionFilterExpression().with_expression(
             self._get_comparative_expression("$ne", other)
@@ -124,8 +121,7 @@ class FieldExpression:
         )
 
     def __neg__(self) -> "FieldExpression":
-        """
-        Flip the default sort order.
+        """Flip the default sort order.
 
         Returns:
             FieldExpression: A new instance with reversed sort order.
@@ -142,8 +138,7 @@ class FieldExpression:
         return self._field_name
 
     def __getattr__(self, name: str) -> "FieldExpression":
-        """
-        Support for chained dot notation, e.g. `user.address.city`.
+        """Support for chained dot notation, e.g. `user.address.city`.
 
         Args:
             name (str): Subfield name.
@@ -155,8 +150,7 @@ class FieldExpression:
 
     @classmethod
     def _getattr(cls, field_name: str, annotation: Any, name: str) -> "FieldExpression":
-        """
-        Helper to resolve nested fields.
+        """Helper to resolve nested fields.
 
         Args:
             field_name (str): Current field name path.
@@ -191,15 +185,13 @@ class FieldExpression:
 
 
 class ArraySizeFieldExpression(FieldExpression):
-    """
-    Represents an expression for the size of an array field.
+    """Represents an expression for the size of an array field.
 
     Used for queries like: `len(User.tags) > 2`
     """
 
     def _get_comparative_expression(self, operator: str, value: int) -> dict:
-        """
-        Build a MongoDB `$expr` query comparing the size of an array.
+        """Build a MongoDB `$expr` query comparing the size of an array.
 
         Args:
             operator (str): Comparison operator (e.g., "$gt").
@@ -212,15 +204,13 @@ class ArraySizeFieldExpression(FieldExpression):
 
 
 class ArrayFieldExpression(FieldExpression):
-    """
-    Represents an array field in a MongoDB document.
+    """Represents an array field in a MongoDB document.
 
     Adds support for array-specific operations like `.contains()`, `.size()`, and `.matches()`.
     """
 
     def size(self) -> ArraySizeFieldExpression:
-        """
-        Get an expression that targets the array's length.
+        """Get an expression that targets the array's length.
 
         Returns:
             ArraySizeFieldExpression: An expression targeting the array's size.
@@ -230,8 +220,7 @@ class ArrayFieldExpression(FieldExpression):
     def matches(
         self, values: Iterable[Any], match_order: bool = False
     ) -> CollectionFilterExpression:
-        """
-        Check if the array exactly matches the provided values.
+        """Check if the array exactly matches the provided values.
 
         Args:
             values (Iterable[Any]): Values to match against.
@@ -249,8 +238,7 @@ class ArrayFieldExpression(FieldExpression):
         return CollectionFilterExpression().with_expression(expression)
 
     def contains(self, value: Any) -> CollectionFilterExpression:
-        """
-        Check if the array contains one or more values.
+        """Check if the array contains one or more values.
 
         Args:
             value (Any): A scalar or iterable to check presence for.
@@ -262,8 +250,7 @@ class ArrayFieldExpression(FieldExpression):
         return CollectionFilterExpression().with_expression(expression)
 
     def excludes(self, value: Any) -> CollectionFilterExpression:
-        """
-        Check if the array excludes one or more values.
+        """Check if the array excludes one or more values.
 
         Args:
             value (Any): A scalar or iterable to check absence for.
@@ -275,8 +262,7 @@ class ArrayFieldExpression(FieldExpression):
         return CollectionFilterExpression().with_expression(expression)
 
     def __getattr__(self, name: str) -> FieldExpression:
-        """
-        Support accessing subfields within an array of objects.
+        """Support accessing subfields within an array of objects.
 
         Args:
             name (str): Name of the subfield.
@@ -295,8 +281,7 @@ class ArrayFieldExpression(FieldExpression):
         return self._getattr(self.field_name, element_type, name)
 
     def __len__(self) -> ArraySizeFieldExpression:
-        """
-        Return an expression for the array's size (using `len()`).
+        """Return an expression for the array's size (using `len()`).
 
         Returns:
             ArraySizeFieldExpression: Expression targeting array length.
@@ -304,8 +289,7 @@ class ArrayFieldExpression(FieldExpression):
         return self.size()
 
     def __contains__(self, value: Any) -> CollectionFilterExpression:
-        """
-        Python-style containment check using `in` syntax.
+        """Python-style containment check using `in` syntax.
 
         Args:
             value (Any): Element to check for.

@@ -1,10 +1,11 @@
 """Test collection naming configuration."""
 
 
-from pydongo.drivers.mock import MockMongoDBDriver
-from pydongo.workers.collection import as_collection
-from pydongo.workers.document import as_document
-from tests.resources import User, UserWithModelConfig
+from src.pydongo.drivers.mock import MockMongoDBDriver
+from src.pydongo.workers.collection import as_collection
+from src.pydongo.workers.document import as_document
+from tests.resources import User
+from tests.resources import UserWithModelConfig
 
 
 def test_default_collection_name_set_correctly(driver: MockMongoDBDriver) -> None:

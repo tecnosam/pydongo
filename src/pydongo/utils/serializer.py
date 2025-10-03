@@ -1,18 +1,18 @@
 import datetime
-
-from typing import Any, Mapping, TypeVar
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
+from collections.abc import Mapping
+from typing import Any
+from typing import TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel
-
 
 T = TypeVar("T", bound=BaseModel)
 
 
 class BaseTypeSerializer(ABC):
-    """
-    Abstract base class for type serializers.
+    """Abstract base class for type serializers.
 
     Implementations define how to convert values to and from MongoDB-compatible types.
     """
@@ -20,8 +20,7 @@ class BaseTypeSerializer(ABC):
     @staticmethod
     @abstractmethod
     def serialize(value: Any) -> Any:
-        """
-        Convert a Python value into a MongoDB-storable format.
+        """Convert a Python value into a MongoDB-storable format.
 
         Args:
             value (Any): The value to serialize.
@@ -33,8 +32,7 @@ class BaseTypeSerializer(ABC):
     @staticmethod
     @abstractmethod
     def deserialize(value: Any) -> Any:
-        """
-        Convert a MongoDB-stored value back to a Python-native type.
+        """Convert a MongoDB-stored value back to a Python-native type.
 
         Args:
             value (Any): The value to deserialize.
@@ -45,16 +43,14 @@ class BaseTypeSerializer(ABC):
 
 
 class DateSerializer(BaseTypeSerializer):
-    """
-    Serializer for converting `datetime.date` to `datetime.datetime`.
+    """Serializer for converting `datetime.date` to `datetime.datetime`.
 
     Ensures compatibility with MongoDB, which only supports datetime objects.
     """
 
     @staticmethod
     def serialize(value: datetime.date) -> datetime.datetime:
-        """
-        Serialize a `date` object into a UTC `datetime` object.
+        """Serialize a `date` object into a UTC `datetime` object.
 
         Args:
             value (datetime.date): The date to serialize.
@@ -66,8 +62,7 @@ class DateSerializer(BaseTypeSerializer):
 
     @staticmethod
     def deserialize(value: datetime.datetime) -> datetime.date:
-        """
-        Deserialize a `datetime` object back into a `date`.
+        """Deserialize a `datetime` object back into a `date`.
 
         Args:
             value (datetime.datetime): The datetime to convert.
@@ -79,14 +74,12 @@ class DateSerializer(BaseTypeSerializer):
 
 
 class UUIDSerializer(BaseTypeSerializer):
-    """
-    Serializer for UUIDs, converting them to and from strings.
+    """Serializer for UUIDs, converting them to and from strings.
     """
 
     @staticmethod
     def serialize(value: UUID) -> str:
-        """
-        Convert a UUID to a string for MongoDB storage.
+        """Convert a UUID to a string for MongoDB storage.
 
         Args:
             value (UUID): The UUID to serialize.
@@ -98,8 +91,7 @@ class UUIDSerializer(BaseTypeSerializer):
 
     @staticmethod
     def deserialize(value: str) -> UUID:
-        """
-        Convert a string back into a UUID object.
+        """Convert a string back into a UUID object.
 
         Args:
             value (str): UUID string.
@@ -117,8 +109,7 @@ HANDLER_MAPPING: Mapping[Any, BaseTypeSerializer] = {
 
 
 def replace_unserializable_fields(document: dict) -> dict:
-    """
-    Recursively replaces values in a document that are not MongoDB-compatible
+    """Recursively replaces values in a document that are not MongoDB-compatible
     with serialized equivalents, using registered type handlers.
 
     Args:
@@ -146,8 +137,7 @@ def replace_unserializable_fields(document: dict) -> dict:
 
 
 def restore_unserializable_fields(document: dict) -> dict:
-    """
-    Recursively attempts to deserialize known types in a document.
+    """Recursively attempts to deserialize known types in a document.
 
     NOTE: This is a basic placeholder strategy — it applies all registered deserializers
     without knowing the intended field type. This can result in incorrect types.

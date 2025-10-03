@@ -10,7 +10,7 @@ Your help is greatly appreciated, whether it's fixing bugs, improving documentat
 To contribute to Pydongo, you'll need:
 
 - Python 3.9 or higher
-- [Poetry](https://python-poetry.org/) for dependency management
+- [uv](https://docs.astral.sh/uv/) for dependency management
 - MongoDB (optional — unit tests can run without it using the built-in mock driver)
 
 ```bash
@@ -19,7 +19,7 @@ git clone https://github.com/tecnosam/pydongo.git
 cd pydongo
 
 # Install dependencies
-poetry install
+uv sync
 ```
 
 ---
@@ -119,13 +119,13 @@ Again, if conflicts arise, try and resolve them and continue the rebase.
 - Before committing, make sure to run the tests and check code style:
 
 ```bash
-poetry run poe lint
+uv run poe lint
 ```
 
 This will run all the linters, formatters, and type checkers.
 
 ```bash
-poetry run poe test
+uv run poe test
 ```
 
 This will run all the tests.

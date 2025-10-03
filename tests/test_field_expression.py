@@ -1,12 +1,11 @@
 """Test field expressions."""
 
-from pydongo.expressions.field import (
-    ArrayFieldExpression,
-    ArraySizeFieldExpression,
-    FieldExpression,
-)
-from pydongo.expressions.filter import CollectionFilterExpression
-from tests.resources import Friend, User
+from src.pydongo.expressions.field import ArrayFieldExpression
+from src.pydongo.expressions.field import ArraySizeFieldExpression
+from src.pydongo.expressions.field import FieldExpression
+from src.pydongo.expressions.filter import CollectionFilterExpression
+from tests.resources import Friend
+from tests.resources import User
 
 
 def test_comparative_operators_resolve_correct_queries() -> None:

@@ -1,10 +1,10 @@
 from typing import Optional
+
 from pydongo.expressions.base import BaseExpression
 
 
 class CollectionFilterExpression(BaseExpression):
-    """
-    Represents a boolean filter expression used to query a MongoDB collection.
+    """Represents a boolean filter expression used to query a MongoDB collection.
 
     These expressions are composable using:
         - Logical OR (`|`)
@@ -20,8 +20,7 @@ class CollectionFilterExpression(BaseExpression):
     """
 
     def __init__(self, expression: Optional[dict] = None):
-        """
-        Initialize the filter expression with an optional initial dictionary.
+        """Initialize the filter expression with an optional initial dictionary.
 
         Args:
             expression (Optional[dict]): A MongoDB-style query dictionary.
@@ -30,8 +29,7 @@ class CollectionFilterExpression(BaseExpression):
         self.expression = expression or {}
 
     def with_expression(self, expression: dict) -> "CollectionFilterExpression":
-        """
-        Mutate the internal expression by merging in a new dictionary.
+        """Mutate the internal expression by merging in a new dictionary.
 
         Args:
             expression (dict): A MongoDB-style query to merge into the current expression.
@@ -43,8 +41,7 @@ class CollectionFilterExpression(BaseExpression):
         return self
 
     def serialize(self) -> dict:
-        """
-        Serialize the filter expression into a MongoDB-compatible query object.
+        """Serialize the filter expression into a MongoDB-compatible query object.
 
         Returns:
             dict: Serialized MongoDB query.
@@ -54,8 +51,7 @@ class CollectionFilterExpression(BaseExpression):
     def __and__(
         self, other: "CollectionFilterExpression"
     ) -> "CollectionFilterExpression":
-        """
-        Combine this filter with another using a logical AND.
+        """Combine this filter with another using a logical AND.
 
         Args:
             other (CollectionFilterExpression): Another filter to combine with.
@@ -69,8 +65,7 @@ class CollectionFilterExpression(BaseExpression):
     def __or__(
         self, other: "CollectionFilterExpression"
     ) -> "CollectionFilterExpression":
-        """
-        Combine this filter with another using a logical OR.
+        """Combine this filter with another using a logical OR.
 
         Args:
             other (CollectionFilterExpression): Another filter to combine with.
@@ -82,8 +77,7 @@ class CollectionFilterExpression(BaseExpression):
         return CollectionFilterExpression(expression=expression)
 
     def __invert__(self) -> "CollectionFilterExpression":
-        """
-        Invert the current filter using a logical NOT.
+        """Invert the current filter using a logical NOT.
 
         Returns:
             CollectionFilterExpression: A new filter expression wrapped in `$not`.

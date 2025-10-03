@@ -6,7 +6,7 @@
 
 ## Installation
 
-You can install Pydongo from PyPI using **pip** or **Poetry**:
+You can install Pydongo from PyPI using **pip** or **uv**:
 
 **Using pip:**
 
@@ -14,10 +14,10 @@ You can install Pydongo from PyPI using **pip** or **Poetry**:
 pip install pydongo
 ```
 
-**Using Poetry:**
+**Using UV:**
 
 ```bash
-poetry add pydongo
+uv add pydongo
 ```
 
 Pydongo requires Python 3.9+ and will automatically install dependencies like **pymongo** (for sync use) and **motor** (for async use).

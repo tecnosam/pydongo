@@ -1,7 +1,7 @@
 """Test collection builder core functionality."""
 
-from pydongo.drivers.mock import MockMongoDBDriver
-from pydongo.workers.collection import as_collection
+from src.pydongo.drivers.mock import MockMongoDBDriver
+from src.pydongo.workers.collection import as_collection
 from tests.resources import User
 
 

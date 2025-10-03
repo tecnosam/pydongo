@@ -1,24 +1,26 @@
 import uuid
-
 from collections import defaultdict
-from typing import List, Dict, Any, Optional, Tuple
 from copy import deepcopy
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
 
-from pydongo.drivers.base import AbstractSyncMongoDBDriver, AbstractAsyncMongoDBDriver
+from pydongo.drivers.base import AbstractAsyncMongoDBDriver
+from pydongo.drivers.base import AbstractSyncMongoDBDriver
 from pydongo.expressions.index import IndexExpression
 
 
 class MockMongoDBDriver(AbstractSyncMongoDBDriver):
-    """
-    In-memory mock implementation of the AbstractSyncMongoDBDriver.
+    """In-memory mock implementation of the AbstractSyncMongoDBDriver.
 
     This mock driver mimics MongoDB behavior for unit testing without requiring
     a real database connection. Data is stored in-memory in Python dictionaries.
     """
 
     def __init__(self, connection_string: str = "", database_name: str = "mockdb"):
-        """
-        Initialize the mock driver with an empty in-memory store.
+        """Initialize the mock driver with an empty in-memory store.
 
         Args:
             connection_string (str): Ignored.
@@ -26,11 +28,10 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
         """
         super().__init__(connection_string, database_name)
         self._collections: Dict[str, List[Dict[str, Any]]] = {}
-        self.indexes: defaultdict = defaultdict(lambda: [])
+        self.indexes: defaultdict = defaultdict(list)
 
     def connect(self) -> bool:
-        """
-        Simulate a successful connection.
+        """Simulate a successful connection.
 
         Returns:
             bool: Always True.
@@ -38,14 +39,10 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
         return True
 
     def close(self) -> None:
-        """
-        Close the connection (noop for the mock driver).
-        """
-        pass
+        """Close the connection (noop for the mock driver)."""
 
-    def insert_one(self, collection: str, document: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Insert a document into the in-memory collection.
+    def insert_one(self, collection: str, document: dict[str, Any]) -> dict[str, Any]:
+        """Insert a document into the in-memory collection.
 
         Args:
             collection (str): Name of the collection.
@@ -59,11 +56,8 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
         self._collections.setdefault(collection, []).append(document)
         return {"inserted_id": document["_id"]}
 
-    def insert_many(
-        self, collection: str, documents: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
-        """
-        Insert multiple documents into the in-memory collection.
+    def insert_many(self, collection: str, documents: list[dict[str, Any]]) -> dict[str, Any]:
+        """Insert multiple documents into the in-memory collection.
 
         Args:
             collection (str): Name of the collection.
@@ -78,11 +72,8 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
             inserted_ids.append(inserted["inserted_id"])
         return {"inserted_ids": inserted_ids}
 
-    def find_one(
-        self, collection: str, query: Dict[str, Any]
-    ) -> Optional[Dict[str, Any]]:
-        """
-        Find a single document matching the query.
+    def find_one(self, collection: str, query: dict[str, Any]) -> Optional[dict[str, Any]]:
+        """Find a single document matching the query.
 
         Args:
             collection (str): Name of the collection.
@@ -99,13 +90,12 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
     def find_many(
         self,
         collection: str,
-        query: Dict[str, Any],
-        sort_criteria: Dict[str, Any],
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-    ) -> List[Dict[str, Any]]:
-        """
-        Find multiple documents matching the query.
+        query: dict[str, Any],
+        sort_criteria: dict[str, Any],
+        offset: int | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Find multiple documents matching the query.
 
         Args:
             collection (str): Name of the collection.
@@ -127,17 +117,17 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
     def update_one(
         self,
         collection: str,
-        query: Dict[str, Any],
-        update: Dict[str, Any],
+        query: dict[str, Any],
+        update: dict[str, Any],
         upsert: bool = False,
-    ) -> Dict[str, Any]:
-        """
-        Update a single document matching the query.
+    ) -> dict[str, Any]:
+        """Update a single document matching the query.
 
         Args:
             collection (str): Name of the collection.
             query (dict): Filter query.
             update (dict): Update operations (only supports "$set").
+            upsert (bool): Whether to insert a new document if no match is found.
 
         Returns:
             dict: Update result with matched and modified count.
@@ -149,8 +139,7 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
         return {"matched_count": 0, "modified_count": 0, "upserted_id": None}
 
     def delete_one(self, collection: str, query: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Delete the first document matching the query.
+        """Delete the first document matching the query.
 
         Args:
             collection (str): Name of the collection.
@@ -166,9 +155,8 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
                 return {"deleted_count": 1}
         return {"deleted_count": 0}
 
-    def count(self, collection: str, query: Dict[str, Any]) -> int:
-        """
-        Count documents that match the query.
+    def count(self, collection: str, query: dict[str, Any]) -> int:
+        """Count documents that match the query.
 
         Args:
             collection (str): Name of the collection.
@@ -183,9 +171,8 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
             if all(doc.get(k) == v for k, v in query.items())
         )
 
-    def exists(self, collection: str, query: Dict[str, Any]) -> bool:
-        """
-        Check if at least one document matches the query.
+    def exists(self, collection: str, query: dict[str, Any]) -> bool:
+        """Check if at least one document matches the query.
 
         Args:
             collection (str): Name of the collection.
@@ -199,9 +186,8 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
             for doc in self._collections.get(collection, [])
         )
 
-    def create_index(self, collection: str, index: Tuple[IndexExpression]):
-        """
-        Create an index on a collection in the MongoDB Database
+    def create_index(self, collection: str, index: Tuple[IndexExpression]) -> None:
+        """Create an index on a collection in the MongoDB Database.
 
         Args:
             collection (str): The collection name.
@@ -211,33 +197,29 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
                 not multiple indexes
 
         """
-
         self.indexes[collection].append(index)
 
 
 class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
-    """
-    In-memory mock implementation of the AbstractAsyncMongoDBDriver.
+    """In-memory mock implementation of the AbstractAsyncMongoDBDriver.
 
     This async mock mirrors the behavior of MongoDB using native async/await
     and an in-memory store. Ideal for use in async unit tests.
     """
 
     def __init__(self, connection_string: str = "", database_name: str = "mockdb"):
-        """
-        Initialize the async mock with an in-memory store.
+        """Initialize the async mock with an in-memory store.
 
         Args:
             connection_string (str): Ignored.
             database_name (str): Mock database name.
         """
         super().__init__(connection_string, database_name)
-        self._collections: Dict[str, List[Dict[str, Any]]] = {}
-        self.indexes: defaultdict = defaultdict(lambda: [])
+        self._collections: dict[str, list[dict[str, Any]]] = {}
+        self.indexes: defaultdict = defaultdict(list)
 
     async def connect(self) -> bool:
-        """
-        Simulate async connection success.
+        """Simulate async connection success.
 
         Returns:
             bool: Always True.
@@ -245,16 +227,10 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
         return True
 
     async def close(self) -> None:
-        """
-        Simulate async close (noop).
-        """
-        pass
+        """Simulate async close (noop)."""
 
-    async def insert_one(
-        self, collection: str, document: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Asynchronously insert a document into the mock store.
+    async def insert_one(self, collection: str, document: dict[str, Any]) -> dict[str, Any]:
+        """Asynchronously insert a document into the mock store.
 
         Args:
             collection (str): Collection name.
@@ -268,11 +244,8 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
         self._collections.setdefault(collection, []).append(document)
         return {"inserted_id": document["_id"]}
 
-    async def insert_many(
-        self, collection: str, documents: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
-        """
-        Asynchronously insert multiple documents.
+    async def insert_many(self, collection: str, documents: list[dict[str, Any]]) -> dict[str, Any]:
+        """Asynchronously insert multiple documents.
 
         Args:
             collection (str): Collection name.
@@ -287,11 +260,8 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
             inserted_ids.append(inserted["inserted_id"])
         return {"inserted_ids": inserted_ids}
 
-    async def find_one(
-        self, collection: str, query: Dict[str, Any]
-    ) -> Optional[Dict[str, Any]]:
-        """
-        Asynchronously find a single matching document.
+    async def find_one(self, collection: str, query: dict[str, Any]) -> Optional[dict[str, Any]]:
+        """Asynchronously find a single matching document.
 
         Args:
             collection (str): Collection name.
@@ -308,13 +278,12 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
     async def find_many(
         self,
         collection: str,
-        query: Dict[str, Any],
-        sort_criteria: Dict[str, Any],
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-    ) -> List[Dict[str, Any]]:
-        """
-        Asynchronously return a list of matching documents.
+        query: dict[str, Any],
+        sort_criteria: dict[str, Any],
+        offset: int | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Asynchronously return a list of matching documents.
 
         Args:
             collection (str): Collection name.
@@ -336,12 +305,11 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
     async def update_one(
         self,
         collection: str,
-        query: Dict[str, Any],
-        update: Dict[str, Any],
+        query: dict[str, Any],
+        update: dict[str, Any],
         upsert: bool = False,
-    ) -> Dict[str, Any]:
-        """
-        Asynchronously update a single matching document.
+    ) -> dict[str, Any]:
+        """Asynchronously update a single matching document.
 
         Args:
             collection (str): Collection name.
@@ -357,11 +325,8 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
                 return {"matched_count": 1, "modified_count": 1, "upserted_id": None}
         return {"matched_count": 0, "modified_count": 0, "upserted_id": None}
 
-    async def delete_one(
-        self, collection: str, query: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Asynchronously delete a single matching document.
+    async def delete_one(self, collection: str, query: dict[str, Any]) -> dict[str, Any]:
+        """Asynchronously delete a single matching document.
 
         Args:
             collection (str): Collection name.
@@ -377,9 +342,8 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
                 return {"deleted_count": 1}
         return {"deleted_count": 0}
 
-    async def count(self, collection: str, query: Dict[str, Any]) -> int:
-        """
-        Asynchronously count matching documents.
+    async def count(self, collection: str, query: dict[str, Any]) -> int:
+        """Asynchronously count matching documents.
 
         Args:
             collection (str): Collection name.
@@ -394,9 +358,8 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
             if all(doc.get(k) == v for k, v in query.items())
         )
 
-    async def exists(self, collection: str, query: Dict[str, Any]) -> bool:
-        """
-        Asynchronously check if any document matches the filter.
+    async def exists(self, collection: str, query: dict[str, Any]) -> bool:
+        """Asynchronously check if any document matches the filter.
 
         Args:
             collection (str): Collection name.
@@ -410,17 +373,15 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
             for doc in self._collections.get(collection, [])
         )
 
-    async def create_index(self, collection: str, index: Tuple[IndexExpression]):
-        """
-        Create an index on a collection in the MongoDB Database
+    async def create_index(self, collection: str, index: tuple[IndexExpression]) -> None:
+        """Create an index on a collection in the MongoDB Database.
 
         Args:
             collection (str): The collection name.
             index (tuple[IndexExpression]):
                 A tuple of IndexExpression objects representing the index to create
-                NOTE: Muiltiple elements in tuple indicate a single compound index
+                NOTE: Multiple elements in tuple indicate a single compound index
                 not multiple indexes
 
         """
-
         self.indexes[collection].append(index)

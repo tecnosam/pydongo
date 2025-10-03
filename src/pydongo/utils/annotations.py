@@ -1,9 +1,13 @@
-from typing import Annotated, Any, Optional, Union, get_args, get_origin
+from typing import Annotated
+from typing import Any
+from typing import Optional
+from typing import Union
+from typing import get_args
+from typing import get_origin
 
 
 def resolve_annotation(annotation: Any) -> Any:
-    """
-    Helper function to resolve actual data types from Optional, Union, or Annotated wrappers.
+    """Helper function to resolve actual data types from Optional, Union, or Annotated wrappers.
 
     Args:
         annotation (Any): Type annotation from the Pydantic model.

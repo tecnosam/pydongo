@@ -1,6 +1,6 @@
 """Test driver mock functionality."""
 
-from pydongo.drivers.mock import MockMongoDBDriver
+from src.pydongo.drivers.mock import MockMongoDBDriver
 
 
 def test_insert_and_find_one() -> None:

@@ -6,10 +6,12 @@ from typing import Any
 import pytest
 import pytest_asyncio
 
-from pydongo import as_collection
-from pydongo.drivers.mock import MockAsyncMongoDBDriver, MockMongoDBDriver
-from pydongo.workers.collection import CollectionWorker
-from tests.resources import AsyncDemoModel, DemoModel
+from src.pydongo import as_collection
+from src.pydongo.drivers.mock import MockAsyncMongoDBDriver
+from src.pydongo.drivers.mock import MockMongoDBDriver
+from src.pydongo.workers.collection import CollectionWorker
+from tests.resources import AsyncDemoModel
+from tests.resources import DemoModel
 
 
 @pytest.fixture
@@ -27,7 +29,7 @@ def async_driver() -> MockAsyncMongoDBDriver:
 @pytest.fixture
 def current_date() -> datetime.date:
     """Fixture to provide the current date."""
-    return datetime.date.today()
+    return datetime.datetime.now(tz=datetime.timezone.utc).date()
 
 
 @pytest.fixture

@@ -4,14 +4,12 @@ from typing import Any
 
 import pytest
 
-from pydongo.drivers.mock import MockAsyncMongoDBDriver
-from pydongo.expressions.index import (
-    CollationStrength,
-    IndexExpression,
-    IndexSortOrder,
-    IndexType,
-)
-from pydongo.workers.collection import CollectionWorker
+from src.pydongo.drivers.mock import MockAsyncMongoDBDriver
+from src.pydongo.expressions.index import CollationStrength
+from src.pydongo.expressions.index import IndexExpression
+from src.pydongo.expressions.index import IndexSortOrder
+from src.pydongo.expressions.index import IndexType
+from src.pydongo.workers.collection import CollectionWorker
 
 
 def _assert_index_registered(

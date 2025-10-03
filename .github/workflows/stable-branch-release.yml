@@ -6,64 +6,58 @@ on:
       - stable
 
 jobs:
-  test:
-    name: Run Tests, Lint, Mypy, and Coverage
+  quality-checks:
+    name: 🧪 Quality Checks
     runs-on: ubuntu-latest
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: ⚙️ Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: 📦 Install Poetry
-        uses: abatilo/actions-poetry@v3
+      - name: 📦 Set up uv
+        uses: astral-sh/setup-uv@v6
         with:
-          poetry-version: "1.8.2"
+          enable-cache: true
 
       - name: 🔧 Install dependencies
-        run: poetry install
-
-      - name: ✅ Run Pytest
-        run: poetry run pytest
+        run: uv sync --frozen
 
       - name: 🧹 Run Ruff Linter
-        run: poetry run ruff check .
+        run: uv run poe lint
 
-      - name: 🔍 Run Mypy
-        run: poetry run mypy pydongo
+      - name: ✅ Run Pytest
+        run: uv run poe test
 
   release:
     name: 🚀 Publish to PyPI
-    needs: test
+    needs: quality-checks
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/stable'
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: ⚙️ Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: 📦 Install Poetry
-        uses: abatilo/actions-poetry@v3
+      - name: 📦 Set up uv
+        uses: astral-sh/setup-uv@v6
         with:
-          poetry-version: "1.8.2"
+          enable-cache: true
 
-      - name: 🔧 Install dependencies
-        run: poetry install
-
-      - name: 🗝 Set up PyPI token
-        run: poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
+      - name: 🏗️ Build package
+        run: uv build
 
       - name: 🚀 Publish to PyPI
-        run: poetry publish --build
+        run: uv publish --token ${{ secrets.PYPI_API_TOKEN }}
 
   docs:
     name: 📘 Deploy Documentation
@@ -73,16 +67,20 @@ jobs:
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: ⚙️ Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: 📦 Install dependencies for docs
-        run: |
-          pip install mkdocs mkdocs-material pymdown-extensions
+      - name: 📦 Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: 🔧 Install dependencies
+        run: uv sync --frozen
 
       - name: 🚀 Deploy to GitHub Pages
-        run: mkdocs gh-deploy --force
+        run: uv run mkdocs gh-deploy --force

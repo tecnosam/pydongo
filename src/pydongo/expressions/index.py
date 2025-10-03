@@ -1,5 +1,8 @@
-from typing import Optional, Any
-from enum import Enum, IntEnum
+from enum import Enum
+from enum import IntEnum
+from typing import Any
+from typing import Optional
+
 from pydongo.expressions.base import BaseExpression
 from pydongo.expressions.filter import CollectionFilterExpression
 
@@ -66,11 +69,9 @@ class IndexExpression(BaseExpression):
         return {self.field_name: self.sort_order}
 
     def build_kwargs(self) -> dict:
-        """
-        Additional specifications for the index to be passed to MongoDB's create_index.
+        """Additional specifications for the index to be passed to MongoDB's create_index.
         Only includes non-null values.
         """
-
         kwargs: dict[str, Any] = {}
 
         if self.index_name:
@@ -132,7 +133,7 @@ class IndexExpression(BaseExpression):
                 and self.serialize() == expr.serialize()
             )
 
-        elif isinstance(expr, str):
+        if isinstance(expr, str):
             return self.field_name == expr
         return False
 
