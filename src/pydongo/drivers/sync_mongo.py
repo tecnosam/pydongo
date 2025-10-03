@@ -1,7 +1,6 @@
 from collections.abc import Iterable
 from typing import Any
 from typing import Optional
-from typing import Tuple
 
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
@@ -41,7 +40,7 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
             self.db = self.client[self.database_name]
             return True
         except PyMongoError as e:
-            raise RuntimeError(f"Failed to connect to MongoDB: {e}")
+            raise RuntimeError(f"Failed to connect to MongoDB: {e}") from e
 
     def close(self) -> None:
         """Close the MongoDB connection."""
@@ -181,7 +180,7 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
         """
         return self.db[collection].count_documents(query, limit=1) > 0
 
-    def create_index(self, collection: str, index: Tuple[IndexExpression]) -> None:
+    def create_index(self, collection: str, index: tuple[IndexExpression]) -> None:
         """Create an index on a collection in the MongoDB Database.
 
         Args:

@@ -2,10 +2,7 @@ import uuid
 from collections import defaultdict
 from copy import deepcopy
 from typing import Any
-from typing import Dict
-from typing import List
 from typing import Optional
-from typing import Tuple
 
 from pydongo.drivers.base import AbstractAsyncMongoDBDriver
 from pydongo.drivers.base import AbstractSyncMongoDBDriver
@@ -27,7 +24,7 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
             database_name (str): Name of the fake database.
         """
         super().__init__(connection_string, database_name)
-        self._collections: Dict[str, List[Dict[str, Any]]] = {}
+        self._collections: dict[str, list[dict[str, Any]]] = {}
         self.indexes: defaultdict = defaultdict(list)
 
     def connect(self) -> bool:
@@ -91,7 +88,7 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
         self,
         collection: str,
         query: dict[str, Any],
-        sort_criteria: dict[str, Any],
+        sort_criteria: dict[str, Any],  # noqa: ARG002
         offset: int | None = None,
         limit: int | None = None,
     ) -> list[dict[str, Any]]:
@@ -119,7 +116,7 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
         collection: str,
         query: dict[str, Any],
         update: dict[str, Any],
-        upsert: bool = False,
+        upsert: bool = False,  # noqa: ARG002
     ) -> dict[str, Any]:
         """Update a single document matching the query.
 
@@ -138,7 +135,7 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
                 return {"matched_count": 1, "modified_count": 1, "upserted_id": None}
         return {"matched_count": 0, "modified_count": 0, "upserted_id": None}
 
-    def delete_one(self, collection: str, query: Dict[str, Any]) -> Dict[str, Any]:
+    def delete_one(self, collection: str, query: dict[str, Any]) -> dict[str, Any]:
         """Delete the first document matching the query.
 
         Args:
@@ -165,11 +162,7 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
         Returns:
             int: Number of matching documents.
         """
-        return sum(
-            1
-            for doc in self._collections.get(collection, [])
-            if all(doc.get(k) == v for k, v in query.items())
-        )
+        return sum(1 for doc in self._collections.get(collection, []) if all(doc.get(k) == v for k, v in query.items()))
 
     def exists(self, collection: str, query: dict[str, Any]) -> bool:
         """Check if at least one document matches the query.
@@ -181,12 +174,9 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
         Returns:
             bool: True if at least one document matches.
         """
-        return any(
-            all(doc.get(k) == v for k, v in query.items())
-            for doc in self._collections.get(collection, [])
-        )
+        return any(all(doc.get(k) == v for k, v in query.items()) for doc in self._collections.get(collection, []))
 
-    def create_index(self, collection: str, index: Tuple[IndexExpression]) -> None:
+    def create_index(self, collection: str, index: tuple[IndexExpression]) -> None:
         """Create an index on a collection in the MongoDB Database.
 
         Args:
@@ -279,7 +269,7 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
         self,
         collection: str,
         query: dict[str, Any],
-        sort_criteria: dict[str, Any],
+        sort_criteria: dict[str, Any],  # noqa: ARG002
         offset: int | None = None,
         limit: int | None = None,
     ) -> list[dict[str, Any]]:
@@ -307,7 +297,7 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
         collection: str,
         query: dict[str, Any],
         update: dict[str, Any],
-        upsert: bool = False,
+        upsert: bool = False,  # noqa: ARG002
     ) -> dict[str, Any]:
         """Asynchronously update a single matching document.
 
@@ -315,6 +305,7 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
             collection (str): Collection name.
             query (dict): Filter.
             update (dict): Update expression.
+            upsert (bool): Whether to insert if no match found.
 
         Returns:
             dict: Update result.
@@ -352,11 +343,7 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
         Returns:
             int: Number of matches.
         """
-        return sum(
-            1
-            for doc in self._collections.get(collection, [])
-            if all(doc.get(k) == v for k, v in query.items())
-        )
+        return sum(1 for doc in self._collections.get(collection, []) if all(doc.get(k) == v for k, v in query.items()))
 
     async def exists(self, collection: str, query: dict[str, Any]) -> bool:
         """Asynchronously check if any document matches the filter.
@@ -368,10 +355,7 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
         Returns:
             bool: True if at least one match exists.
         """
-        return any(
-            all(doc.get(k) == v for k, v in query.items())
-            for doc in self._collections.get(collection, [])
-        )
+        return any(all(doc.get(k) == v for k, v in query.items()) for doc in self._collections.get(collection, []))
 
     async def create_index(self, collection: str, index: tuple[IndexExpression]) -> None:
         """Create an index on a collection in the MongoDB Database.

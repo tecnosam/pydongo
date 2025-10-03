@@ -48,9 +48,7 @@ class CollectionFilterExpression(BaseExpression):
         """
         return self.expression
 
-    def __and__(
-        self, other: "CollectionFilterExpression"
-    ) -> "CollectionFilterExpression":
+    def __and__(self, other: "CollectionFilterExpression") -> "CollectionFilterExpression":
         """Combine this filter with another using a logical AND.
 
         Args:
@@ -62,9 +60,7 @@ class CollectionFilterExpression(BaseExpression):
         expression = {"$and": [self.expression, other.expression]}
         return CollectionFilterExpression(expression=expression)
 
-    def __or__(
-        self, other: "CollectionFilterExpression"
-    ) -> "CollectionFilterExpression":
+    def __or__(self, other: "CollectionFilterExpression") -> "CollectionFilterExpression":
         """Combine this filter with another using a logical OR.
 
         Args:

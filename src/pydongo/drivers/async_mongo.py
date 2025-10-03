@@ -1,6 +1,5 @@
 from collections.abc import Iterable
 from typing import Any
-from typing import List
 from typing import Optional
 
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -41,7 +40,7 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
             self.db = self.client[self.database_name]
             return True
         except PyMongoError as e:
-            raise RuntimeError(f"Failed to connect to MongoDB: {e}")
+            raise RuntimeError(f"Failed to connect to MongoDB: {e}") from e
 
     async def close(self) -> None:
         """Asynchronously close the MongoDB connection."""
@@ -117,7 +116,7 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
         if limit is not None:
             cursor = cursor.limit(limit)
 
-        return cursor  # type: ignore
+        return cursor
 
     async def update_one(
         self,
@@ -191,7 +190,7 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
                 NOTE: Multiple elements in the tuple indicate a single compound index,
                 not multiple separate indexes.
         """
-        index_key: List[tuple] = []
+        index_key: list[tuple] = []
         final_kwargs = {}
 
         for expr in index:

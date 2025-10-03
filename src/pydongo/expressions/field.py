@@ -1,7 +1,6 @@
 from collections.abc import Iterable
 from collections.abc import Sequence
 from typing import Any
-from typing import Set
 from typing import get_args
 from typing import get_origin
 
@@ -25,7 +24,7 @@ class FieldExpression:
     It also supports nested attribute access (e.g., user.address.city).
     """
 
-    def __init__(self, field_name: str, annotation=None, sort_ascending: bool = True):
+    def __init__(self, field_name: str, annotation: Any = None, sort_ascending: bool = True) -> None:
         """Initialize a field expression.
 
         Args:
@@ -51,15 +50,9 @@ class FieldExpression:
         This allows users to customize the index further, such as adding uniqueness,
         TTL, collation, or partial filter expressions—before building the final index object.
         """
-        sort_order = (
-            IndexSortOrder.ASCENDING
-            if self.sort_ascending
-            else IndexSortOrder.DESCENDING
-        )
+        sort_order = IndexSortOrder.ASCENDING if self.sort_ascending else IndexSortOrder.DESCENDING
 
-        builder = IndexExpressionBuilder(field_name=self.field_name).use_sort_order(
-            sort_order=sort_order
-        )
+        builder = IndexExpressionBuilder(field_name=self.field_name).use_sort_order(sort_order=sort_order)
 
         datatype = get_origin(self.annotation) or self.annotation
 
@@ -84,41 +77,29 @@ class FieldExpression:
 
         return {self.field_name: {operator: value}}
 
-    def __eq__(self, other: object) -> "CollectionFilterExpression":  # type: ignore
+    def __eq__(self, other: object) -> "CollectionFilterExpression":
         """Build an equality expression (`==`)."""
-        return CollectionFilterExpression().with_expression(
-            self._get_comparative_expression("$eq", other)
-        )
+        return CollectionFilterExpression().with_expression(self._get_comparative_expression("$eq", other))
 
-    def __ne__(self, other: object) -> "CollectionFilterExpression":  # type: ignore
+    def __ne__(self, other: object) -> "CollectionFilterExpression":
         """Build an inequality expression (`!=`)."""
-        return CollectionFilterExpression().with_expression(
-            self._get_comparative_expression("$ne", other)
-        )
+        return CollectionFilterExpression().with_expression(self._get_comparative_expression("$ne", other))
 
     def __gt__(self, other: Any) -> "CollectionFilterExpression":
         """Build a greater-than expression (`>`)."""
-        return CollectionFilterExpression().with_expression(
-            self._get_comparative_expression("$gt", other)
-        )
+        return CollectionFilterExpression().with_expression(self._get_comparative_expression("$gt", other))
 
     def __ge__(self, other: Any) -> "CollectionFilterExpression":
         """Build a greater-than-or-equal expression (`>=`)."""
-        return CollectionFilterExpression().with_expression(
-            self._get_comparative_expression("$gte", other)
-        )
+        return CollectionFilterExpression().with_expression(self._get_comparative_expression("$gte", other))
 
     def __lt__(self, other: Any) -> "CollectionFilterExpression":
         """Build a less-than expression (`<`)."""
-        return CollectionFilterExpression().with_expression(
-            self._get_comparative_expression("$lt", other)
-        )
+        return CollectionFilterExpression().with_expression(self._get_comparative_expression("$lt", other))
 
     def __le__(self, other: Any) -> "CollectionFilterExpression":
         """Build a less-than-or-equal expression (`<=`)."""
-        return CollectionFilterExpression().with_expression(
-            self._get_comparative_expression("$lte", other)
-        )
+        return CollectionFilterExpression().with_expression(self._get_comparative_expression("$lte", other))
 
     def __neg__(self) -> "FieldExpression":
         """Flip the default sort order.
@@ -133,7 +114,7 @@ class FieldExpression:
         )
 
     @property
-    def field_name(self):
+    def field_name(self) -> str:
         """The full field name, including nested paths if applicable."""
         return self._field_name
 
@@ -167,9 +148,7 @@ class FieldExpression:
         field_name = ".".join((field_name, name))
 
         if not issubclass(annotation, BaseModel):
-            raise AttributeError(
-                f"'{annotation.__name__}' is not an object but a scalar value"
-            )
+            raise AttributeError(f"'{annotation.__name__}' is not an object but a scalar value")
         if name not in annotation.model_fields:
             raise AttributeError(f"'{annotation.__name__}' has no field named '{name}'")
 
@@ -178,8 +157,9 @@ class FieldExpression:
 
     @staticmethod
     def get_field_expression(field_name: str, annotation: Any) -> "FieldExpression":
+        """Factory method to return the appropriate FieldExpression subclass."""
         dtype = get_origin(annotation) or annotation
-        if isinstance(dtype, type) and issubclass(dtype, (Sequence, Set)):  # type: ignore
+        if isinstance(dtype, type) and issubclass(dtype, (Sequence, set)):
             return ArrayFieldExpression(field_name, annotation=annotation)
         return FieldExpression(field_name, annotation=annotation)
 
@@ -217,9 +197,7 @@ class ArrayFieldExpression(FieldExpression):
         """
         return ArraySizeFieldExpression(self.field_name, self.annotation)
 
-    def matches(
-        self, values: Iterable[Any], match_order: bool = False
-    ) -> CollectionFilterExpression:
+    def matches(self, values: Iterable[Any], match_order: bool = False) -> CollectionFilterExpression:
         """Check if the array exactly matches the provided values.
 
         Args:
@@ -230,9 +208,7 @@ class ArrayFieldExpression(FieldExpression):
             CollectionFilterExpression: MongoDB `$all` or exact match query.
         """
         if match_order:
-            return CollectionFilterExpression().with_expression(
-                {self.field_name: list(values)}
-            )
+            return CollectionFilterExpression().with_expression({self.field_name: list(values)})
 
         expression = {self.field_name: {"$all": list(values)}}
         return CollectionFilterExpression().with_expression(expression)

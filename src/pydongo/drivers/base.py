@@ -2,15 +2,15 @@ import contextvars
 from abc import ABC
 from abc import abstractmethod
 from collections.abc import Iterable
+from types import TracebackType
 from typing import Any
 from typing import Optional
 from typing import Self
-from typing import Tuple
 
 from pydongo.expressions.index import IndexExpression
 
 
-class AbstractMongoDBDriver(ABC):
+class AbstractMongoDBDriver(ABC):  # noqa: B024
     """Abstract base class for MongoDB drivers."""
 
 
@@ -21,9 +21,7 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
     to the currently active driver instance via contextvars.
     """
 
-    _current: contextvars.ContextVar["AbstractSyncMongoDBDriver"] = (
-        contextvars.ContextVar("mongo_driver_current")
-    )
+    _current: contextvars.ContextVar["AbstractSyncMongoDBDriver"] = contextvars.ContextVar("mongo_driver_current")
 
     def __init__(self, connection_string: str, database_name: str):
         """Initialize the MongoDB driver with a connection string and database name.
@@ -41,7 +39,9 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         self._token = self._current.set(self)
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(
+        self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None
+    ) -> None:
         """Exit the context manager, close the connection, and reset the driver context."""
         self.close()
         self._current.reset(self._token)
@@ -58,8 +58,8 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         """
         try:
             return cls._current.get()
-        except LookupError:
-            raise RuntimeError("No active MongoDBDriver context found")
+        except LookupError as e:
+            raise RuntimeError("No active MongoDBDriver context found") from e
 
     @abstractmethod
     def connect(self) -> bool:
@@ -86,9 +86,7 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         """
 
     @abstractmethod
-    def insert_many(
-        self, collection: str, documents: list[dict[str, Any]]
-    ) -> dict[str, Any]:
+    def insert_many(self, collection: str, documents: list[dict[str, Any]]) -> dict[str, Any]:
         """Insert multiple documents into the specified collection.
 
         Args:
@@ -100,9 +98,7 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         """
 
     @abstractmethod
-    def find_one(
-        self, collection: str, query: dict[str, Any]
-    ) -> Optional[dict[str, Any]]:
+    def find_one(self, collection: str, query: dict[str, Any]) -> Optional[dict[str, Any]]:
         """Find a single document matching the query.
 
         Args:
@@ -192,7 +188,7 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         """
 
     @abstractmethod
-    def create_index(self, collection: str, index: Tuple[IndexExpression]) -> None:
+    def create_index(self, collection: str, index: tuple[IndexExpression]) -> None:
         """Create an index on a collection in the MongoDB Database.
 
         Args:
@@ -210,9 +206,7 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
     to the currently active driver instance via contextvars.
     """
 
-    _current: contextvars.ContextVar["AbstractAsyncMongoDBDriver"] = (
-        contextvars.ContextVar("mongo_driver_current")
-    )
+    _current: contextvars.ContextVar["AbstractAsyncMongoDBDriver"] = contextvars.ContextVar("mongo_driver_current")
 
     def __init__(self, connection_string: str, database_name: str):
         """Initialize the MongoDB driver with a connection string and database name.
@@ -230,7 +224,9 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         self._token = self._current.set(self)
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
+    async def __aexit__(
+        self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None
+    ) -> None:
         """Exit the async context manager, close the connection, and reset the driver context."""
         await self.close()
         self._current.reset(self._token)
@@ -247,8 +243,8 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         """
         try:
             return cls._current.get()
-        except LookupError:
-            raise RuntimeError("No active MongoDBDriver context found")
+        except LookupError as e:
+            raise RuntimeError("No active MongoDBDriver context found") from e
 
     @abstractmethod
     async def connect(self) -> bool:

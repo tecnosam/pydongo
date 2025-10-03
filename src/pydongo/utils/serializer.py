@@ -74,8 +74,7 @@ class DateSerializer(BaseTypeSerializer):
 
 
 class UUIDSerializer(BaseTypeSerializer):
-    """Serializer for UUIDs, converting them to and from strings.
-    """
+    """Serializer for UUIDs, converting them to and from strings."""
 
     @staticmethod
     def serialize(value: UUID) -> str:
@@ -109,8 +108,9 @@ HANDLER_MAPPING: Mapping[Any, BaseTypeSerializer] = {
 
 
 def replace_unserializable_fields(document: dict) -> dict:
-    """Recursively replaces values in a document that are not MongoDB-compatible
-    with serialized equivalents, using registered type handlers.
+    """Recursively replaces values in a document that are not MongoDB-compatible.
+
+    With serialized equivalents, using registered type handlers.
 
     Args:
         document (dict): The original document to sanitize.
