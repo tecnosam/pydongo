@@ -3,7 +3,7 @@
 import datetime
 import uuid
 
-from src.pydongo.utils.serializer import replace_unserializable_fields
+from pydongo.utils.serializer import replace_unserializable_fields
 
 
 def test_date_serialization(current_date: datetime.date) -> None:

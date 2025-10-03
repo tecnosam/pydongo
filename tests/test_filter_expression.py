@@ -1,6 +1,6 @@
 """Test filter expressions."""
 
-from src.pydongo.expressions.filter import CollectionFilterExpression
+from pydongo.expressions.filter import CollectionFilterExpression
 
 
 def test_with_expression_merges_dict() -> None:

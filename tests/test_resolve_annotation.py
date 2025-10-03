@@ -4,7 +4,7 @@ from typing import Annotated
 from typing import Optional
 from typing import Union
 
-from src.pydongo.utils.annotations import resolve_annotation
+from pydongo.utils.annotations import resolve_annotation
 
 
 def test_resolve_annotation_union() -> None:

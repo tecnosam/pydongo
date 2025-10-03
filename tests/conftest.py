@@ -6,10 +6,10 @@ from typing import Any
 import pytest
 import pytest_asyncio
 
-from src.pydongo import as_collection
-from src.pydongo.drivers.mock import MockAsyncMongoDBDriver
-from src.pydongo.drivers.mock import MockMongoDBDriver
-from src.pydongo.workers.collection import CollectionWorker
+from pydongo import as_collection
+from pydongo.drivers.mock import MockAsyncMongoDBDriver
+from pydongo.drivers.mock import MockMongoDBDriver
+from pydongo.workers.collection import CollectionWorker
 from tests.resources import AsyncDemoModel
 from tests.resources import DemoModel
 
