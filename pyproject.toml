@@ -157,7 +157,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-force-single-line = true
+force-single-line = false
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["D", "PT011", "S", "PLR2004"]
