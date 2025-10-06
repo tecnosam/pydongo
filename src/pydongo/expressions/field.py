@@ -1,16 +1,10 @@
-from collections.abc import Iterable
-from collections.abc import Sequence
-from typing import Any
-from typing import get_args
-from typing import get_origin
+from collections.abc import Iterable, Sequence
+from typing import Any, get_args, get_origin
 
 from pydantic import BaseModel
 
 from pydongo.expressions.filter import CollectionFilterExpression
-from pydongo.expressions.index import IndexExpression
-from pydongo.expressions.index import IndexExpressionBuilder
-from pydongo.expressions.index import IndexSortOrder
-from pydongo.expressions.index import IndexType
+from pydongo.expressions.index import IndexExpression, IndexExpressionBuilder, IndexSortOrder, IndexType
 from pydongo.utils.annotations import resolve_annotation
 from pydongo.utils.serializer import HANDLER_MAPPING
 
@@ -61,7 +55,7 @@ class FieldExpression:
 
         return builder
 
-    def _get_comparative_expression(self, operator: str, value: Any) -> dict:
+    def _get_comparative_expression(self, operator: str, value: Any) -> dict[str, Any]:
         """Build a MongoDB filter expression using the given operator and value.
 
         Args:
@@ -77,11 +71,11 @@ class FieldExpression:
 
         return {self.field_name: {operator: value}}
 
-    def __eq__(self, other: object) -> "CollectionFilterExpression":
+    def __eq__(self, other: object) -> "CollectionFilterExpression":  # type: ignore  # noqa: PGH003
         """Build an equality expression (`==`)."""
         return CollectionFilterExpression().with_expression(self._get_comparative_expression("$eq", other))
 
-    def __ne__(self, other: object) -> "CollectionFilterExpression":
+    def __ne__(self, other: object) -> "CollectionFilterExpression":  # type: ignore  # noqa: PGH003
         """Build an inequality expression (`!=`)."""
         return CollectionFilterExpression().with_expression(self._get_comparative_expression("$ne", other))
 
@@ -170,7 +164,7 @@ class ArraySizeFieldExpression(FieldExpression):
     Used for queries like: `len(User.tags) > 2`
     """
 
-    def _get_comparative_expression(self, operator: str, value: int) -> dict:
+    def _get_comparative_expression(self, operator: str, value: int) -> dict[str, Any]:
         """Build a MongoDB `$expr` query comparing the size of an array.
 
         Args:

@@ -1,6 +1,5 @@
 from collections.abc import Iterable
-from typing import Any
-from typing import Optional
+from typing import Any, Union
 
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import PyMongoError
@@ -24,7 +23,7 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
             database_name (str): Name of the database to use.
         """
         super().__init__(connection_string, database_name)
-        self.client: Optional[AsyncIOMotorClient] = None
+        self.client: Union[AsyncIOMotorClient, None] = None  # type: ignore  # noqa: PGH003
 
     async def connect(self) -> bool:
         """Asynchronously establish a connection to the MongoDB server.
@@ -73,7 +72,7 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
         result = await self.db[collection].insert_many(documents)
         return {"inserted_ids": [str(_id) for _id in result.inserted_ids]}
 
-    async def find_one(self, collection: str, query: dict[str, Any]) -> Optional[dict[str, Any]]:
+    async def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
         """Find a single document that matches the query.
 
         Args:
@@ -90,8 +89,8 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
         collection: str,
         query: dict[str, Any],
         sort_criteria: dict[str, int],
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
+        offset: Union[int, None] = None,
+        limit: Union[int, None] = None,
     ) -> Iterable[dict[str, Any]]:
         """Find multiple documents matching the query.
 
@@ -99,8 +98,8 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
             collection (str): Name of the collection.
             query (dict): MongoDB filter query.
             sort_criteria (dict): Sort order (e.g., {"created_at": -1}).
-            offset (int, optional): Number of documents to skip.
-            limit (int, optional): Max number of documents to return.
+            offset (Union[int, None]): Number of documents to skip.
+            limit (Union[int, None]): Max number of documents to return.
 
         Returns:
             Iterable[dict]: A cursor of matching documents.
@@ -116,7 +115,7 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
         if limit is not None:
             cursor = cursor.limit(limit)
 
-        return cursor
+        return cursor  # type: ignore[return-value]
 
     async def update_one(
         self,
@@ -190,7 +189,7 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
                 NOTE: Multiple elements in the tuple indicate a single compound index,
                 not multiple separate indexes.
         """
-        index_key: list[tuple] = []
+        index_key: list[tuple[str, Any]] = []
         final_kwargs = {}
 
         for expr in index:

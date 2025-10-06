@@ -3,8 +3,7 @@
 from pydongo.drivers.mock import MockMongoDBDriver
 from pydongo.workers.collection import as_collection
 from pydongo.workers.document import as_document
-from tests.resources import User
-from tests.resources import UserWithModelConfig
+from tests.resources import User, UserWithModelConfig
 
 
 def test_default_collection_name_set_correctly(driver: MockMongoDBDriver) -> None:
@@ -34,7 +33,7 @@ def test_custom_collection_name_set_correctly(driver: MockMongoDBDriver) -> None
 
     collection = as_collection(User, driver=driver, collection_name=collection_name)
     assert collection.collection_name == collection_name
-    collection = as_collection(UserWithModelConfig, driver=driver, collection_name=collection_name)
+    collection = as_collection(UserWithModelConfig, driver=driver, collection_name=collection_name)  # type: ignore[arg-type]
     assert collection.collection_name == collection_name
 
     document = as_document(User(), driver=driver, collection_name=collection_name)

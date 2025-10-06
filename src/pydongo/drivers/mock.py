@@ -1,11 +1,9 @@
 import uuid
 from collections import defaultdict
 from copy import deepcopy
-from typing import Any
-from typing import Optional
+from typing import Any, Union
 
-from pydongo.drivers.base import AbstractAsyncMongoDBDriver
-from pydongo.drivers.base import AbstractSyncMongoDBDriver
+from pydongo.drivers.base import AbstractAsyncMongoDBDriver, AbstractSyncMongoDBDriver
 from pydongo.expressions.index import IndexExpression
 
 
@@ -25,7 +23,7 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
         """
         super().__init__(connection_string, database_name)
         self._collections: dict[str, list[dict[str, Any]]] = {}
-        self.indexes: defaultdict = defaultdict(list)
+        self.indexes: defaultdict[str, Any] = defaultdict(list)
 
     def connect(self) -> bool:
         """Simulate a successful connection.
@@ -69,7 +67,7 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
             inserted_ids.append(inserted["inserted_id"])
         return {"inserted_ids": inserted_ids}
 
-    def find_one(self, collection: str, query: dict[str, Any]) -> Optional[dict[str, Any]]:
+    def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
         """Find a single document matching the query.
 
         Args:
@@ -89,8 +87,8 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
         collection: str,
         query: dict[str, Any],
         sort_criteria: dict[str, Any],  # noqa: ARG002
-        offset: int | None = None,
-        limit: int | None = None,
+        offset: Union[int, None] = None,
+        limit: Union[int, None] = None,
     ) -> list[dict[str, Any]]:
         """Find multiple documents matching the query.
 
@@ -98,8 +96,8 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
             collection (str): Name of the collection.
             query (dict): MongoDB-style filter.
             sort_criteria (dict): Ignored in the mock.
-            offset (int, optional): Skip the first N results.
-            limit (int, optional): Limit the number of results returned.
+            offset (Union[int, None]): Skip the first N results.
+            limit (Union[int, None]): Limit the number of results returned.
 
         Returns:
             list: List of matching documents.
@@ -206,7 +204,7 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
         """
         super().__init__(connection_string, database_name)
         self._collections: dict[str, list[dict[str, Any]]] = {}
-        self.indexes: defaultdict = defaultdict(list)
+        self.indexes: defaultdict[str, Any] = defaultdict(list)
 
     async def connect(self) -> bool:
         """Simulate async connection success.
@@ -250,7 +248,7 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
             inserted_ids.append(inserted["inserted_id"])
         return {"inserted_ids": inserted_ids}
 
-    async def find_one(self, collection: str, query: dict[str, Any]) -> Optional[dict[str, Any]]:
+    async def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
         """Asynchronously find a single matching document.
 
         Args:
@@ -270,8 +268,8 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
         collection: str,
         query: dict[str, Any],
         sort_criteria: dict[str, Any],  # noqa: ARG002
-        offset: int | None = None,
-        limit: int | None = None,
+        offset: Union[int, None] = None,
+        limit: Union[int, None] = None,
     ) -> list[dict[str, Any]]:
         """Asynchronously return a list of matching documents.
 
@@ -279,8 +277,8 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
             collection (str): Collection name.
             query (dict): Filter.
             sort_criteria (dict): Ignored.
-            offset (int, optional): Skip N docs.
-            limit (int, optional): Limit docs returned.
+            offset (Union[int, None]): Skip N docs.
+            limit (Union[int, None]): Limit docs returned.
 
         Returns:
             list: Matching documents.

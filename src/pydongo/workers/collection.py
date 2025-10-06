@@ -1,25 +1,16 @@
 from abc import ABC
-from collections.abc import Iterable
-from collections.abc import Sequence
-from typing import Generic
-from typing import Optional
-from typing import Self
-from typing import TypeVar
-from typing import Union
+from collections.abc import Iterable, Sequence
+from typing import Any, Generic, Self, TypeVar, Union
 
 from pydantic import BaseModel
 
-from pydongo.drivers.base import AbstractAsyncMongoDBDriver
-from pydongo.drivers.base import AbstractMongoDBDriver
-from pydongo.drivers.base import AbstractSyncMongoDBDriver
+from pydongo.drivers.base import AbstractAsyncMongoDBDriver, AbstractMongoDBDriver, AbstractSyncMongoDBDriver
 from pydongo.expressions.field import FieldExpression
 from pydongo.expressions.filter import CollectionFilterExpression
 from pydongo.expressions.index import IndexExpression
 from pydongo.utils.annotations import resolve_annotation
 from pydongo.utils.serializer import restore_unserializable_fields
-from pydongo.workers.document import AsyncDocumentWorker
-from pydongo.workers.document import BaseDocumentWorker
-from pydongo.workers.document import DocumentWorker
+from pydongo.workers.document import AsyncDocumentWorker, BaseDocumentWorker, DocumentWorker
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -27,14 +18,14 @@ T = TypeVar("T", bound=BaseModel)
 def as_collection(
     pydantic_model: type[T],
     driver: Union[AbstractSyncMongoDBDriver, AbstractAsyncMongoDBDriver],
-    collection_name: str | None = None,
-) -> "CollectionWorker":
+    collection_name: Union[str, None] = None,
+) -> "CollectionWorker[T]":
     """Wraps a Pydantic model in a CollectionWorker for querying and interacting with the corresponding MongoDB collection.
 
     Args:
         pydantic_model (type[T]): The Pydantic model class to wrap.
         driver (Union[AbstractSyncMongoDBDriver, AbstractAsyncMongoDBDriver]): The MongoDB driver to use.
-        collection_name (str | None, optional): The name of the MongoDB collection. Defaults to None.
+        collection_name (Union[str, None]): The name of the MongoDB collection. Defaults to None.
 
     Returns:
         CollectionWorker: A CollectionWorker instance.
@@ -59,7 +50,7 @@ class CollectionWorker(Generic[T]):
         self,
         pydantic_model: type[T],
         driver: Union[AbstractSyncMongoDBDriver, AbstractAsyncMongoDBDriver],
-        collection_name: Optional[str] = None,
+        collection_name: Union[str, None] = None,
     ):
         self.pydantic_model = pydantic_model
         self.driver = driver
@@ -72,7 +63,7 @@ class CollectionWorker(Generic[T]):
             else SyncCollectionResponseBuilder
         )
 
-    def find_one(self, expression: CollectionFilterExpression) -> Optional[DocumentWorker]:
+    def find_one(self, expression: CollectionFilterExpression) -> Union[BaseDocumentWorker[T], None]:
         """Query the database for a single document that matches the filter expression.
 
         Only works with a synchronous driver.
@@ -81,7 +72,7 @@ class CollectionWorker(Generic[T]):
             expression (CollectionFilterExpression): The MongoDB-style filter expression.
 
         Returns:
-            Optional[DocumentWorker]: A wrapped Pydantic object if found, otherwise None.
+            Union[DocumentWorker, None]: A wrapped Pydantic object if found, otherwise None.
         """
         if issubclass(type(self.driver), AbstractAsyncMongoDBDriver):
             raise AttributeError("Use the afind_one method instead as you're using an async driver")
@@ -89,7 +80,7 @@ class CollectionWorker(Generic[T]):
 
         return (
             CollectionResponseBuilder.serialize_document(
-                document=result,
+                document=result,  # type: ignore[arg-type]
                 document_worker_class=DocumentWorker,
                 pydantic_model=self.pydantic_model,
                 driver=self.driver,
@@ -98,7 +89,7 @@ class CollectionWorker(Generic[T]):
             else None
         )
 
-    async def afind_one(self, expression: CollectionFilterExpression) -> Optional[AsyncDocumentWorker]:
+    async def afind_one(self, expression: CollectionFilterExpression) -> Union[BaseDocumentWorker[T], None]:
         """Asynchronously query the database for a single document matching the filter expression.
 
         Only works with an async driver.
@@ -107,7 +98,7 @@ class CollectionWorker(Generic[T]):
             expression (CollectionFilterExpression): The MongoDB-style filter expression.
 
         Returns:
-            Optional[AsyncDocumentWorker]: A wrapped Pydantic object if found, otherwise None.
+            Union[BaseDocumentWorker[T], None]: A wrapped Pydantic object if found, otherwise None.
         """
         if issubclass(type(self.driver), AbstractSyncMongoDBDriver):
             raise AttributeError("Use the find_one method instead as you're using a sync driver")
@@ -124,11 +115,11 @@ class CollectionWorker(Generic[T]):
             else None
         )
 
-    def find(self, expression: Optional[CollectionFilterExpression] = None) -> "CollectionResponseBuilder":
+    def find(self, expression: Union[CollectionFilterExpression, None] = None) -> "CollectionResponseBuilder[T]":
         """Initiates a fluent response builder chain for querying multiple documents.
 
         Args:
-            expression (Optional[CollectionFilterExpression]): Optional filter expression.
+            expression (Union[CollectionFilterExpression, None]): Optional filter expression.
 
         Returns:
             CollectionResponseBuilder: Builder for fluent chaining (e.g., .limit(), .sort()).
@@ -138,14 +129,14 @@ class CollectionWorker(Generic[T]):
         return self.response_builder_class(
             expression=expression,
             pydantic_model=self.pydantic_model,
-            driver=self.driver,
+            driver=self.driver,  # type: ignore[arg-type]
             collection_name=self.collection_name,
             indexes=self._indexes,
         )
 
     def use_index(
         self,
-        index: Union[IndexExpression, tuple[IndexExpression]],
+        index: Union[IndexExpression, tuple[IndexExpression, ...]],
     ) -> Self:
         """Registers an index (or compound index) on the collection.
 
@@ -158,7 +149,7 @@ class CollectionWorker(Generic[T]):
             CollectionWorker: Self, for method chaining.
         """
         index = (index,) if isinstance(index, IndexExpression) else index
-        self._indexes.add(index)
+        self._indexes.add(index)  # type: ignore[arg-type]
         return self
 
     def __getattr__(self, name: str) -> FieldExpression:
@@ -213,8 +204,8 @@ class CollectionResponseBuilder(ABC, Generic[T]):
     ):
         self._expression = expression
         self._sort_criteria: Sequence[FieldExpression] = []
-        self._limit: Optional[int] = None
-        self._offset: Optional[int] = None
+        self._limit: Union[int, None] = None
+        self._offset: Union[int, None] = None
 
         self._indexes = indexes
         self._indexes_created = False
@@ -223,7 +214,7 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         self.driver = driver
         self.collection_name = collection_name
 
-    def skip(self, offset: int) -> "CollectionResponseBuilder":
+    def skip(self, offset: int) -> "CollectionResponseBuilder[T]":
         """Skip the first N documents in the query result.
 
         Args:
@@ -235,7 +226,7 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         self._offset = offset
         return self
 
-    def limit(self, limit_value: int) -> "CollectionResponseBuilder":
+    def limit(self, limit_value: int) -> "CollectionResponseBuilder[T]":
         """Limit the number of documents returned.
 
         Args:
@@ -247,7 +238,7 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         self._limit = limit_value
         return self
 
-    def sort(self, sort_criteria: Union[FieldExpression, Sequence[FieldExpression]]) -> "CollectionResponseBuilder":
+    def sort(self, sort_criteria: Union[FieldExpression, Sequence[FieldExpression]]) -> "CollectionResponseBuilder[T]":
         """Apply sort criteria to the query.
 
         Args:
@@ -259,7 +250,7 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         self._sort_criteria = [sort_criteria] if isinstance(sort_criteria, FieldExpression) else sort_criteria
         return self
 
-    def build_kwargs(self) -> dict:
+    def build_kwargs(self) -> dict[str, Any]:
         """Assembles the query, sort, offset, and limit into a single dictionary.
 
         Returns:
@@ -278,11 +269,11 @@ class CollectionResponseBuilder(ABC, Generic[T]):
     @classmethod
     def serialize_document(
         cls,
-        document: dict,
-        document_worker_class: type[BaseDocumentWorker],
+        document: dict[str, Any],
+        document_worker_class: type[BaseDocumentWorker[T]],
         pydantic_model: type[T],
         driver: AbstractMongoDBDriver,
-    ) -> BaseDocumentWorker:
+    ) -> BaseDocumentWorker[T]:
         """Deserialize a raw MongoDB document and wrap it in a DocumentWorker.
 
         Args:
@@ -300,7 +291,7 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         return document_worker_class(pydantic_object=pydantic_object, driver=driver, objectId=object_id)
 
 
-class SyncCollectionResponseBuilder(CollectionResponseBuilder):
+class SyncCollectionResponseBuilder(CollectionResponseBuilder[T]):
     """Response builder for synchronous drivers.
 
     Provides direct methods to count, check existence, and iterate documents.
@@ -325,7 +316,7 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
             bool: True if at least one document exists.
         """
         self.create_indexes()
-        return self.driver.exists(self.collection_name, self._expression.serialize())
+        return self.driver.exists(self.collection_name, self._expression.serialize())  # type: ignore[return-value]
 
     def count(self) -> int:
         """Count how many documents match the filter expression.
@@ -334,7 +325,7 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
             int: Number of matching documents.
         """
         self.create_indexes()
-        return self.driver.count(self.collection_name, self._expression.serialize())
+        return self.driver.count(self.collection_name, self._expression.serialize())  # type: ignore[return-value]
 
     def all(self) -> Iterable[DocumentWorker]:
         """Retrieve all documents that match the current query builder state.
@@ -363,7 +354,7 @@ class SyncCollectionResponseBuilder(CollectionResponseBuilder):
         self._indexes_created = True
 
 
-class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
+class AsyncCollectionResponseBuilder(CollectionResponseBuilder[T]):
     """Response builder for asynchronous drivers.
 
     Supports async versions of exists, count, and all().
@@ -388,7 +379,7 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
             bool: True if a match exists.
         """
         await self.create_indexes()
-        return await self.driver.exists(self.collection_name, self._expression.serialize())
+        return await self.driver.exists(self.collection_name, self._expression.serialize())  # type: ignore[no-any-return]
 
     async def count(self) -> int:
         """Asynchronously count how many documents match the filter.
@@ -397,7 +388,7 @@ class AsyncCollectionResponseBuilder(CollectionResponseBuilder):
             int: Number of matching documents.
         """
         await self.create_indexes()
-        return await self.driver.count(self.collection_name, self._expression.serialize())
+        return await self.driver.count(self.collection_name, self._expression.serialize())  # type: ignore[no-any-return]
 
     async def all(self) -> Iterable[AsyncDocumentWorker]:
         """Asynchronously retrieve all matching documents.

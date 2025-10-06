@@ -1,6 +1,5 @@
 from collections.abc import Iterable
-from typing import Any
-from typing import Optional
+from typing import Any, Union
 
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
@@ -24,7 +23,7 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
             database_name (str): The target database to operate on.
         """
         super().__init__(connection_string, database_name)
-        self.client: Optional[MongoClient] = None
+        self.client: Union[MongoClient, None] = None  # type: ignore[type-arg]
 
     def connect(self) -> bool:
         """Establish a connection to the MongoDB server.
@@ -73,7 +72,7 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
         result = self.db[collection].insert_many(documents)
         return {"inserted_ids": [str(_id) for _id in result.inserted_ids]}
 
-    def find_one(self, collection: str, query: dict[str, Any]) -> dict[str, Any] | None:
+    def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
         """Find a single document that matches the query.
 
         Args:
@@ -90,8 +89,8 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
         collection: str,
         query: dict[str, Any],
         sort_criteria: dict[str, Any],
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
+        offset: Union[int, None] = None,
+        limit: Union[int, None] = None,
     ) -> Iterable[dict[str, Any]]:
         """Find multiple documents that match the query.
 
@@ -99,8 +98,8 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
             collection (str): Name of the collection.
             query (dict): Filter conditions.
             sort_criteria (dict): Sorting fields and directions.
-            offset (int, optional): Number of records to skip.
-            limit (int, optional): Maximum number of documents to return.
+            offset (Union[int, None]): Number of records to skip.
+            limit (Union[int, None]): Maximum number of documents to return.
 
         Returns:
             Iterable[dict]: Cursor for matching documents.
@@ -191,7 +190,7 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
                 not multiple indexes
 
         """
-        index_key: list[tuple] = []
+        index_key: list[tuple[str, Any]] = []
         final_kwargs = {}
 
         for expr in index:

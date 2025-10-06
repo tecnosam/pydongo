@@ -1,8 +1,6 @@
 """Test resolving annotations."""
 
-from typing import Annotated
-from typing import Optional
-from typing import Union
+from typing import Annotated, Optional, Union
 
 from pydongo.utils.annotations import resolve_annotation
 

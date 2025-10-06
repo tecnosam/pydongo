@@ -5,10 +5,7 @@ from typing import Any
 import pytest
 
 from pydongo.drivers.mock import MockAsyncMongoDBDriver
-from pydongo.expressions.index import CollationStrength
-from pydongo.expressions.index import IndexExpression
-from pydongo.expressions.index import IndexSortOrder
-from pydongo.expressions.index import IndexType
+from pydongo.expressions.index import CollationStrength, IndexExpression, IndexSortOrder, IndexType
 from pydongo.workers.collection import CollectionWorker
 
 
@@ -31,7 +28,7 @@ async def test_single_key_index_async(
 
     assert isinstance(index, IndexExpression)
     collection.use_index(index)
-    await collection.find().count()
+    await collection.find().count()  # type: ignore  # noqa: PGH003
 
     _assert_index_registered(collection, driver, 1)
 
@@ -49,7 +46,7 @@ async def test_compound_index_async(
     assert isinstance(index2, IndexExpression)
 
     collection.use_index((index1, index2))
-    await collection.find().count()
+    await collection.find().count()  # type: ignore  # noqa: PGH003
 
     _assert_index_registered(collection, driver, 1)
 
@@ -71,7 +68,7 @@ async def test_text_and_hash_index_async(
 
     collection.use_index(text_index)
     collection.use_index(hash_index)
-    await collection.find().count()
+    await collection.find().count()  # type: ignore  # noqa: PGH003
 
     _assert_index_registered(collection, driver, 2)
 
@@ -94,7 +91,7 @@ async def test_geo_index_types_async(
 
     collection.use_index(index_2d)
     collection.use_index(index_2dsphere)
-    await collection.find().count()
+    await collection.find().count()  # type: ignore  # noqa: PGH003
 
     _assert_index_registered(collection, driver, 2)
 
@@ -121,7 +118,7 @@ async def test_index_with_special_kwargs_async(
 
     assert isinstance(index, IndexExpression)
     collection.use_index(index)
-    await collection.find().count()
+    await collection.find().count()  # type: ignore  # noqa: PGH003
 
     _assert_index_registered(collection, driver, 1)
 

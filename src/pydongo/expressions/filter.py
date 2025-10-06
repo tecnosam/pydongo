@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Union
 
 from pydongo.expressions.base import BaseExpression
 
@@ -19,16 +19,16 @@ class CollectionFilterExpression(BaseExpression):
     The resulting expression can be serialized and passed to the database driver.
     """
 
-    def __init__(self, expression: Optional[dict] = None):
+    def __init__(self, expression: Union[dict[str, Any], None] = None):
         """Initialize the filter expression with an optional initial dictionary.
 
         Args:
-            expression (Optional[dict]): A MongoDB-style query dictionary.
+            expression (Union[dict, None]): A MongoDB-style query dictionary.
         """
         super().__init__()
         self.expression = expression or {}
 
-    def with_expression(self, expression: dict) -> "CollectionFilterExpression":
+    def with_expression(self, expression: dict[str, Any]) -> "CollectionFilterExpression":
         """Mutate the internal expression by merging in a new dictionary.
 
         Args:
@@ -40,7 +40,7 @@ class CollectionFilterExpression(BaseExpression):
         self.expression.update(expression)
         return self
 
-    def serialize(self) -> dict:
+    def serialize(self) -> dict[str, Any]:
         """Serialize the filter expression into a MongoDB-compatible query object.
 
         Returns:

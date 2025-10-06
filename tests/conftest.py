@@ -1,17 +1,18 @@
 """."""
 
 import datetime
-from typing import Any
+from typing import Any, TypeVar
 
 import pytest
 import pytest_asyncio
+from pydantic import BaseModel
 
 from pydongo import as_collection
-from pydongo.drivers.mock import MockAsyncMongoDBDriver
-from pydongo.drivers.mock import MockMongoDBDriver
+from pydongo.drivers.mock import MockAsyncMongoDBDriver, MockMongoDBDriver
 from pydongo.workers.collection import CollectionWorker
-from tests.resources import AsyncDemoModel
-from tests.resources import DemoModel
+from tests.resources import AsyncDemoModel, DemoModel
+
+T = TypeVar("T", bound=BaseModel)
 
 
 @pytest.fixture
@@ -33,7 +34,7 @@ def current_date() -> datetime.date:
 
 
 @pytest.fixture
-def setup(driver: MockMongoDBDriver) -> tuple["CollectionWorker", MockMongoDBDriver]:
+def setup(driver: MockMongoDBDriver) -> tuple["CollectionWorker[DemoModel]", MockMongoDBDriver]:
     """Fixture to set up the database and collection."""
     driver.connect()
     collection = as_collection(DemoModel, driver)

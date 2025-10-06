@@ -1,11 +1,8 @@
 import contextvars
-from abc import ABC
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from types import TracebackType
-from typing import Any
-from typing import Optional
-from typing import Self
+from typing import Any, Self, Union
 
 from pydongo.expressions.index import IndexExpression
 
@@ -40,7 +37,10 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         return self
 
     def __exit__(
-        self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None
+        self,
+        exc_type: Union[type[BaseException], None],
+        exc_val: Union[BaseException, None],
+        exc_tb: Union[TracebackType, None],
     ) -> None:
         """Exit the context manager, close the connection, and reset the driver context."""
         self.close()
@@ -98,7 +98,7 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         """
 
     @abstractmethod
-    def find_one(self, collection: str, query: dict[str, Any]) -> Optional[dict[str, Any]]:
+    def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
         """Find a single document matching the query.
 
         Args:
@@ -115,8 +115,8 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         collection: str,
         query: dict[str, Any],
         sort_criteria: dict[str, Any],
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
+        offset: Union[int, None] = None,
+        limit: Union[int, None] = None,
     ) -> Iterable[dict[str, Any]]:
         """Find multiple documents matching the query.
 
@@ -124,8 +124,8 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
             collection (str): The collection name.
             query (dict): The filter query.
             sort_criteria (dict): How to order the results
-            offset (int, optional): Number of records to skip (useful for pagination)
-            limit (int, optional): Max number of documents to return.
+            offset (Union[int, None]): Number of records to skip (useful for pagination)
+            limit (Union[int, None]): Max number of documents to return.
 
         Returns:
             iterator for result: Iterable sequence of matching documents.
@@ -225,7 +225,10 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         return self
 
     async def __aexit__(
-        self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None
+        self,
+        exc_type: Union[type[BaseException], None],
+        exc_val: Union[BaseException, None],
+        exc_tb: Union[TracebackType, None],
     ) -> None:
         """Exit the async context manager, close the connection, and reset the driver context."""
         await self.close()
@@ -283,7 +286,7 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         """
 
     @abstractmethod
-    async def find_one(self, collection: str, query: dict[str, Any]) -> Optional[dict[str, Any]]:
+    async def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
         """Find a single document matching the query.
 
         Args:
@@ -300,8 +303,8 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         collection: str,
         query: dict[str, Any],
         sort_criteria: dict[str, Any],
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
+        offset: Union[int, None] = None,
+        limit: Union[int, None] = None,
     ) -> Iterable[dict[str, Any]]:
         """Find multiple documents matching the query.
 
@@ -309,8 +312,8 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
             collection (str): The collection name.
             query (dict): The filter query.
             sort_criteria (dict): How to order the results
-            offset (int, optional): Number of records to skip (useful for pagination)
-            limit (int, optional): Max number of documents to return.
+            offset (Union[int, None]): Number of records to skip (useful for pagination)
+            limit (Union[int, None]): Max number of documents to return.
 
         Returns:
             iterable sequence: Iterable sequence of matching documents.

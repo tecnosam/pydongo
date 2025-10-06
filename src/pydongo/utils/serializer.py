@@ -1,9 +1,7 @@
 import datetime
-from abc import ABC
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from collections.abc import Mapping
-from typing import Any
-from typing import TypeVar
+from typing import Any, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -107,7 +105,7 @@ HANDLER_MAPPING: Mapping[Any, BaseTypeSerializer] = {
 }
 
 
-def replace_unserializable_fields(document: dict) -> dict:
+def replace_unserializable_fields(document: dict[str, Any]) -> dict[str, Any]:
     """Recursively replaces values in a document that are not MongoDB-compatible.
 
     With serialized equivalents, using registered type handlers.
@@ -136,7 +134,7 @@ def replace_unserializable_fields(document: dict) -> dict:
     return document
 
 
-def restore_unserializable_fields(document: dict) -> dict:
+def restore_unserializable_fields(document: dict[str, Any]) -> dict[str, Any]:
     """Recursively attempts to deserialize known types in a document.
 
     NOTE: This is a basic placeholder strategy — it applies all registered deserializers

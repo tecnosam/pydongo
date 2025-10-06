@@ -5,15 +5,17 @@ from typing import Any
 import pytest
 
 from pydongo.drivers.mock import MockMongoDBDriver
-from pydongo.expressions.index import CollationStrength
-from pydongo.expressions.index import IndexExpression
-from pydongo.expressions.index import IndexExpressionBuilder
-from pydongo.expressions.index import IndexSortOrder
-from pydongo.expressions.index import IndexType
+from pydongo.expressions.index import (
+    CollationStrength,
+    IndexExpression,
+    IndexExpressionBuilder,
+    IndexSortOrder,
+    IndexType,
+)
 from pydongo.workers.collection import CollectionWorker
 
 
-def _assert_index_registered(collection: CollectionWorker, driver: MockMongoDBDriver, expected_count: int) -> None:
+def _assert_index_registered(collection: CollectionWorker, driver: MockMongoDBDriver, expected_count: int) -> None:  # type: ignore  # noqa: PGH003
     """Assert that the index is registered in the collection and driver."""
     assert len(collection._indexes) == expected_count, "Index should be registered in collection"
     assert len(driver.indexes[collection.collection_name]) == expected_count, "Driver should contain the index"
@@ -27,7 +29,7 @@ def test_single_key_index(setup: tuple[CollectionWorker[Any], MockMongoDBDriver]
 
     assert isinstance(index, IndexExpression)
     collection.use_index(index)
-    collection.find().count()
+    collection.find().count()  # type: ignore  # noqa: PGH003
 
     _assert_index_registered(collection, driver, 1)
 
@@ -43,7 +45,7 @@ def test_compound_index(setup: tuple[CollectionWorker[Any], MockMongoDBDriver]) 
     assert isinstance(index2, IndexExpression)
 
     collection.use_index((index1, index2))
-    collection.find().count()
+    collection.find().count()  # type: ignore  # noqa: PGH003
 
     _assert_index_registered(collection, driver, 1)
 
@@ -65,7 +67,7 @@ def test_text_and_hash_index(
 
     collection.use_index(text_index)
     collection.use_index(hash_index)
-    collection.find().count()
+    collection.find().count()  # type: ignore  # noqa: PGH003
 
     _assert_index_registered(collection, driver, 2)
 
@@ -86,7 +88,7 @@ def test_geo_index_types(setup: tuple[CollectionWorker[Any], MockMongoDBDriver])
 
     collection.use_index(index_2d)
     collection.use_index(index_2dsphere)
-    collection.find().count()
+    collection.find().count()  # type: ignore  # noqa: PGH003
 
     _assert_index_registered(collection, driver, 2)
 
@@ -111,7 +113,7 @@ def test_index_with_special_kwargs(setup: tuple[CollectionWorker[Any], MockMongo
 
     assert isinstance(index, IndexExpression)
     collection.use_index(index)
-    collection.find().count()
+    collection.find().count()  # type: ignore  # noqa: PGH003
 
     _assert_index_registered(collection, driver, 1)
 

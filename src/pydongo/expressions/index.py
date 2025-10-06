@@ -1,7 +1,5 @@
-from enum import Enum
-from enum import IntEnum
-from typing import Any
-from typing import Optional
+from enum import Enum, IntEnum
+from typing import Any, Union
 
 from pydongo.expressions.base import BaseExpression
 from pydongo.expressions.filter import CollectionFilterExpression
@@ -53,16 +51,16 @@ class IndexExpression(BaseExpression):
     def __init__(  # noqa: PLR0913
         self,
         field_name: str,
-        index_type: Optional[IndexType] = None,
+        index_type: Union[IndexType, None] = None,
         sort_order: IndexSortOrder = IndexSortOrder.ASCENDING,
-        expires_after_seconds: Optional[float] = None,  # For TTL indexes
-        is_sparse: Optional[bool] = None,
-        is_unique: Optional[bool] = None,
-        is_hidden: Optional[bool] = None,
+        expires_after_seconds: Union[float, None] = None,  # For TTL indexes
+        is_sparse: Union[bool, None] = None,
+        is_unique: Union[bool, None] = None,
+        is_hidden: Union[bool, None] = None,
         collation_locale: str = "en",
-        collation_strength: Optional[CollationStrength] = None,
-        partial_expression: Optional[CollectionFilterExpression] = None,
-        index_name: Optional[str] = None,
+        collation_strength: Union[CollationStrength, None] = None,
+        partial_expression: Union[CollectionFilterExpression, None] = None,
+        index_name: Union[str, None] = None,
     ):
         self.field_name = field_name
         self.index_type = index_type
@@ -76,13 +74,13 @@ class IndexExpression(BaseExpression):
         self.partial_expression = partial_expression
         self.index_name = index_name
 
-    def serialize(self) -> dict:
+    def serialize(self) -> dict[str, Any]:
         """Serialize the index definition into a MongoDB-compatible format."""
         if self.index_type:
             return {self.field_name: self.index_type}
         return {self.field_name: self.sort_order}
 
-    def build_kwargs(self) -> dict:
+    def build_kwargs(self) -> dict[str, Any]:
         """Additional specifications for the index to be passed to MongoDB's create_index.
 
         Only includes non-null values.
@@ -232,7 +230,7 @@ class IndexExpressionBuilder:
         """Set whether the index should be sparse.
 
         Args:
-            is_sparse (bool, optional): Whether the index should be sparse. Defaults to True.
+            is_sparse (bool): Whether the index should be sparse. Defaults to True.
 
         Returns:
             IndexExpressionBuilder: The builder instance for chaining.
@@ -244,7 +242,7 @@ class IndexExpressionBuilder:
         """Set whether the index should enforce uniqueness.
 
         Args:
-            is_unique (bool, optional): Whether the index should enforce uniqueness. Defaults to True.
+            is_unique (bool): Whether the index should enforce uniqueness. Defaults to True.
 
         Returns:
             IndexExpressionBuilder: The builder instance for chaining.
@@ -256,7 +254,7 @@ class IndexExpressionBuilder:
         """Set whether the index should be hidden.
 
         Args:
-            is_hidden (bool, optional): Whether the index should be hidden. Defaults to True.
+            is_hidden (bool): Whether the index should be hidden. Defaults to True.
 
         Returns:
             IndexExpressionBuilder: The builder instance for chaining.
