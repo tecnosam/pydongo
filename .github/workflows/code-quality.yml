@@ -5,34 +5,43 @@ name: Python package
 
 on:
   push:
-    branches: [ "main", "stable" ]
+    branches: ["main", "stable"]
   pull_request:
-    branches: [ "main", "stable" ]
+    branches: ["main", "stable"]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-
+        python-version:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pipx install poetry
-        poetry install
-    - name: Code Quality Checks
-      run: |
-        poetry run ruff check .
-        poetry run mypy pydongo 
-    - name: Test with pytest
-      run: |
-        poetry run pytest
+      - uses: actions/checkout@v5
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: |
+          uv sync --frozen
+
+      - name: Code Quality Checks
+        run: |
+          uv run poe lint
+
+      - name: Test with pytest
+        run: |
+          uv run poe test

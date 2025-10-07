@@ -1,11 +1,13 @@
 import asyncio
 import uuid
-from typing import List, Optional
-from pydantic import BaseModel, Field
+from typing import Union
 
-from pydongo import as_document, as_collection
+from pydantic import BaseModel
+from pydantic import Field
+
+from pydongo import as_collection
+from pydongo import as_document
 from pydongo.drivers.async_mongo import DefaultAsyncMongoDBDriver
-
 
 # === MODELS ===
 
@@ -19,8 +21,8 @@ class Post(BaseModel):
 class User(BaseModel):
     username: str
     email: str
-    bio: Optional[str] = ""
-    posts: List[Post] = []
+    bio: Union[str, None] = ""
+    posts: list[Post] = []
 
 
 # === DB SETUP ===
@@ -38,7 +40,7 @@ async def create_user(username: str, email: str, bio: str = "") -> User:
     return doc
 
 
-async def make_post(username: str, content: str) -> Optional[Post]:
+async def make_post(username: str, content: str) -> Union[Post, None]:
     users = as_collection(User, driver)
     user_doc = await users.find_one(users.username == username)
     if not user_doc:
@@ -64,7 +66,7 @@ async def like_post(username: str, post_id: str) -> bool:
     return False
 
 
-async def get_all_posts(username: Optional[str] = None) -> List[Post]:
+async def get_all_posts(username: Union[str, None] = None) -> list[Post]:
     users = as_collection(User, driver)
 
     if username:
@@ -81,7 +83,7 @@ async def get_all_posts(username: Optional[str] = None) -> List[Post]:
 # === DEMO FLOW ===
 
 
-async def main():
+async def main() -> None:
     await driver.connect()
 
     # Create a user

@@ -1,10 +1,6 @@
 """Test field expressions."""
 
-from pydongo.expressions.field import (
-    ArrayFieldExpression,
-    ArraySizeFieldExpression,
-    FieldExpression,
-)
+from pydongo.expressions.field import ArrayFieldExpression, ArraySizeFieldExpression, FieldExpression
 from pydongo.expressions.filter import CollectionFilterExpression
 from tests.resources import Friend, User
 

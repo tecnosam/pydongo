@@ -1,9 +1,11 @@
-from typing import List, Optional
-from pydantic import BaseModel, Field
-from pydongo import as_document, as_collection
-from pydongo.drivers.sync_mongo import DefaultMongoDBDriver
 import uuid
+from typing import Union
+from pydantic import BaseModel
+from pydantic import Field
 
+from pydongo import as_collection
+from pydongo import as_document
+from pydongo.drivers.sync_mongo import DefaultMongoDBDriver
 
 # === MODELS ===
 
@@ -20,7 +22,7 @@ class Patient(BaseModel):
     patient_id: str
     name: str
     age: int
-    prescriptions: List[Prescription] = []
+    prescriptions: list[Prescription] = []
 
 
 # === DB SETUP ===
@@ -42,7 +44,7 @@ def create_patient(patient_id: str, name: str, age: int) -> Patient:
 
 def add_prescription(
     patient_id: str, drug_name: str, dosage: str, frequency: str, duration_days: int
-) -> Optional[Prescription]:
+) -> Union[Prescription, None]:
     patient_doc = patients.find_one(patients.patient_id == patient_id)
     if not patient_doc:
         return None
@@ -58,7 +60,7 @@ def add_prescription(
     return prescription
 
 
-def get_prescriptions(patient_id: str) -> List[Prescription]:
+def get_prescriptions(patient_id: str) -> list[Prescription]:
     patient_doc = patients.find_one(patients.patient_id == patient_id)
     return patient_doc.prescriptions if patient_doc else []
 

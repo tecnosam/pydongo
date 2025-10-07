@@ -1,30 +1,27 @@
 import contextvars
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional, Iterable, Tuple
+from collections.abc import Iterable
+from types import TracebackType
+from typing import Any, Self, Union
 
 from pydongo.expressions.index import IndexExpression
 
 
-class AbstractMongoDBDriver(ABC):
-    """
-    Abstract base class for MongoDB drivers.
-    """
+class AbstractMongoDBDriver(ABC):  # noqa: B024
+    """Abstract base class for MongoDB drivers."""
 
 
 class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
-    """
-    Abstract base class for synchronous MongoDB drivers.
+    """Abstract base class for synchronous MongoDB drivers.
+
     Provides context management support and coroutine/thread-safe access
     to the currently active driver instance via contextvars.
     """
 
-    _current: contextvars.ContextVar["AbstractSyncMongoDBDriver"] = (
-        contextvars.ContextVar("mongo_driver_current")
-    )
+    _current: contextvars.ContextVar["AbstractSyncMongoDBDriver"] = contextvars.ContextVar("mongo_driver_current")
 
     def __init__(self, connection_string: str, database_name: str):
-        """
-        Initialize the MongoDB driver with a connection string and database name.
+        """Initialize the MongoDB driver with a connection string and database name.
 
         Args:
             connection_string (str): MongoDB connection URI.
@@ -33,25 +30,25 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         self.connection_string = connection_string
         self.database_name = database_name
 
-    def __enter__(self):
-        """
-        Enter the context manager, connect to MongoDB, and set the current driver context.
-        """
+    def __enter__(self) -> Self:
+        """Enter the context manager, connect to MongoDB, and set the current driver context."""
         self.connect()
         self._token = self._current.set(self)
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """
-        Exit the context manager, close the connection, and reset the driver context.
-        """
+    def __exit__(
+        self,
+        exc_type: Union[type[BaseException], None],
+        exc_val: Union[BaseException, None],
+        exc_tb: Union[TracebackType, None],
+    ) -> None:
+        """Exit the context manager, close the connection, and reset the driver context."""
         self.close()
         self._current.reset(self._token)
 
     @classmethod
     def current(cls) -> "AbstractSyncMongoDBDriver":
-        """
-        Get the current MongoDB driver instance for this coroutine/thread.
+        """Get the current MongoDB driver instance for this coroutine/thread.
 
         Returns:
             AbstractMongoDBDriver: The active driver instance.
@@ -61,27 +58,24 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         """
         try:
             return cls._current.get()
-        except LookupError:
-            raise RuntimeError("No active MongoDBDriver context found")
+        except LookupError as e:
+            raise RuntimeError("No active MongoDBDriver context found") from e
 
     @abstractmethod
     def connect(self) -> bool:
-        """
-        Establish a connection to the MongoDB server.
+        """Establish a connection to the MongoDB server.
+
         Returns:
             bool: True if connection was successful.
         """
 
     @abstractmethod
     def close(self) -> None:
-        """
-        Close the connection to the MongoDB server.
-        """
+        """Close the connection to the MongoDB server."""
 
     @abstractmethod
-    def insert_one(self, collection: str, document: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Insert a single document into the specified collection.
+    def insert_one(self, collection: str, document: dict[str, Any]) -> dict[str, Any]:
+        """Insert a single document into the specified collection.
 
         Args:
             collection (str): The collection name.
@@ -92,11 +86,8 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         """
 
     @abstractmethod
-    def insert_many(
-        self, collection: str, documents: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
-        """
-        Insert multiple documents into the specified collection.
+    def insert_many(self, collection: str, documents: list[dict[str, Any]]) -> dict[str, Any]:
+        """Insert multiple documents into the specified collection.
 
         Args:
             collection (str): The collection name.
@@ -107,11 +98,8 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         """
 
     @abstractmethod
-    def find_one(
-        self, collection: str, query: Dict[str, Any]
-    ) -> Optional[Dict[str, Any]]:
-        """
-        Find a single document matching the query.
+    def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
+        """Find a single document matching the query.
 
         Args:
             collection (str): The collection name.
@@ -125,20 +113,19 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
     def find_many(
         self,
         collection: str,
-        query: Dict[str, Any],
-        sort_criteria: Dict[str, Any],
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-    ) -> Iterable[Dict[str, Any]]:
-        """
-        Find multiple documents matching the query.
+        query: dict[str, Any],
+        sort_criteria: dict[str, Any],
+        offset: Union[int, None] = None,
+        limit: Union[int, None] = None,
+    ) -> Iterable[dict[str, Any]]:
+        """Find multiple documents matching the query.
 
         Args:
             collection (str): The collection name.
             query (dict): The filter query.
             sort_criteria (dict): How to order the results
-            offset (int, optional): Number of records to skip (useful for pagination)
-            limit (int, optional): Max number of documents to return.
+            offset (Union[int, None]): Number of records to skip (useful for pagination)
+            limit (Union[int, None]): Max number of documents to return.
 
         Returns:
             iterator for result: Iterable sequence of matching documents.
@@ -148,26 +135,25 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
     def update_one(
         self,
         collection: str,
-        query: Dict[str, Any],
-        update: Dict[str, Any],
+        query: dict[str, Any],
+        update: dict[str, Any],
         upsert: bool = False,
-    ) -> Dict[str, Any]:
-        """
-        Update a single document matching the query.
+    ) -> dict[str, Any]:
+        """Update a single document matching the query.
 
         Args:
             collection (str): The collection name.
             query (dict): The filter query.
             update (dict): The update document.
+            upsert (bool): Whether to insert a new document if no match is found.
 
         Returns:
             dict: Result of the update operation.
         """
 
     @abstractmethod
-    def delete_one(self, collection: str, query: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Delete a single document matching the query.
+    def delete_one(self, collection: str, query: dict[str, Any]) -> dict[str, Any]:
+        """Delete a single document matching the query.
 
         Args:
             collection (str): The collection name.
@@ -179,8 +165,7 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
 
     @abstractmethod
     def count(self, collection: str, query: dict[str, Any]) -> int:
-        """
-        Count how many records are in a collection that match the specified query
+        """Count how many records are in a collection that match the specified query.
 
         Args:
             collection (str): The collection name.
@@ -192,9 +177,7 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
 
     @abstractmethod
     def exists(self, collection: str, query: dict[str, Any]) -> bool:
-        """
-        Check if at least one document exists in the collection that matches the
-        specified query
+        """Check if at least one document exists in the collection that matches the specified query.
 
         Args:
             collection (str): The collection name.
@@ -205,9 +188,8 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         """
 
     @abstractmethod
-    def create_index(self, collection: str, index: Tuple[IndexExpression]):
-        """
-        Create an index on a collection in the MongoDB Database
+    def create_index(self, collection: str, index: tuple[IndexExpression]) -> None:
+        """Create an index on a collection in the MongoDB Database.
 
         Args:
             collection (str): The collection name.
@@ -218,19 +200,16 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
 
 
 class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
-    """
-    Abstract base class for asynchronous MongoDB drivers.
+    """Abstract base class for asynchronous MongoDB drivers.
+
     Provides async context management and coroutine-safe access
     to the currently active driver instance via contextvars.
     """
 
-    _current: contextvars.ContextVar["AbstractAsyncMongoDBDriver"] = (
-        contextvars.ContextVar("mongo_driver_current")
-    )
+    _current: contextvars.ContextVar["AbstractAsyncMongoDBDriver"] = contextvars.ContextVar("mongo_driver_current")
 
     def __init__(self, connection_string: str, database_name: str):
-        """
-        Initialize the MongoDB driver with a connection string and database name.
+        """Initialize the MongoDB driver with a connection string and database name.
 
         Args:
             connection_string (str): MongoDB connection URI.
@@ -239,25 +218,25 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         self.connection_string = connection_string
         self.database_name = database_name
 
-    async def __aenter__(self):
-        """
-        Enter the async context manager, connect to MongoDB, and set the current driver context.
-        """
+    async def __aenter__(self) -> Self:
+        """Enter the async context manager, connect to MongoDB, and set the current driver context."""
         await self.connect()
         self._token = self._current.set(self)
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """
-        Exit the async context manager, close the connection, and reset the driver context.
-        """
+    async def __aexit__(
+        self,
+        exc_type: Union[type[BaseException], None],
+        exc_val: Union[BaseException, None],
+        exc_tb: Union[TracebackType, None],
+    ) -> None:
+        """Exit the async context manager, close the connection, and reset the driver context."""
         await self.close()
         self._current.reset(self._token)
 
     @classmethod
     def current(cls) -> "AbstractAsyncMongoDBDriver":
-        """
-        Get the current MongoDB driver instance for this coroutine.
+        """Get the current MongoDB driver instance for this coroutine.
 
         Returns:
             AbstractAsyncMongoDBDriver: The active driver instance.
@@ -267,29 +246,24 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         """
         try:
             return cls._current.get()
-        except LookupError:
-            raise RuntimeError("No active MongoDBDriver context found")
+        except LookupError as e:
+            raise RuntimeError("No active MongoDBDriver context found") from e
 
     @abstractmethod
     async def connect(self) -> bool:
-        """
-        Establish a connection to the MongoDB server.
+        """Establish a connection to the MongoDB server.
+
         Returns:
             bool: True if connection was successful.
         """
 
     @abstractmethod
     async def close(self) -> None:
-        """
-        Close the connection to the MongoDB server.
-        """
+        """Close the connection to the MongoDB server."""
 
     @abstractmethod
-    async def insert_one(
-        self, collection: str, document: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Insert a single document into the specified collection.
+    async def insert_one(self, collection: str, document: dict[str, Any]) -> dict[str, Any]:
+        """Insert a single document into the specified collection.
 
         Args:
             collection (str): The collection name.
@@ -300,11 +274,8 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         """
 
     @abstractmethod
-    async def insert_many(
-        self, collection: str, documents: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
-        """
-        Insert multiple documents into the specified collection.
+    async def insert_many(self, collection: str, documents: list[dict[str, Any]]) -> dict[str, Any]:
+        """Insert multiple documents into the specified collection.
 
         Args:
             collection (str): The collection name.
@@ -315,11 +286,8 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         """
 
     @abstractmethod
-    async def find_one(
-        self, collection: str, query: Dict[str, Any]
-    ) -> Optional[Dict[str, Any]]:
-        """
-        Find a single document matching the query.
+    async def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
+        """Find a single document matching the query.
 
         Args:
             collection (str): The collection name.
@@ -333,20 +301,19 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
     async def find_many(
         self,
         collection: str,
-        query: Dict[str, Any],
-        sort_criteria: Dict[str, Any],
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-    ) -> Iterable[Dict[str, Any]]:
-        """
-        Find multiple documents matching the query.
+        query: dict[str, Any],
+        sort_criteria: dict[str, Any],
+        offset: Union[int, None] = None,
+        limit: Union[int, None] = None,
+    ) -> Iterable[dict[str, Any]]:
+        """Find multiple documents matching the query.
 
         Args:
             collection (str): The collection name.
             query (dict): The filter query.
             sort_criteria (dict): How to order the results
-            offset (int, optional): Number of records to skip (useful for pagination)
-            limit (int, optional): Max number of documents to return.
+            offset (Union[int, None]): Number of records to skip (useful for pagination)
+            limit (Union[int, None]): Max number of documents to return.
 
         Returns:
             iterable sequence: Iterable sequence of matching documents.
@@ -356,28 +323,25 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
     async def update_one(
         self,
         collection: str,
-        query: Dict[str, Any],
-        update: Dict[str, Any],
+        query: dict[str, Any],
+        update: dict[str, Any],
         upsert: bool = False,
-    ) -> Dict[str, Any]:
-        """
-        Update a single document matching the query.
+    ) -> dict[str, Any]:
+        """Update a single document matching the query.
 
         Args:
             collection (str): The collection name.
             query (dict): The filter query.
             update (dict): The update document.
+            upsert (bool): Whether to insert a new document if no match is found.
 
         Returns:
             dict: Result of the update operation.
         """
 
     @abstractmethod
-    async def delete_one(
-        self, collection: str, query: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Delete a single document matching the query.
+    async def delete_one(self, collection: str, query: dict[str, Any]) -> dict[str, Any]:
+        """Delete a single document matching the query.
 
         Args:
             collection (str): The collection name.
@@ -389,8 +353,7 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
 
     @abstractmethod
     async def count(self, collection: str, query: dict[str, Any]) -> int:
-        """
-        Count how many records are in a collection that match the specified query
+        """Count how many records are in a collection that match the specified query.
 
         Args:
             collection (str): The collection name.
@@ -402,9 +365,7 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
 
     @abstractmethod
     async def exists(self, collection: str, query: dict[str, Any]) -> bool:
-        """
-        Check if at least one document exists in the collection that matches the
-        specified query
+        """Check if at least one document exists in the collection that matches the specified query.
 
         Args:
             collection (str): The collection name.
@@ -415,9 +376,8 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         """
 
     @abstractmethod
-    async def create_index(self, collection: str, index: Tuple[IndexExpression]):
-        """
-        Create an index on a collection in the MongoDB Database
+    async def create_index(self, collection: str, index: tuple[IndexExpression]) -> None:
+        """Create an index on a collection in the MongoDB Database.
 
         Args:
             collection (str): The collection name.

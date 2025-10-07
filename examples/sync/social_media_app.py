@@ -1,8 +1,11 @@
 import uuid
-from typing import List, Optional
-from pydantic import BaseModel, Field
+from typing import Union
 
-from pydongo import as_document, as_collection
+from pydantic import BaseModel
+from pydantic import Field
+
+from pydongo import as_collection
+from pydongo import as_document
 from pydongo.drivers.sync_mongo import DefaultMongoDBDriver
 
 # === MODELS ===
@@ -17,8 +20,8 @@ class Post(BaseModel):
 class User(BaseModel):
     username: str
     email: str
-    bio: Optional[str] = ""
-    posts: List[Post] = []
+    bio: Union[str, None] = ""
+    posts: list[Post] = []
 
 
 # === DB SETUP ===
@@ -38,7 +41,7 @@ def create_user(username: str, email: str, bio: str = "") -> User:
     return doc
 
 
-def make_post(username: str, content: str) -> Optional[Post]:
+def make_post(username: str, content: str) -> Union[Post, None]:
     user_doc = users.find_one(users.username == username)
     if not user_doc:
         return None
@@ -62,7 +65,7 @@ def like_post(username: str, post_id: str) -> bool:
     return False
 
 
-def get_all_posts(username: Optional[str] = None) -> List[Post]:
+def get_all_posts(username: Union[str, None] = None) -> list[Post]:
     if username:
         user_doc = users.find_one(users.username == username)
         return user_doc.posts if user_doc else []

@@ -1,33 +1,32 @@
+from collections.abc import Iterable
+from typing import Any, Union
+
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
-from typing import List, Dict, Any, Optional, Iterable, Tuple
 
 from pydongo.drivers.base import AbstractSyncMongoDBDriver
 from pydongo.expressions.index import IndexExpression
 
 
 class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
-    """
-    Default synchronous MongoDB driver implementation using PyMongo.
+    """Default synchronous MongoDB driver implementation using PyMongo.
 
     This driver connects to a real MongoDB instance and executes
     blocking operations such as insert, update, query, and delete.
     """
 
     def __init__(self, connection_string: str, database_name: str):
-        """
-        Initialize the driver with a MongoDB connection URI and database name.
+        """Initialize the driver with a MongoDB connection URI and database name.
 
         Args:
             connection_string (str): MongoDB URI (e.g., "mongodb://localhost:27017").
             database_name (str): The target database to operate on.
         """
         super().__init__(connection_string, database_name)
-        self.client: Optional[MongoClient] = None
+        self.client: Union[MongoClient, None] = None  # type: ignore[type-arg]
 
     def connect(self) -> bool:
-        """
-        Establish a connection to the MongoDB server.
+        """Establish a connection to the MongoDB server.
 
         Returns:
             bool: True if the connection is successful.
@@ -40,18 +39,15 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
             self.db = self.client[self.database_name]
             return True
         except PyMongoError as e:
-            raise RuntimeError(f"Failed to connect to MongoDB: {e}")
+            raise RuntimeError(f"Failed to connect to MongoDB: {e}") from e
 
     def close(self) -> None:
-        """
-        Close the MongoDB connection.
-        """
+        """Close the MongoDB connection."""
         if self.client:
             self.client.close()
 
-    def insert_one(self, collection: str, document: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Insert a single document into a collection.
+    def insert_one(self, collection: str, document: dict[str, Any]) -> dict[str, Any]:
+        """Insert a single document into a collection.
 
         Args:
             collection (str): Name of the collection.
@@ -63,11 +59,8 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
         result = self.db[collection].insert_one(document)
         return {"inserted_id": str(result.inserted_id)}
 
-    def insert_many(
-        self, collection: str, documents: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
-        """
-        Insert multiple documents into a collection.
+    def insert_many(self, collection: str, documents: list[dict[str, Any]]) -> dict[str, Any]:
+        """Insert multiple documents into a collection.
 
         Args:
             collection (str): Name of the collection.
@@ -79,11 +72,8 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
         result = self.db[collection].insert_many(documents)
         return {"inserted_ids": [str(_id) for _id in result.inserted_ids]}
 
-    def find_one(
-        self, collection: str, query: Dict[str, Any]
-    ) -> Optional[Dict[str, Any]]:
-        """
-        Find a single document that matches the query.
+    def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
+        """Find a single document that matches the query.
 
         Args:
             collection (str): Name of the collection.
@@ -97,20 +87,19 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
     def find_many(
         self,
         collection: str,
-        query: Dict[str, Any],
-        sort_criteria: Dict[str, Any],
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-    ) -> Iterable[Dict[str, Any]]:
-        """
-        Find multiple documents that match the query.
+        query: dict[str, Any],
+        sort_criteria: dict[str, Any],
+        offset: Union[int, None] = None,
+        limit: Union[int, None] = None,
+    ) -> Iterable[dict[str, Any]]:
+        """Find multiple documents that match the query.
 
         Args:
             collection (str): Name of the collection.
             query (dict): Filter conditions.
             sort_criteria (dict): Sorting fields and directions.
-            offset (int, optional): Number of records to skip.
-            limit (int, optional): Maximum number of documents to return.
+            offset (Union[int, None]): Number of records to skip.
+            limit (Union[int, None]): Maximum number of documents to return.
 
         Returns:
             Iterable[dict]: Cursor for matching documents.
@@ -118,7 +107,7 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
         cursor = self.db[collection].find(query)
 
         if sort_criteria:
-            cursor = cursor.sort([(k, v) for k, v in sort_criteria.items()])
+            cursor = cursor.sort(list(sort_criteria.items()))
 
         if offset:
             cursor = cursor.skip(offset)
@@ -131,12 +120,11 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
     def update_one(
         self,
         collection: str,
-        query: Dict[str, Any],
-        update: Dict[str, Any],
+        query: dict[str, Any],
+        update: dict[str, Any],
         upsert: bool = False,
-    ) -> Dict[str, Any]:
-        """
-        Update a single document matching the query.
+    ) -> dict[str, Any]:
+        """Update a single document matching the query.
 
         Args:
             collection (str): Name of the collection.
@@ -154,9 +142,8 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
             "upserted_id": str(result.upserted_id) if result.upserted_id else None,
         }
 
-    def delete_one(self, collection: str, query: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Delete a single document matching the query.
+    def delete_one(self, collection: str, query: dict[str, Any]) -> dict[str, Any]:
+        """Delete a single document matching the query.
 
         Args:
             collection (str): Name of the collection.
@@ -168,9 +155,8 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
         result = self.db[collection].delete_one(query)
         return {"deleted_count": result.deleted_count}
 
-    def count(self, collection: str, query: Dict[str, Any]) -> int:
-        """
-        Count the number of documents matching the query.
+    def count(self, collection: str, query: dict[str, Any]) -> int:
+        """Count the number of documents matching the query.
 
         Args:
             collection (str): Name of the collection.
@@ -181,9 +167,8 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
         """
         return self.db[collection].count_documents(query)
 
-    def exists(self, collection: str, query: Dict[str, Any]) -> bool:
-        """
-        Check if at least one document exists that matches the query.
+    def exists(self, collection: str, query: dict[str, Any]) -> bool:
+        """Check if at least one document exists that matches the query.
 
         Args:
             collection (str): Name of the collection.
@@ -194,9 +179,8 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
         """
         return self.db[collection].count_documents(query, limit=1) > 0
 
-    def create_index(self, collection: str, index: Tuple[IndexExpression]):
-        """
-        Create an index on a collection in the MongoDB Database
+    def create_index(self, collection: str, index: tuple[IndexExpression]) -> None:
+        """Create an index on a collection in the MongoDB Database.
 
         Args:
             collection (str): The collection name.
@@ -206,8 +190,7 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
                 not multiple indexes
 
         """
-
-        index_key: List[tuple] = []
+        index_key: list[tuple[str, Any]] = []
         final_kwargs = {}
 
         for expr in index:

@@ -10,7 +10,7 @@ Your help is greatly appreciated, whether it's fixing bugs, improving documentat
 To contribute to Pydongo, you'll need:
 
 - Python 3.9 or higher
-- [Poetry](https://python-poetry.org/) for dependency management
+- [uv](https://docs.astral.sh/uv/) for dependency management
 - MongoDB (optional — unit tests can run without it using the built-in mock driver)
 
 ```bash
@@ -19,7 +19,7 @@ git clone https://github.com/tecnosam/pydongo.git
 cd pydongo
 
 # Install dependencies
-poetry install
+uv sync
 ```
 
 ---
@@ -65,10 +65,65 @@ git checkout -b feat/awesome-feature
 ### 2. Make your changes
 
 - Follow the code style already present in the repo.
-- If you add new functionality, please include a test.
+- If you add new functionality, please include the tests.
 - If you add or change a public method, include or update docstrings.
 
-### 3. Keep your fork up to date
+#### Versioning
+
+> Don't forget to update the version in `pyproject.toml`
+
+To do so, depending on the type of changes you made, update the version following [Semantic Versioning](https://semver.org/):
+
+- **MAJOR** version when you make incompatible API changes
+- **MINOR** version when you add functionality in a backwards-compatible manner
+- **PATCH** version when you make backwards-compatible bug fixes
+
+For example, if the current version is `1.2.3`:
+
+- If you made a breaking change, update it to `2.0.0`
+
+```bash
+uv version --bump major
+```
+
+- If you added a new feature, update it to `1.3.0`
+
+```bash
+uv version --bump minor
+```
+
+- If you fixed a bug, update it to `1.2.4`
+
+```bash
+uv version --bump patch
+```
+
+For more details, check the [uv version documentation](https://docs.astral.sh/uv/guides/package/#updating-your-version).
+
+### 3. Optional: Check your installation
+
+To check that your changes are correctly reflected and works as expected,
+you can install the package in editable mode and import it in a Python shell.
+
+```bash
+uv pip install -e .
+```
+
+```bash
+python
+>>> import pydongo
+>>> pydongo.__version__
+```
+
+Or you can build and install the static package:
+
+```bash
+uv build
+
+uv pip install dist/pydongo-<PUT_VERSION>-py3-none-any.whl
+```
+
+### 4. Keep your fork up to date
 
 If your feature takes a few weeks or months to develop, it may happen that new code changes are made to main branch by other contributors.
 Some of the files that are changed maybe the same files you are working on.
@@ -114,21 +169,30 @@ git rebase main
 This will apply all the changes from your main branch to your feature branch.
 Again, if conflicts arise, try and resolve them and continue the rebase.
 
-### 4. Commit and Push
+### 5. Commit and Push
 
 - Before committing, make sure to run the tests and check code style:
 
-```bash
-poetry run poe lint
-```
 
 This will run all the linters, formatters, and type checkers.
 
 ```bash
-poetry run poe test
+uv run poe lint
 ```
 
 This will run all the tests.
+
+```bash
+uv run poe test
+```
+
+There is `scripts/test-build.sh` script that you can use to test the build process.
+
+```bash
+chmod +x ./scripts/test-build.sh
+
+./scripts/test-build.sh
+```
 
 - Commit your changes with a clear message:
 
@@ -161,7 +225,7 @@ git push origin feat/awesome-feature
 
 We use:
 
-- [**ruff**](https://docs.astral.sh/ruff/) and [**pylint**](https://pylint.readthedocs.io/en/stable/) for linting and formatting
+- [**ruff**](https://docs.astral.sh/ruff/) for linting and formatting
 - [**mypy**](https://mypy-lang.org/) for type checking
 
 ---

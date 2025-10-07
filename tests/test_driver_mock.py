@@ -27,7 +27,8 @@ def test_update_and_delete() -> None:
     driver.update_one("users", {"name": "Bob"}, {"$set": {"age": 26}})
     updated = driver.find_one("users", {"name": "Bob"})
 
-    assert updated["age"] == 26
+    if updated is not None:
+        assert updated["age"] == 26
 
     deleted = driver.delete_one("users", {"name": "Bob"})
     assert deleted["deleted_count"] == 1

@@ -1,4 +1,4 @@
-## Installation
+# Installation
 
 Install from PyPI:
 
@@ -6,13 +6,15 @@ Install from PyPI:
 pip install pydongo
 ```
 
-Or with Poetry:
+Or with UV:
 
 ```bash
-poetry add pydongo
+uv add pydongo
 ```
 
-### Requirements
+## Requirements
+
 - Python 3.9+
 - `pymongo` (auto-installed)
+- `pydantic` (auto-installed)
 - `motor` (for async support)
