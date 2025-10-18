@@ -1,22 +1,18 @@
-[project.urls]
-Homepage = "https://github.com/tecnosam/pydongo"
-GitHub = "https://github.com/tecnosam/pydongo"
-Documentation = "https://tecnosam.github.io/pydongo/"
-
 [project]
 name = "pydongo"
-version = "0.4.0"
+version = "0.4.2"
 description = "A lightweight ORM for MongoDB using Pydantic models."
 readme = "README.md"
 license = "MIT"
-authors = [{ name = "Samuel Abolo", email = "ikabolo59@gmail.com" }]
+authors = [
+    { name = "Samuel Abolo", email = "ikabolo59@gmail.com" },
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -25,16 +21,29 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
     "Typing :: Typed",
 ]
+keywords = [
+    "mongodb",
+    "pydantic",
+    "orm",
+    "async",
+    "motor",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "motor>=3.7.1",
+    "pydantic>=2.11.9",
+    "pymongo>=4.15.2",
+    "tomli-w>=1.2.0",
+]
 
-keywords = ["mongodb", "pydantic", "orm", "async", "motor"]
-
-requires-python = ">=3.9"
-
-dependencies = ["motor>=3.7.1", "pydantic>=2.11.9", "pymongo>=4.15.2"]
-
+[project.urls]
+Homepage = "https://github.com/tecnosam/pydongo"
+GitHub = "https://github.com/tecnosam/pydongo"
+Documentation = "https://tecnosam.github.io/pydongo/"
 
 [dependency-groups]
 dev = [
+    "bumpversion>=0.6.0",
     "coverage>=7.10.7",
     "mkdocs>=1.6.1",
     "mkdocs-material>=9.6.21",
@@ -47,35 +56,16 @@ dev = [
     "twine>=6.2.0",
 ]
 
-
-#------------------------
-
-###   UV
-
-#------------------------
-
 [tool.uv]
-default-groups = ["dev"]
-
-
-#------------------------
-
-###   Ruff
-
-#------------------------
+default-groups = [
+    "dev",
+]
 
 [tool.ruff]
 line-length = 120
 fix = true
 indent-width = 4
-builtins = []     # builtin names to recognize as defined
-
-
-#------------------------
-
-###   Ruff Linter
-
-#------------------------
+builtins = []
 
 [tool.ruff.lint]
 exclude = [
@@ -89,85 +79,79 @@ exclude = [
     ".ruff_cache",
     ".pytest_cache",
 ]
-
 select = [
-    "ARG",   # flake8-arg-names
-    "ANN",   # flake8-annotations
-    "ASYNC", # flake8-async
-    "A",     # flake8-builtins
-    "C4",    # flake8-comprehensions
-    "D",     # pydocstyle
-    "DTZ",   # flake8-datetimezones
-    "E",     # pycodestyle errors
-    "W",     # pycodestyle warnings
-    "F",     # pyflakes
-    "I",     # isort
-    "ICN",   # flake8-import-conventions
-    "B",     # flake8-bugbear
-    "N",     # pep8-naming
-    "UP",    # pyupgrade
-    "YTT",   # flake8-2020
-    "T10",   # flake8-debugger
-    "T20",   # flake8-print
-    "G",     # flake8-logging-format
-    "PIE",   # flake8-pie
-    "PYI",   # flake8-pyi
-    "PT",    # flake8-pytest-style
-    "Q",     # flake8-quotes
-    "SIM",   # flake8-simplify
-    "TC",    # flake8-type-checking
-    "TID",   # flake8-tidy-imports
-    "PTH",   # flake8-use-pathlib
-    "S",     # flake8-bandit
-    "PGH",   # pygrep-hooks
-    "PERF",  # perflint
-    "RET",   # flake8-return
-    "PLE",   # pylint extensions
-    "PLC",   # pylint
-    "PLR",   # pylint
-    "RUF",   # ruff-specific rules
+    "ARG",
+    "ANN",
+    "ASYNC",
+    "A",
+    "C4",
+    "D",
+    "DTZ",
+    "E",
+    "W",
+    "F",
+    "I",
+    "ICN",
+    "B",
+    "N",
+    "UP",
+    "YTT",
+    "T10",
+    "T20",
+    "G",
+    "PIE",
+    "PYI",
+    "PT",
+    "Q",
+    "SIM",
+    "TC",
+    "TID",
+    "PTH",
+    "S",
+    "PGH",
+    "PERF",
+    "RET",
+    "PLE",
+    "PLC",
+    "PLR",
+    "RUF",
 ]
 ignore = [
-    "ANN401", # allow-any-type
-    "FIX",    # fixme, todo, hack, xxx
-    "PTH123", # builtin-open
-    "SIM118", # in-dict-keys
-    "G004",   # logging-fstring-interpolation
-    "D100",   # missing-docstring in public module
-    "D104",   # missing-docstring in public package
-    "D107",   # missing-docstring in __init__
-    "D401",   # first-line-sentence-capitalized
-    "D404",   # first word of docstring should not be "This"
-
-    # We use both ruff formatter and linter so some rules should always be disabled.
-    # See: https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
-    "W191",   # https://docs.astral.sh/ruff/rules/tab-indentation/
-    "E111",   # https://docs.astral.sh/ruff/rules/indentation-with-invalid-multiple/
-    "E114",   # https://docs.astral.sh/ruff/rules/indentation-with-invalid-multiple-comment/
-    "E117",   # https://docs.astral.sh/ruff/rules/over-indented/
-    "D206",   # https://docs.astral.sh/ruff/rules/docstring-tab-indentation/
-    "D300",   # https://docs.astral.sh/ruff/rules/triple-single-quotes/
-    "Q000",   # https://docs.astral.sh/ruff/rules/bad-quotes-inline-string/
-    "Q001",   # https://docs.astral.sh/ruff/rules/bad-quotes-multiline-string/
-    "Q002",   # https://docs.astral.sh/ruff/rules/bad-quotes-docstring/
-    "Q003",   # https://docs.astral.sh/ruff/rules/avoidable-escaped-quote/
-    "COM812", # https://docs.astral.sh/ruff/rules/missing-trailing-comma/
-    "COM819", # https://docs.astral.sh/ruff/rules/prohibited-trailing-comma/
-    "ISC002", # https://docs.astral.sh/ruff/rules/multi-line-implicit-string-concatenation/
+    "ANN401",
+    "FIX",
+    "PTH123",
+    "SIM118",
+    "G004",
+    "D100",
+    "D104",
+    "D107",
+    "D401",
+    "D404",
+    "W191",
+    "E111",
+    "E114",
+    "E117",
+    "D206",
+    "D300",
+    "Q000",
+    "Q001",
+    "Q002",
+    "Q003",
+    "COM812",
+    "COM819",
+    "ISC002",
 ]
 
 [tool.ruff.lint.isort]
 force-single-line = false
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["D", "PT011", "S", "PLR2004"]
-
-# # Ignore `E402` (import violations) in all `__init__.py` files.
-# # Ignore `F401` (unused imports) in all `__init__.py` files
-# "__init__.py" = ["E402", "F401"]
-
-# # Ignore `D` rules everywhere except for the `src/` directory.
-# "!src/**.py" = ["D"]
+"tests/*" = [
+    "D",
+    "PT011",
+    "S",
+    "PLR2004",
+]
 
 [tool.ruff.lint.flake8-annotations]
 mypy-init-return = true
@@ -192,27 +176,15 @@ convention = "google"
 [tool.ruff.lint.pylint]
 max-args = 6
 
-
-#------------------------
-
-###   Ruff Formatter
-
-#------------------------
-
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 line-ending = "auto"
-exclude = ["*.pyi", "*.ipynb"]
+exclude = [
+    "*.pyi",
+    "*.ipynb",
+]
 
-
-#------------------------
-
-###   MyPy
-
-#------------------------
-
-###   Mypy   ###
 [tool.mypy]
 junit_xml = "reports/mypy.xml"
 strict = true
@@ -225,65 +197,61 @@ warn_unreachable = true
 warn_unused_ignores = true
 disallow_subclassing_any = false
 plugins = "pydantic.mypy"
-exclude = [".venv"]
-disable_error_code = ["union-attr", "misc"]
+exclude = [
+    ".venv",
+]
+disable_error_code = [
+    "union-attr",
+    "misc",
+]
 
 [[tool.mypy.overrides]]
-module = ["tests.*"]
+module = [
+    "tests.*",
+]
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
 
-[tool.pydantic-mypy] # https://pydantic-docs.helpmanual.io/mypy_plugin/#configuring-the-plugin
+[tool.pydantic-mypy]
 init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
 warn_untyped_fields = true
 
-
-#------------------------
-
-###   Pytest and Coverage
-
-#------------------------
-
-###   Pytest   ###
-[tool.pytest.ini_options] # https://docs.pytest.org/en/latest/reference/reference.html#ini-options-ref
+[tool.pytest.ini_options]
 addopts = "--exitfirst --failed-first --strict-config --strict-markers --verbosity=2 --junitxml=reports/pytest.xml"
-filterwarnings = ["error", "ignore::DeprecationWarning"]
-testpaths = ["tests"]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+]
+testpaths = [
+    "tests",
+]
 xfail_strict = true
 
-
-###   Coverage   ###
-[tool.coverage.report] # https://coverage.readthedocs.io/en/latest/config.html#report
+[tool.coverage.report]
 fail_under = 50
 precision = 1
 show_missing = true
 skip_covered = true
 
-[tool.coverage.run] # https://coverage.readthedocs.io/en/latest/config.html#run
+[tool.coverage.run]
 branch = true
 command_line = "--module pytest"
 data_file = "reports/.coverage"
-source = ["src"]
-omit = ["*/tests/*"]
+source = [
+    "src",
+]
+omit = [
+    "*/tests/*",
+]
 
-[tool.coverage.xml] # https://coverage.readthedocs.io/en/latest/config.html#xml
+[tool.coverage.xml]
 output = "reports/coverage.xml"
 
+[tool.poe.executor]
+type = "uv"
 
-#------------------------
-
-###   Tasks
-
-#------------------------
-
-
-[tool.poe]
-# If Poe doesn’t automatically detect your uv project, specify it explicitly in your configuration
-executor.type = "uv"
-
-# Poe Tasks
 [tool.poe.tasks]
 _ruff_sort = "ruff check src/ tests/ --fix --select I"
 _ruff_lint = "ruff check src/ tests/ --fix"
@@ -291,19 +259,19 @@ _ruff_fmt = "ruff format src/ tests/"
 _type_check = "mypy src/ tests/"
 _coverage_test = "coverage run -m pytest tests/"
 _coverage_report = "coverage html -d coverage"
-
-# Call only below tasks!
-lint = ["_ruff_sort", "_ruff_lint", "_ruff_fmt", "_type_check"]
-test = ["_coverage_test", "_coverage_report"]
-
-
-#------------------------
-
-###   Build System
-
-#------------------------
-
+lint = [
+    "_ruff_sort",
+    "_ruff_lint",
+    "_ruff_fmt",
+    "_type_check",
+]
+test = [
+    "_coverage_test",
+    "_coverage_report",
+]
 
 [build-system]
-requires = ["uv_build>=0.8.22,<0.9.0"]
+requires = [
+    "uv_build>=0.8.22,<0.9.0",
+]
 build-backend = "uv_build"

@@ -9,7 +9,7 @@ Your help is greatly appreciated, whether it's fixing bugs, improving documentat
 
 To contribute to Pydongo, you'll need:
 
-- Python 3.9 or higher
+- Python 3.10 or higher
 - [uv](https://docs.astral.sh/uv/) for dependency management
 - MongoDB (optional — unit tests can run without it using the built-in mock driver)
 

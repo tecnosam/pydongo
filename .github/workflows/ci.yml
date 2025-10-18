@@ -1,0 +1,88 @@
+name: CI (PR) + Preview (TestPyPI)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    environment: preview
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Create venv for ${{ matrix.python-version }} and sync deps
+        run: |
+          uv venv -p ${{ matrix.python-version }}
+          uv sync --dev
+
+      - name: Lint
+        run: make lint
+
+      - name: Format check
+        run: make format-check
+
+      - name: Type check
+        run: make typecheck
+
+      # 🔒 Require a version bump when package code changes
+      - name: Version bump check
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+          REQUIRED_LEVEL: patch         # or: minor / major
+          PACKAGE_DIRS: src             # customize if needed
+        run: make check-version-bump
+
+      - name: Tests
+        run: make test
+
+      - name: Build (sanity)
+        run: make build
+
+  preview-publish:
+    if: >
+      github.event.pull_request.head.repo.full_name == github.repository
+      && !cancelled() && !failure()
+    needs: [ci]
+    runs-on: ubuntu-latest
+    environment: preview
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up uv (3.11)
+        uses: astral-sh/setup-uv@v3
+        with:
+          python-version: "3.11"
+
+      - name: venv + deps
+        run: |
+          uv venv -p 3.11
+          uv sync --dev
+
+      - name: Compute preview version
+        run: make preview-version
+
+      - name: Patch pyproject version
+        run: make patch-pyproject
+
+      - name: Build dists
+        run: make clean build
+
+      - name: Publish to TestPyPI (OIDC)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/

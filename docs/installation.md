@@ -14,7 +14,7 @@ uv add pydongo
 
 ## Requirements
 
-- Python 3.9+
+- Python 3.10+
 - `pymongo` (auto-installed)
 - `pydantic` (auto-installed)
 - `motor` (for async support)
