@@ -37,12 +37,18 @@ bump-patch:
 	$(UV) run bump2version patch
 	@TAG=$$(git describe --tags --abbrev=0); \
 	echo "Created tag $$TAG"
+	git add uv.lock
+	git commit -m "Added lockfile after bump"
 
 bump-minor:
 	$(UV) run bump2version minor
+	git add uv.lock
+	git commit -m "Added lockfile after bump"
 
 bump-major:
 	$(UV) run bump2version major
+	git add uv.lock
+	git commit -m "Added lockfile after bump"
 
 echo-version:
 	@$(UV) run python ci/python/echo_version.py
