@@ -20,7 +20,7 @@ pip install pydongo
 uv add pydongo
 ```
 
-Pydongo requires Python 3.9+ and will automatically install dependencies like **pymongo** (for sync use) and **motor** (for async use).
+Pydongo requires Python 3.10+ and will automatically install dependencies like **pymongo** (for sync use) and **motor** (for async use).
 
 ## Quickstart
 
