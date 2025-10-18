@@ -34,6 +34,14 @@ jobs:
       - name: Type check
         run: make typecheck
 
+      # 🔒 Require a version bump when package code changes
+      - name: Version bump check
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+          REQUIRED_LEVEL: patch         # or: minor / major
+          PACKAGE_DIRS: src             # customize if needed
+        run: make check-version-bump
+
       - name: Tests
         run: make test
 

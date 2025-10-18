@@ -42,6 +42,18 @@ preview-version:
 patch-pyproject:
 	@$(UV) run python ci/python/patch_pyproject.py
 
+# require env:
+#   BASE_REF: git ref to compare against (default: origin/<PR base> or origin/main)
+#   REQUIRED_LEVEL: patch | minor | major (default: patch)
+#   PACKAGE_DIRS: space-separated dirs that trigger a bump when changed (default: "src")
+
+check-version-bump:
+	@BASE_REF="$${BASE_REF:-origin/$${GITHUB_BASE_REF:-main}}"; \
+	REQUIRED_LEVEL="$${REQUIRED_LEVEL:-patch}"; \
+	PACKAGE_DIRS="$${PACKAGE_DIRS:-src}"; \
+	echo "Checking version bump vs $$BASE_REF (required: $$REQUIRED_LEVEL)"; \
+	$(UV) run python ci/python/check_version_bump.py --base-ref "$$BASE_REF" --require-level "$$REQUIRED_LEVEL" --package-dirs "$$PACKAGE_DIRS"
+
 # --- Tagging ---
 
 tag:
