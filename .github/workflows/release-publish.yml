@@ -1,4 +1,4 @@
-name: Publish on GitHub Release
+name: Publish to PyPI on GitHub Release
 
 on:
   release:
