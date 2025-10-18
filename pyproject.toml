@@ -29,7 +29,12 @@ keywords = ["mongodb", "pydantic", "orm", "async", "motor"]
 
 requires-python = ">=3.10"
 
-dependencies = ["motor>=3.7.1", "pydantic>=2.11.9", "pymongo>=4.15.2"]
+dependencies = [
+    "motor>=3.7.1",
+    "pydantic>=2.11.9",
+    "pymongo>=4.15.2",
+    "tomli-w>=1.2.0",
+]
 
 
 [dependency-groups]
