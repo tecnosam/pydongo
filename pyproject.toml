@@ -16,7 +16,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -28,7 +27,7 @@ classifiers = [
 
 keywords = ["mongodb", "pydantic", "orm", "async", "motor"]
 
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 dependencies = ["motor>=3.7.1", "pydantic>=2.11.9", "pymongo>=4.15.2"]
 
