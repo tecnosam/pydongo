@@ -4,7 +4,7 @@ UV ?= uv
 
 .PHONY: install lint format format-check typecheck test build clean \
         echo-version preview-version patch-pyproject \
-        publish-testpypi publish-pypi tag
+        publish-testpypi publish-pypi tag bump-patch bump-minor bump-major
 
 install:
 	$(UV) sync --dev
@@ -32,6 +32,15 @@ clean:
 	@find . -name "__pycache__" -type d -exec rm -rf {} +
 
 # --- Versioning helpers ---
+
+bump-patch:
+	$(UV) run bump2version patch
+
+bump-minor:
+	$(UV) run bump2version minor
+
+bump-major:
+	$(UV) run bump2version major
 
 echo-version:
 	@$(UV) run python ci/python/echo_version.py
