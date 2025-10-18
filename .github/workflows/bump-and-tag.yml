@@ -30,8 +30,8 @@ jobs:
           git push origin HEAD
           git push origin ${{ env.TAG }}
 
-      - name: Trigger release publish
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          event-type: new-release
-          client-payload: '{"tag": "${{ env.TAG }}"}'
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ env.TAG }}" --generate-notes
