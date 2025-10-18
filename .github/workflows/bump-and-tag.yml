@@ -1,0 +1,37 @@
+name: Bump and Tag
+
+on:
+  workflow_dispatch:  # run manually
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: make install
+
+      - name: Bump patch version
+        run: |
+          make bump-patch
+          TAG=$(git describe --tags --abbrev=0)
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Push commits and tags
+        run: |
+          git push origin HEAD
+          git push origin ${{ env.TAG }}
+
+      - name: Trigger release publish
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          event-type: new-release
+          client-payload: '{"tag": "${{ env.TAG }}"}'

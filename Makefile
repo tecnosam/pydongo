@@ -35,6 +35,8 @@ clean:
 
 bump-patch:
 	$(UV) run bump2version patch
+	@TAG=$$(git describe --tags --abbrev=0); \
+	echo "Created tag $$TAG"
 
 bump-minor:
 	$(UV) run bump2version minor
