@@ -4,7 +4,8 @@ UV ?= uv
 
 .PHONY: install lint format format-check typecheck test build clean \
         echo-version preview-version patch-pyproject \
-        publish-testpypi publish-pypi tag bump-patch bump-minor bump-major
+        publish-testpypi publish-pypi tag bump-patch bump-minor bump-major \
+		lock-and-commit
 
 install:
 	$(UV) sync --dev
@@ -33,22 +34,24 @@ clean:
 
 # --- Versioning helpers ---
 
+lock-and-commit:
+	$(UV) lock
+	git add uv.lock
+	git commit -m "Added lockfile after bump"
+
 bump-patch:
 	$(UV) run bump2version patch
 	@TAG=$$(git describe --tags --abbrev=0); \
 	echo "Created tag $$TAG"
-	git add uv.lock
-	git commit -m "Added lockfile after bump"
+	lock-and-commit
 
 bump-minor:
 	$(UV) run bump2version minor
-	git add uv.lock
-	git commit -m "Added lockfile after bump"
+	lock-and-commit
 
 bump-major:
 	$(UV) run bump2version major
-	git add uv.lock
-	git commit -m "Added lockfile after bump"
+	lock-and-commit
 
 echo-version:
 	@$(UV) run python ci/python/echo_version.py
