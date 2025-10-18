@@ -41,8 +41,6 @@ lock-and-commit:
 
 bump-patch:
 	$(UV) run bump2version patch
-	@TAG=$$(git describe --tags --abbrev=0); \
-	echo "Created tag $$TAG"
 	$(MAKE) -s lock-and-commit
 
 bump-minor:
