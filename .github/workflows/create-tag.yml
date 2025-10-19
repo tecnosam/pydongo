@@ -1,4 +1,4 @@
-name: Create Release
+name: Create Github Tag & Release
 
 on:
   workflow_dispatch:  # run manually
@@ -19,14 +19,9 @@ jobs:
       - name: Install deps
         run: make install
 
-      - name: Bump patch version
-        run: |
-          make bump-patch
-          TAG=$(git describe --tags --abbrev=0)
-          echo "TAG=$TAG" >> $GITHUB_ENV
-
       - name: Push commits and tags
         run: |
+          TAG=$(uvx hatch version)
           git push origin HEAD
           git push origin ${{ env.TAG }}
 
