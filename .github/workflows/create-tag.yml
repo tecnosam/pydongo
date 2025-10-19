@@ -24,10 +24,3 @@ jobs:
           git tag "v$TAG"
           git push origin HEAD
           git push origin "v$TAG"
-
-      - name: Create GitHub Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          TAG=$(uvx hatch version)
-          gh release create "v$TAG" --generate-notes
