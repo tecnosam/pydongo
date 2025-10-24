@@ -11,8 +11,8 @@ T = TypeVar("T", bound=BaseModel)
 
 def as_document(
     pydantic_object: T,
-    driver: Union[AbstractSyncMongoDBDriver, AbstractAsyncMongoDBDriver],
-    collection_name: Union[str, None] = None,
+    driver: AbstractSyncMongoDBDriver | AbstractAsyncMongoDBDriver,
+    collection_name: str | None = None,
 ) -> Union["DocumentWorker", "AsyncDocumentWorker"]:
     """Wraps a Pydantic object in either a synchronous or asynchronous document worker, depending on the provided MongoDB driver.
 
@@ -47,8 +47,8 @@ class BaseDocumentWorker(Generic[T]):
     def __init__(  # noqa: D417
         self,
         pydantic_object: T,
-        objectId: Union[str, None] = None,  # noqa: N803
-        collection_name: Union[str, None] = None,
+        objectId: str | None = None,  # noqa: N803
+        collection_name: str | None = None,
         *args: Any,  # noqa: ARG002
         **kwargs: Any,  # noqa: ARG002
     ) -> None:
@@ -136,8 +136,8 @@ class DocumentWorker(BaseDocumentWorker):  # type: ignore[type-arg]
         self,
         pydantic_object: T,
         driver: AbstractSyncMongoDBDriver,
-        objectId: Union[str, None] = None,  # noqa: N803
-        collection_name: Union[str, None] = None,
+        objectId: str | None = None,  # noqa: N803
+        collection_name: str | None = None,
     ) -> None:
         """Initialize the sync document worker.
 
@@ -190,8 +190,8 @@ class AsyncDocumentWorker(BaseDocumentWorker):  # type: ignore[type-arg]
         self,
         pydantic_object: T,
         driver: AbstractAsyncMongoDBDriver,
-        objectId: Union[str, None] = None,  # noqa: N803
-        collection_name: Union[str, None] = None,
+        objectId: str | None = None,  # noqa: N803
+        collection_name: str | None = None,
     ):
         """Initialize the async document worker.
 

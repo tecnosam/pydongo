@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from typing import Any, Union
+from typing import Any
 
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import PyMongoError
@@ -23,7 +23,7 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
             database_name (str): Name of the database to use.
         """
         super().__init__(connection_string, database_name)
-        self.client: Union[AsyncIOMotorClient, None] = None  # type: ignore  # noqa: PGH003
+        self.client: AsyncIOMotorClient | None = None  # type: ignore  # noqa: PGH003
 
     async def connect(self) -> bool:
         """Asynchronously establish a connection to the MongoDB server.
@@ -72,7 +72,7 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
         result = await self.db[collection].insert_many(documents)
         return {"inserted_ids": [str(_id) for _id in result.inserted_ids]}
 
-    async def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
+    async def find_one(self, collection: str, query: dict[str, Any]) -> dict[str, Any] | None:
         """Find a single document that matches the query.
 
         Args:
@@ -89,8 +89,8 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
         collection: str,
         query: dict[str, Any],
         sort_criteria: dict[str, int],
-        offset: Union[int, None] = None,
-        limit: Union[int, None] = None,
+        offset: int | None = None,
+        limit: int | None = None,
     ) -> Iterable[dict[str, Any]]:
         """Find multiple documents matching the query.
 

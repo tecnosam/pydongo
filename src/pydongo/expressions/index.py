@@ -1,5 +1,5 @@
 from enum import Enum, IntEnum
-from typing import Any, Union
+from typing import Any
 
 from pydongo.expressions.base import BaseExpression
 from pydongo.expressions.filter import CollectionFilterExpression
@@ -51,16 +51,16 @@ class IndexExpression(BaseExpression):
     def __init__(  # noqa: PLR0913
         self,
         field_name: str,
-        index_type: Union[IndexType, None] = None,
+        index_type: IndexType | None = None,
         sort_order: IndexSortOrder = IndexSortOrder.ASCENDING,
-        expires_after_seconds: Union[float, None] = None,  # For TTL indexes
-        is_sparse: Union[bool, None] = None,
-        is_unique: Union[bool, None] = None,
-        is_hidden: Union[bool, None] = None,
+        expires_after_seconds: float | None = None,  # For TTL indexes
+        is_sparse: bool | None = None,
+        is_unique: bool | None = None,
+        is_hidden: bool | None = None,
         collation_locale: str = "en",
-        collation_strength: Union[CollationStrength, None] = None,
-        partial_expression: Union[CollectionFilterExpression, None] = None,
-        index_name: Union[str, None] = None,
+        collation_strength: CollationStrength | None = None,
+        partial_expression: CollectionFilterExpression | None = None,
+        index_name: str | None = None,
     ):
         self.field_name = field_name
         self.index_type = index_type
