@@ -13,13 +13,13 @@ To work with a document, you wrap a Pydantic model using `as_document()`:
 ```python
 from pydantic import BaseModel
 from pydongo import as_document
-from pydongo.drivers.sync_mongo import DefaultMongoDBDriver
+from pydongo.drivers.sync_mongo import PyMongoDriver
 
 class User(BaseModel):
     name: str
     age: int
 
-driver = DefaultMongoDBDriver("mongodb://localhost:27017", "mydb")
+driver = PyMongoDriver("mongodb://localhost:27017", "mydb")
 driver.connect()
 
 user = User(name="Alice", age=30)
@@ -110,13 +110,13 @@ You don’t need to construct it manually — Pydongo will automatically return 
 ```python
 from pydantic import BaseModel
 from pydongo import as_document
-from pydongo.drivers.async_mongo import DefaultAsyncMongoDBDriver
+from pydongo.drivers.async_mongo import PyMongoAsyncDriver
 
 class User(BaseModel):
     name: str
     age: int
 
-driver = DefaultAsyncMongoDBDriver("mongodb://localhost:27017", "mydb")
+driver = PyMongoAsyncDriver("mongodb://localhost:27017", "mydb")
 await driver.connect()
 
 user = User(name="Bob", age=28)

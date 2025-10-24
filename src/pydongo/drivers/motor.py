@@ -1,15 +1,15 @@
 from collections.abc import Iterable
 from typing import Any
 
-from pymongo.asynchronous.mongo_client import AsyncMongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import PyMongoError
 
 from pydongo.drivers.base import AbstractAsyncMongoDBDriver
 from pydongo.expressions.index import IndexExpression
 
 
-class PyMongoAsyncDriver(AbstractAsyncMongoDBDriver):
-    """Default asynchronous MongoDB driver using PyMongo's async API.
+class MotorMongoDBDriver(AbstractAsyncMongoDBDriver):
+    """Default asynchronous MongoDB driver using Motor (async wrapper for PyMongo).
 
     This driver connects to a real MongoDB instance and provides async methods
     for insert, update, query, and delete operations.
@@ -24,7 +24,7 @@ class PyMongoAsyncDriver(AbstractAsyncMongoDBDriver):
         """
         self.connection_string = connection_string
         self.database_name = database_name
-        self.client: AsyncMongoClient | None = None  # type: ignore  # noqa: PGH003
+        self.client: AsyncIOMotorClient | None = None  # type: ignore  # noqa: PGH003
 
     async def connect(self) -> bool:
         """Asynchronously establish a connection to the MongoDB server.
@@ -36,7 +36,7 @@ class PyMongoAsyncDriver(AbstractAsyncMongoDBDriver):
             RuntimeError: If unable to connect to MongoDB.
         """
         try:
-            self.client = AsyncMongoClient(self.connection_string)
+            self.client = AsyncIOMotorClient(self.connection_string)
             self.db = self.client[self.database_name]
             return True
         except PyMongoError as e:
@@ -45,7 +45,7 @@ class PyMongoAsyncDriver(AbstractAsyncMongoDBDriver):
     async def close(self) -> None:
         """Asynchronously close the MongoDB connection."""
         if self.client:
-            await self.client.close()
+            self.client.close()
 
     async def insert_one(self, collection: str, document: dict[str, Any]) -> dict[str, Any]:
         """Insert a single document into the specified collection.

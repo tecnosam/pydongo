@@ -22,13 +22,13 @@ It brings structure and type safety to your unstructured NoSQL world — giving 
 ```python
 from pydantic import BaseModel
 from pydongo import as_document, as_collection
-from pydongo.drivers.sync_mongo import DefaultMongoDBDriver
+from pydongo.drivers.sync_mongo import PyMongoDriver
 
 class User(BaseModel):
     name: str
     age: int
 
-driver = DefaultMongoDBDriver("mongodb://localhost:27017", "mydb")
+driver = PyMongoDriver("mongodb://localhost:27017", "mydb")
 driver.connect()
 
 # Insert a document

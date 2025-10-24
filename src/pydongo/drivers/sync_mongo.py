@@ -8,7 +8,7 @@ from pydongo.drivers.base import AbstractSyncMongoDBDriver
 from pydongo.expressions.index import IndexExpression
 
 
-class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
+class PyMongoDriver(AbstractSyncMongoDBDriver):
     """Default synchronous MongoDB driver implementation using PyMongo.
 
     This driver connects to a real MongoDB instance and executes

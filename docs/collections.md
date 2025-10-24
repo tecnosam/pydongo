@@ -12,13 +12,13 @@ You don't interact directly with `CollectionWorker`. Instead, use the `as_collec
 ```python
 from pydongo import as_collection
 from pydantic import BaseModel
-from pydongo.drivers.sync_mongo import DefaultMongoDBDriver
+from pydongo.drivers.sync_mongo import PyMongoDriver
 
 class User(BaseModel):
     name: str
     age: int
 
-driver = DefaultMongoDBDriver("mongodb://localhost:27017", "mydb")
+driver = PyMongoDriver("mongodb://localhost:27017", "mydb")
 driver.connect()
 
 collection = as_collection(User, driver)
