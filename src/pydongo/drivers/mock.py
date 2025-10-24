@@ -21,7 +21,8 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
             connection_string (str): Ignored.
             database_name (str): Name of the fake database.
         """
-        super().__init__(connection_string, database_name)
+        self.connection_string = connection_string
+        self.database_name = database_name
         self._collections: dict[str, list[dict[str, Any]]] = {}
         self.indexes: defaultdict[str, Any] = defaultdict(list)
 
@@ -202,7 +203,8 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
             connection_string (str): Ignored.
             database_name (str): Mock database name.
         """
-        super().__init__(connection_string, database_name)
+        self.connection_string = connection_string
+        self.database_name = database_name
         self._collections: dict[str, list[dict[str, Any]]] = {}
         self.indexes: defaultdict[str, Any] = defaultdict(list)
 

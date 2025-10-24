@@ -20,16 +20,6 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
 
     _current: contextvars.ContextVar["AbstractSyncMongoDBDriver"] = contextvars.ContextVar("mongo_driver_current")
 
-    def __init__(self, connection_string: str, database_name: str):
-        """Initialize the MongoDB driver with a connection string and database name.
-
-        Args:
-            connection_string (str): MongoDB connection URI.
-            database_name (str): Target database name.
-        """
-        self.connection_string = connection_string
-        self.database_name = database_name
-
     def __enter__(self) -> Self:
         """Enter the context manager, connect to MongoDB, and set the current driver context."""
         self.connect()
@@ -207,16 +197,6 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
     """
 
     _current: contextvars.ContextVar["AbstractAsyncMongoDBDriver"] = contextvars.ContextVar("mongo_driver_current")
-
-    def __init__(self, connection_string: str, database_name: str):
-        """Initialize the MongoDB driver with a connection string and database name.
-
-        Args:
-            connection_string (str): MongoDB connection URI.
-            database_name (str): Target database name.
-        """
-        self.connection_string = connection_string
-        self.database_name = database_name
 
     async def __aenter__(self) -> Self:
         """Enter the async context manager, connect to MongoDB, and set the current driver context."""

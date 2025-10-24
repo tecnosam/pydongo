@@ -22,7 +22,9 @@ class AsyncDefaultMongoDBDriver(AbstractAsyncMongoDBDriver):
             connection_string (str): MongoDB connection URI.
             database_name (str): Name of the database to use.
         """
-        super().__init__(connection_string, database_name)
+
+        self.connection_string = connection_string
+        self.database_name = database_name
         self.client: AsyncIOMotorClient | None = None  # type: ignore  # noqa: PGH003
 
     async def connect(self) -> bool:

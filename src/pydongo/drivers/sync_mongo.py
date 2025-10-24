@@ -22,7 +22,8 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
             connection_string (str): MongoDB URI (e.g., "mongodb://localhost:27017").
             database_name (str): The target database to operate on.
         """
-        super().__init__(connection_string, database_name)
+        self.connection_string = connection_string
+        self.database_name = database_name
         self.client: MongoClient | None = None  # type: ignore[type-arg]
 
     def connect(self) -> bool:
