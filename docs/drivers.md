@@ -11,8 +11,9 @@ They expose a common interface so the higher-level Pydongo logic (documents, que
 
 You can choose between:
 
-- ✅ `DefaultMongoDBDriver` (sync) — wraps PyMongo
-- ✅ `DefaultAsyncMongoDBDriver` (async) — wraps Motor
+- ✅ `PyMongoDriver` (sync) — wraps PyMongo
+- ✅ `PyMongoAsyncDriver` (async) — wraps PyMongo's asynchronous client
+- ✅ `MotorMongoDBDriver` (async) — wraps Motor
 - ✅ `MockMongoDBDriver` — in-memory fake for testing
 - ✅ Or build your own
 
@@ -51,14 +52,14 @@ Ideal for async frameworks like **FastAPI** or **Quart**.
 
 ## ✅ Default Drivers
 
-Pydongo includes two ready-to-use drivers:
+Pydongo includes three ready-to-use drivers:
 
-### `DefaultMongoDBDriver` (Synchronous)
+### `PyMongoDriver` (Recommended for Synchronous workflows)
 
 ```python
-from pydongo.drivers.sync_mongo import DefaultMongoDBDriver
+from pydongo.drivers.sync_mongo import PyMongoDriver
 
-driver = DefaultMongoDBDriver("mongodb://localhost:27017", "mydb")
+driver = PyMongoDriver("mongodb://localhost:27017", "mydb")
 driver.connect()
 ```
 
@@ -66,16 +67,27 @@ This driver uses **PyMongo** internally and is safe for CLI apps, scripts, and s
 
 ---
 
-### `DefaultAsyncMongoDBDriver` (Asynchronous)
+### `PyMongoAsyncDriver` (Recommended for Asynchronous workflows)
 
 ```python
-from pydongo.drivers.async_mongo import DefaultAsyncMongoDBDriver
+from pydongo.drivers.async_mongo import PyMongoAsyncDriver
 
-driver = DefaultAsyncMongoDBDriver("mongodb://localhost:27017", "mydb")
+driver = PyMongoAsyncDriver("mongodb://localhost:27017", "mydb")
 await driver.connect()
 ```
 
-This driver wraps **Motor** and is ideal for async web servers like **FastAPI**.
+This driver uses **PyMongo**'s official async library and is ideal for async web servers like **FastAPI**.
+
+---
+
+### `MotorMongoDBDriver` (Supported)
+
+```python
+from pydongo.drivers.motor import MotorMongoDBDriver
+
+driver = MotorMongoDBDriver("mongodb://localhost:27017", "mydb")
+await driver.connect()
+```
 
 ---
 
@@ -134,8 +146,9 @@ driver.connect()
 
 | Driver | Type | Backed By | Use Case |
 |--------|------|-----------|----------|
-| `DefaultMongoDBDriver` | Sync | PyMongo | Scripts, CLIs |
-| `DefaultAsyncMongoDBDriver` | Async | Motor | FastAPI, async APIs |
+| `PyMongoDriver` | Sync | PyMongo | Scripts, CLIs |
+| `PyMongoAsyncDriver` | Async | PyMongo | FastAPI, async APIs |
+| `MotorMongoDBDriver` | Async | Motor | FastAPI, async APIs |
 | `MockMongoDBDriver` | Sync | In-memory | Unit tests |
 | `MockAsyncMongoDBDriver` | Async | In-memory | Async unit tests |
 | Custom driver | Sync/Async | Anything | Extend, log, simulate, swap DBs |

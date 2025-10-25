@@ -7,7 +7,7 @@ from pydantic import Field
 
 from pydongo import as_collection
 from pydongo import as_document
-from pydongo.drivers.async_mongo import DefaultAsyncMongoDBDriver
+from pydongo.drivers.async_mongo import PyMongoAsyncDriver
 
 # === MODELS ===
 
@@ -27,7 +27,7 @@ class User(BaseModel):
 
 # === DB SETUP ===
 
-driver = DefaultAsyncMongoDBDriver("mongodb://localhost:27017", "social_app_async")
+driver = PyMongoAsyncDriver("mongodb://localhost:27017", "social_app_async")
 
 
 # === OPERATIONS ===

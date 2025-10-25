@@ -30,10 +30,10 @@ Define your data schema as a Pydantic model, then use Pydongo's driver and query
 
 ```python
 from pydantic import BaseModel
-from pydongo import DefaultMongoDBDriver, as_collection, as_document
+from pydongo import PyMongoDriver, as_collection, as_document
 
 # 1. Create a MongoDB driver (synchronous)
-driver = DefaultMongoDBDriver("mongodb://localhost:27017", "mydatabase")
+driver = PyMongoDriver("mongodb://localhost:27017", "mydatabase")
 driver.connect()  # Establish connection to MongoDB
 
 # 2. Define a Pydantic model for your data
@@ -72,7 +72,7 @@ driver.close()  # Close the connection when done
 ```python
 import asyncio
 from pydantic import BaseModel
-from pydongo import DefaultAsyncMongoDBDriver, as_collection, as_document
+from pydongo import PyMongoAsyncDriver, as_collection, as_document
 
 # Define a Pydantic model (same as before)
 class Product(BaseModel):
@@ -81,7 +81,7 @@ class Product(BaseModel):
 
 async def main():
     # 1. Create a MongoDB driver (asynchronous)
-    driver = DefaultAsyncMongoDBDriver("mongodb://localhost:27017", "mydatabase")
+    driver = PyMongoAsyncDriver("mongodb://localhost:27017", "mydatabase")
     await driver.connect()  # Establish async connection
 
     # 2. Insert a new document using the document interface
@@ -110,7 +110,7 @@ asyncio.run(main())
 
 - **Expressive Query DSL**: Build MongoDB queries using a Pythonic syntax. Compare fields with operators (==, !=, <, >=, etc.) and combine conditions with & (AND), | (OR), or ~ (NOT) for complex queries. This expression system will compile to proper MongoDB filters behind the scenes, making queries more readable and maintainable (similar to Django QuerySets or SQLAlchemy filter expressions).
 - **Document Interface**: In addition to query builder methods, Pydongo lets you treat your Pydantic model instances as active record documents. By wrapping a model with as_document(), you get an object that supports .save() to insert/update itself in the database and .delete() to remove itself. This provides an ORM-like experience where each object knows how to persist itself.
-- **Sync and Async Support**: Use Pydongo in both synchronous and asynchronous applications. It offers a DefaultMongoDBDriver for PyMongo (sync) and a DefaultAsyncMongoDBDriver for Motor (async). Both drivers implement a common interface, so you can write code that is agnostic to the driver type. Async support means you can integrate easily with frameworks like FastAPI, while sync support covers traditional scripts and applications.
+- **Sync and Async Support**: Use Pydongo in both synchronous and asynchronous applications. It offers a PyMongoDriver & PyMongoAsyncDriver for sync and async workflows. Both drivers are based on the official `pymongo` library from MongoDB. Both drivers implement a common interface, so you can write code that is agnostic to the driver type. Async support means you can integrate easily with frameworks like FastAPI, while sync support covers traditional scripts and applications.
 - **Built on Pydantic**: Pydongo models are Pydantic models, so you get all the benefits of Pydantic's validation, parsing, and serialization. Data going into and coming out of MongoDB will match your schema, with Pydantic ensuring types and constraints. This reduces errors and keeps your data model consistent.
 - **Testability with Mock Driver**: Pydongo is designed to be easily testable. It includes an in-memory MockMongoDBDriver (and an async variant) that you can use for unit tests. This means you can run tests without needing a real MongoDB instance, by swapping in the mock driver to simulate database operations. Because the ORM is decoupled from the actual database via the driver interface, you can inject a fake or real driver as needed.
 

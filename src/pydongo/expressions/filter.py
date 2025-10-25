@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 from pydongo.expressions.base import BaseExpression
 
@@ -19,7 +19,7 @@ class CollectionFilterExpression(BaseExpression):
     The resulting expression can be serialized and passed to the database driver.
     """
 
-    def __init__(self, expression: Union[dict[str, Any], None] = None):
+    def __init__(self, expression: dict[str, Any] | None = None):
         """Initialize the filter expression with an optional initial dictionary.
 
         Args:

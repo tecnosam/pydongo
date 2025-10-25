@@ -20,9 +20,9 @@ class User(BaseModel):
 ### 🔌 Step 2: Connect to MongoDB
 
 ```python
-from pydongo.drivers.sync_mongo import DefaultMongoDBDriver
+from pydongo.drivers.sync_mongo import PyMongoDriver
 
-driver = DefaultMongoDBDriver("mongodb://localhost:27017", "mydb")
+driver = PyMongoDriver("mongodb://localhost:27017", "mydb")
 driver.connect()
 ```
 

@@ -2,7 +2,7 @@ import contextvars
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from types import TracebackType
-from typing import Any, Self, Union
+from typing import Any, Self
 
 from pydongo.expressions.index import IndexExpression
 
@@ -20,16 +20,6 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
 
     _current: contextvars.ContextVar["AbstractSyncMongoDBDriver"] = contextvars.ContextVar("mongo_driver_current")
 
-    def __init__(self, connection_string: str, database_name: str):
-        """Initialize the MongoDB driver with a connection string and database name.
-
-        Args:
-            connection_string (str): MongoDB connection URI.
-            database_name (str): Target database name.
-        """
-        self.connection_string = connection_string
-        self.database_name = database_name
-
     def __enter__(self) -> Self:
         """Enter the context manager, connect to MongoDB, and set the current driver context."""
         self.connect()
@@ -38,9 +28,9 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
 
     def __exit__(
         self,
-        exc_type: Union[type[BaseException], None],
-        exc_val: Union[BaseException, None],
-        exc_tb: Union[TracebackType, None],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         """Exit the context manager, close the connection, and reset the driver context."""
         self.close()
@@ -98,7 +88,7 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         """
 
     @abstractmethod
-    def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
+    def find_one(self, collection: str, query: dict[str, Any]) -> dict[str, Any] | None:
         """Find a single document matching the query.
 
         Args:
@@ -115,8 +105,8 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
         collection: str,
         query: dict[str, Any],
         sort_criteria: dict[str, Any],
-        offset: Union[int, None] = None,
-        limit: Union[int, None] = None,
+        offset: int | None = None,
+        limit: int | None = None,
     ) -> Iterable[dict[str, Any]]:
         """Find multiple documents matching the query.
 
@@ -208,16 +198,6 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
 
     _current: contextvars.ContextVar["AbstractAsyncMongoDBDriver"] = contextvars.ContextVar("mongo_driver_current")
 
-    def __init__(self, connection_string: str, database_name: str):
-        """Initialize the MongoDB driver with a connection string and database name.
-
-        Args:
-            connection_string (str): MongoDB connection URI.
-            database_name (str): Target database name.
-        """
-        self.connection_string = connection_string
-        self.database_name = database_name
-
     async def __aenter__(self) -> Self:
         """Enter the async context manager, connect to MongoDB, and set the current driver context."""
         await self.connect()
@@ -226,9 +206,9 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
 
     async def __aexit__(
         self,
-        exc_type: Union[type[BaseException], None],
-        exc_val: Union[BaseException, None],
-        exc_tb: Union[TracebackType, None],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         """Exit the async context manager, close the connection, and reset the driver context."""
         await self.close()
@@ -286,7 +266,7 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         """
 
     @abstractmethod
-    async def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
+    async def find_one(self, collection: str, query: dict[str, Any]) -> dict[str, Any] | None:
         """Find a single document matching the query.
 
         Args:
@@ -303,8 +283,8 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
         collection: str,
         query: dict[str, Any],
         sort_criteria: dict[str, Any],
-        offset: Union[int, None] = None,
-        limit: Union[int, None] = None,
+        offset: int | None = None,
+        limit: int | None = None,
     ) -> Iterable[dict[str, Any]]:
         """Find multiple documents matching the query.
 

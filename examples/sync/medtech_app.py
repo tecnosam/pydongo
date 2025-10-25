@@ -5,7 +5,7 @@ from pydantic import Field
 
 from pydongo import as_collection
 from pydongo import as_document
-from pydongo.drivers.sync_mongo import DefaultMongoDBDriver
+from pydongo.drivers.sync_mongo import PyMongoDriver
 
 # === MODELS ===
 
@@ -27,7 +27,7 @@ class Patient(BaseModel):
 
 # === DB SETUP ===
 
-driver = DefaultMongoDBDriver("mongodb://localhost:27017", "medtech_app")
+driver = PyMongoDriver("mongodb://localhost:27017", "medtech_app")
 driver.connect()
 patients = as_collection(Patient, driver)
 

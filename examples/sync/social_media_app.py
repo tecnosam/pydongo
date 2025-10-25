@@ -6,7 +6,7 @@ from pydantic import Field
 
 from pydongo import as_collection
 from pydongo import as_document
-from pydongo.drivers.sync_mongo import DefaultMongoDBDriver
+from pydongo.drivers.sync_mongo import PyMongoDriver
 
 # === MODELS ===
 
@@ -26,7 +26,7 @@ class User(BaseModel):
 
 # === DB SETUP ===
 
-driver = DefaultMongoDBDriver("mongodb://localhost:27017", "social_app")
+driver = PyMongoDriver("mongodb://localhost:27017", "social_app")
 driver.connect()
 users = as_collection(User, driver)
 

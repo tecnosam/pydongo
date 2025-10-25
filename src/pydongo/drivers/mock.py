@@ -1,7 +1,7 @@
 import uuid
 from collections import defaultdict
 from copy import deepcopy
-from typing import Any, Union
+from typing import Any
 
 from pydongo.drivers.base import AbstractAsyncMongoDBDriver, AbstractSyncMongoDBDriver
 from pydongo.expressions.index import IndexExpression
@@ -21,7 +21,8 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
             connection_string (str): Ignored.
             database_name (str): Name of the fake database.
         """
-        super().__init__(connection_string, database_name)
+        self.connection_string = connection_string
+        self.database_name = database_name
         self._collections: dict[str, list[dict[str, Any]]] = {}
         self.indexes: defaultdict[str, Any] = defaultdict(list)
 
@@ -67,7 +68,7 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
             inserted_ids.append(inserted["inserted_id"])
         return {"inserted_ids": inserted_ids}
 
-    def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
+    def find_one(self, collection: str, query: dict[str, Any]) -> dict[str, Any] | None:
         """Find a single document matching the query.
 
         Args:
@@ -87,8 +88,8 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
         collection: str,
         query: dict[str, Any],
         sort_criteria: dict[str, Any],  # noqa: ARG002
-        offset: Union[int, None] = None,
-        limit: Union[int, None] = None,
+        offset: int | None = None,
+        limit: int | None = None,
     ) -> list[dict[str, Any]]:
         """Find multiple documents matching the query.
 
@@ -202,7 +203,8 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
             connection_string (str): Ignored.
             database_name (str): Mock database name.
         """
-        super().__init__(connection_string, database_name)
+        self.connection_string = connection_string
+        self.database_name = database_name
         self._collections: dict[str, list[dict[str, Any]]] = {}
         self.indexes: defaultdict[str, Any] = defaultdict(list)
 
@@ -248,7 +250,7 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
             inserted_ids.append(inserted["inserted_id"])
         return {"inserted_ids": inserted_ids}
 
-    async def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
+    async def find_one(self, collection: str, query: dict[str, Any]) -> dict[str, Any] | None:
         """Asynchronously find a single matching document.
 
         Args:
@@ -268,8 +270,8 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
         collection: str,
         query: dict[str, Any],
         sort_criteria: dict[str, Any],  # noqa: ARG002
-        offset: Union[int, None] = None,
-        limit: Union[int, None] = None,
+        offset: int | None = None,
+        limit: int | None = None,
     ) -> list[dict[str, Any]]:
         """Asynchronously return a list of matching documents.
 

@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from typing import Any, Union
+from typing import Any
 
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
@@ -8,7 +8,7 @@ from pydongo.drivers.base import AbstractSyncMongoDBDriver
 from pydongo.expressions.index import IndexExpression
 
 
-class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
+class PyMongoDriver(AbstractSyncMongoDBDriver):
     """Default synchronous MongoDB driver implementation using PyMongo.
 
     This driver connects to a real MongoDB instance and executes
@@ -22,8 +22,9 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
             connection_string (str): MongoDB URI (e.g., "mongodb://localhost:27017").
             database_name (str): The target database to operate on.
         """
-        super().__init__(connection_string, database_name)
-        self.client: Union[MongoClient, None] = None  # type: ignore[type-arg]
+        self.connection_string = connection_string
+        self.database_name = database_name
+        self.client: MongoClient | None = None  # type: ignore[type-arg]
 
     def connect(self) -> bool:
         """Establish a connection to the MongoDB server.
@@ -72,7 +73,7 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
         result = self.db[collection].insert_many(documents)
         return {"inserted_ids": [str(_id) for _id in result.inserted_ids]}
 
-    def find_one(self, collection: str, query: dict[str, Any]) -> Union[dict[str, Any], None]:
+    def find_one(self, collection: str, query: dict[str, Any]) -> dict[str, Any] | None:
         """Find a single document that matches the query.
 
         Args:
@@ -89,8 +90,8 @@ class DefaultMongoDBDriver(AbstractSyncMongoDBDriver):
         collection: str,
         query: dict[str, Any],
         sort_criteria: dict[str, Any],
-        offset: Union[int, None] = None,
-        limit: Union[int, None] = None,
+        offset: int | None = None,
+        limit: int | None = None,
     ) -> Iterable[dict[str, Any]]:
         """Find multiple documents that match the query.
 
