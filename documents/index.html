@@ -697,13 +697,13 @@
 <p>To work with a document, you wrap a Pydantic model using <code>as_document()</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_document</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydongo.drivers.sync_mongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultMongoDBDriver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydongo.drivers.sync_mongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PyMongoDriver</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">age</span><span class="p">:</span> <span class="nb">int</span>
 
-<span class="n">driver</span> <span class="o">=</span> <span class="n">DefaultMongoDBDriver</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">)</span>
+<span class="n">driver</span> <span class="o">=</span> <span class="n">PyMongoDriver</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">)</span>
 <span class="n">driver</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
 <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
@@ -779,13 +779,13 @@ To mutate data, modify <code>doc.pydantic_object</code> directly:</p>
 <p>You don’t need to construct it manually — Pydongo will automatically return an <code>AsyncDocumentWorker</code> when used with an async driver:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_document</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydongo.drivers.async_mongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultAsyncMongoDBDriver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydongo.drivers.async_mongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PyMongoAsyncDriver</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">age</span><span class="p">:</span> <span class="nb">int</span>
 
-<span class="n">driver</span> <span class="o">=</span> <span class="n">DefaultAsyncMongoDBDriver</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">)</span>
+<span class="n">driver</span> <span class="o">=</span> <span class="n">PyMongoAsyncDriver</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">)</span>
 <span class="k">await</span> <span class="n">driver</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
 <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">28</span><span class="p">)</span>

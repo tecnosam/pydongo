@@ -370,18 +370,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#defaultmongodbdriver-synchronous" class="md-nav__link">
+  <a href="#pymongodriver-recommended-for-synchronous-workflows" class="md-nav__link">
     <span class="md-ellipsis">
-      DefaultMongoDBDriver (Synchronous)
+      PyMongoDriver (Recommended for Synchronous workflows)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#defaultasyncmongodbdriver-asynchronous" class="md-nav__link">
+  <a href="#pymongoasyncdriver-recommended-for-asynchronous-workflows" class="md-nav__link">
     <span class="md-ellipsis">
-      DefaultAsyncMongoDBDriver (Asynchronous)
+      PyMongoAsyncDriver (Recommended for Asynchronous workflows)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#motormongodbdriver-supported" class="md-nav__link">
+    <span class="md-ellipsis">
+      MotorMongoDBDriver (Supported)
     </span>
   </a>
   
@@ -603,18 +612,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#defaultmongodbdriver-synchronous" class="md-nav__link">
+  <a href="#pymongodriver-recommended-for-synchronous-workflows" class="md-nav__link">
     <span class="md-ellipsis">
-      DefaultMongoDBDriver (Synchronous)
+      PyMongoDriver (Recommended for Synchronous workflows)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#defaultasyncmongodbdriver-asynchronous" class="md-nav__link">
+  <a href="#pymongoasyncdriver-recommended-for-asynchronous-workflows" class="md-nav__link">
     <span class="md-ellipsis">
-      DefaultAsyncMongoDBDriver (Asynchronous)
+      PyMongoAsyncDriver (Recommended for Asynchronous workflows)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#motormongodbdriver-supported" class="md-nav__link">
+    <span class="md-ellipsis">
+      MotorMongoDBDriver (Supported)
     </span>
   </a>
   
@@ -685,8 +703,9 @@
 They expose a common interface so the higher-level Pydongo logic (documents, queries, filters) remains independent of the connection style.</p>
 <p>You can choose between:</p>
 <ul>
-<li>✅ <code>DefaultMongoDBDriver</code> (sync) — wraps PyMongo</li>
-<li>✅ <code>DefaultAsyncMongoDBDriver</code> (async) — wraps Motor</li>
+<li>✅ <code>PyMongoDriver</code> (sync) — wraps PyMongo</li>
+<li>✅ <code>PyMongoAsyncDriver</code> (async) — wraps PyMongo's asynchronous client</li>
+<li>✅ <code>MotorMongoDBDriver</code> (async) — wraps Motor</li>
 <li>✅ <code>MockMongoDBDriver</code> — in-memory fake for testing</li>
 <li>✅ Or build your own</li>
 </ul>
@@ -713,22 +732,29 @@ They expose a common interface so the higher-level Pydongo logic (documents, que
 Ideal for async frameworks like <strong>FastAPI</strong> or <strong>Quart</strong>.</p>
 <hr />
 <h2 id="default-drivers">✅ Default Drivers<a class="headerlink" href="#default-drivers" title="Permanent link">&para;</a></h2>
-<p>Pydongo includes two ready-to-use drivers:</p>
-<h3 id="defaultmongodbdriver-synchronous"><code>DefaultMongoDBDriver</code> (Synchronous)<a class="headerlink" href="#defaultmongodbdriver-synchronous" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydongo.drivers.sync_mongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultMongoDBDriver</span>
+<p>Pydongo includes three ready-to-use drivers:</p>
+<h3 id="pymongodriver-recommended-for-synchronous-workflows"><code>PyMongoDriver</code> (Recommended for Synchronous workflows)<a class="headerlink" href="#pymongodriver-recommended-for-synchronous-workflows" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydongo.drivers.sync_mongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PyMongoDriver</span>
 
-<span class="n">driver</span> <span class="o">=</span> <span class="n">DefaultMongoDBDriver</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">)</span>
+<span class="n">driver</span> <span class="o">=</span> <span class="n">PyMongoDriver</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">)</span>
 <span class="n">driver</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 </code></pre></div>
 <p>This driver uses <strong>PyMongo</strong> internally and is safe for CLI apps, scripts, and synchronous APIs.</p>
 <hr />
-<h3 id="defaultasyncmongodbdriver-asynchronous"><code>DefaultAsyncMongoDBDriver</code> (Asynchronous)<a class="headerlink" href="#defaultasyncmongodbdriver-asynchronous" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydongo.drivers.async_mongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultAsyncMongoDBDriver</span>
+<h3 id="pymongoasyncdriver-recommended-for-asynchronous-workflows"><code>PyMongoAsyncDriver</code> (Recommended for Asynchronous workflows)<a class="headerlink" href="#pymongoasyncdriver-recommended-for-asynchronous-workflows" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydongo.drivers.async_mongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PyMongoAsyncDriver</span>
 
-<span class="n">driver</span> <span class="o">=</span> <span class="n">DefaultAsyncMongoDBDriver</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">)</span>
+<span class="n">driver</span> <span class="o">=</span> <span class="n">PyMongoAsyncDriver</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">)</span>
 <span class="k">await</span> <span class="n">driver</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 </code></pre></div>
-<p>This driver wraps <strong>Motor</strong> and is ideal for async web servers like <strong>FastAPI</strong>.</p>
+<p>This driver uses <strong>PyMongo</strong>'s official async library and is ideal for async web servers like <strong>FastAPI</strong>.</p>
+<hr />
+<h3 id="motormongodbdriver-supported"><code>MotorMongoDBDriver</code> (Supported)<a class="headerlink" href="#motormongodbdriver-supported" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydongo.drivers.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">MotorMongoDBDriver</span>
+
+<span class="n">driver</span> <span class="o">=</span> <span class="n">MotorMongoDBDriver</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">driver</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+</code></pre></div>
 <hr />
 <h2 id="mock-driver-for-testing">🧪 Mock Driver for Testing<a class="headerlink" href="#mock-driver-for-testing" title="Permanent link">&para;</a></h2>
 <p>Use <code>MockMongoDBDriver</code> or <code>MockAsyncMongoDBDriver</code> to test logic <strong>without a real MongoDB instance</strong>.</p>
@@ -778,13 +804,19 @@ Ideal for async frameworks like <strong>FastAPI</strong> or <strong>Quart</stron
 </thead>
 <tbody>
 <tr>
-<td><code>DefaultMongoDBDriver</code></td>
+<td><code>PyMongoDriver</code></td>
 <td>Sync</td>
 <td>PyMongo</td>
 <td>Scripts, CLIs</td>
 </tr>
 <tr>
-<td><code>DefaultAsyncMongoDBDriver</code></td>
+<td><code>PyMongoAsyncDriver</code></td>
+<td>Async</td>
+<td>PyMongo</td>
+<td>FastAPI, async APIs</td>
+</tr>
+<tr>
+<td><code>MotorMongoDBDriver</code></td>
 <td>Async</td>
 <td>Motor</td>
 <td>FastAPI, async APIs</td>
