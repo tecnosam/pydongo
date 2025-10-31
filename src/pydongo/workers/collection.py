@@ -1,6 +1,10 @@
 from abc import ABC
 from collections.abc import Iterable, Sequence
-from typing import Any, Generic, Self, TypeVar
+from typing import Any, Generic, TypeVar
+try:
+    from typing import Self  # For Python 3.11+
+except ImportError:
+    from typing_extensions import Self  # For earlier versions
 
 from pydantic import BaseModel
 
