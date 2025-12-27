@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 from pydongo.expressions.filter import CollectionFilterExpression
 from pydongo.expressions.index import IndexExpression, IndexExpressionBuilder, IndexSortOrder, IndexType
+from pydongo.expressions.mutation import MutationExpression, MutationExpressionContext
 from pydongo.utils.annotations import resolve_annotation
 from pydongo.utils.serializer import HANDLER_MAPPING
 
@@ -18,16 +19,20 @@ class FieldExpression:
     It also supports nested attribute access (e.g., user.address.city).
     """
 
-    def __init__(self, field_name: str, annotation: Any = None, sort_ascending: bool = True) -> None:
+    def __init__(
+        self, field_name: str, annotation: Any = None, sort_ascending: bool = True, update_alias: str | None = None
+    ) -> None:
         """Initialize a field expression.
 
         Args:
             field_name (str): The full dot-path name of the field.
             annotation (Any): The Pydantic type annotation for the field.
             sort_ascending (bool): Whether sorting on this field is ascending by default.
+            update_alias (str): Custom alias for update expressions
         """
-        self._field_name = field_name
         self.annotation = annotation
+        self._field_name = field_name
+        self._update_alias = update_alias or field_name
         self.sort_ascending = sort_ascending
 
     def to_index(self) -> IndexExpression:
@@ -54,6 +59,27 @@ class FieldExpression:
             return builder.use_index_type(IndexType.TEXT)
 
         return builder
+
+    def unset(self) -> MutationExpression:
+        """Build an unset expression.
+
+        Returns:
+            MutationExpression: A MongoDB `$unset` expression.
+        """
+        mutation = MutationExpression(field_name=self._update_alias, operation="$unset", value="")
+        self.add_mutation(mutation)
+        return mutation
+
+    def set_value(self, value: Any) -> MutationExpression:
+        """Build a set expression.
+
+        Args:
+            value (Any): The value to set.
+
+        Returns:
+            MutationExpression: A MongoDB `$set` expression.
+        """
+        return MutationExpression(field_name=self._update_alias, operation="$set", value=value)
 
     def _get_comparative_expression(self, operator: str, value: Any) -> dict[str, Any]:
         """Build a MongoDB filter expression using the given operator and value.
@@ -123,6 +149,38 @@ class FieldExpression:
         """
         return self._getattr(self.field_name, self.annotation, name)
 
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Append a mutation to context."""
+        if not MutationExpressionContext.has_context():
+            return super().__setattr__(name, value)
+
+        if name == "annotation":
+            return super().__setattr__(name, value)
+
+        annotation = resolve_annotation(annotation=self.annotation)
+        return self._setattr(name, value, annotation)
+
+    def _setattr(self, name: str, value: Any, annotation: Any) -> None:
+        """Append a mutation to context."""
+        if not issubclass(annotation, BaseModel):
+            return super().__setattr__(name, value)
+        if name not in annotation.model_fields:
+            return super().__setattr__(name, value)
+
+        field = self._getattr(self.field_name, annotation, name)
+
+        if isinstance(value, MutationExpression):
+            self.add_mutation(value)
+            return None
+
+        self.add_mutation(field.set_value(value))
+        return None
+
+    def add_mutation(self, value: MutationExpression) -> None:
+        """Helper function to add a mutation."""
+        if MutationExpressionContext.has_context():
+            MutationExpressionContext.add_mutation(value)
+
     @classmethod
     def _getattr(cls, field_name: str, annotation: Any, name: str) -> "FieldExpression":
         """Helper to resolve nested fields.
@@ -155,7 +213,83 @@ class FieldExpression:
         dtype = get_origin(annotation) or annotation
         if isinstance(dtype, type) and issubclass(dtype, (Sequence, set)):
             return ArrayFieldExpression(field_name, annotation=annotation)
+        if isinstance(dtype, type) and issubclass(dtype, (int, float)):
+            return NumericFieldExpression(field_name, annotation=annotation)
         return FieldExpression(field_name, annotation=annotation)
+
+
+class NumericFieldExpression(FieldExpression):
+    """Represents a numeric field in a MongoDB document."""
+
+    def __add__(self, other: float) -> MutationExpression:
+        """Build an addition expression (`+`).
+
+        Args:
+            other (Any): The value to add.
+
+        Returns:
+            MutationExpression: A MongoDB `$expr` addition expression.
+        """
+        return MutationExpression(field_name=self._update_alias, operation="$inc", value=other)
+
+    def __sub__(self, other: float) -> MutationExpression:
+        """Build a subtraction expression (`-`).
+
+        Args:
+            other (Any): The value to subtract.
+
+        Returns:
+            MutationExpression: A MongoDB `$expr` subtraction expression.
+        """
+        return MutationExpression(field_name=self._update_alias, operation="$inc", value=-other)
+
+    def __mul__(self, other: float) -> MutationExpression:
+        """Build a multiplication expression (`*`).
+
+        Args:
+            other (Any): The value to multiply by.
+
+        Returns:
+            MutationExpression: A MongoDB `$expr` multiplication expression.
+        """
+        return MutationExpression(field_name=self._update_alias, operation="$mul", value=other)
+
+    def __truediv__(self, other: float) -> MutationExpression:
+        """Build a division expression (`/`).
+
+        Args:
+            other (Any): The value to divide by.
+
+        Returns:
+            MutationExpression: A MongoDB `$expr` division expression.
+        """
+        return MutationExpression(field_name=self._update_alias, operation="$mul", value=1 / other)
+
+    def setmax(self, value: float) -> MutationExpression:
+        """Build a set maximum expression.
+
+        Args:
+            value (Any): The value to set as maximum.
+
+        Returns:
+            MutationExpression: A MongoDB `$max` expression.
+        """
+        mutation = MutationExpression(field_name=self._update_alias, operation="$max", value=value)
+        self.add_mutation(mutation)
+        return mutation
+
+    def setmin(self, value: float) -> MutationExpression:
+        """Build a set minimum expression.
+
+        Args:
+            value (Any): The value to set as minimum.
+
+        Returns:
+            MutationExpression: A MongoDB `$min` expression.
+        """
+        mutation = MutationExpression(field_name=self._update_alias, operation="$min", value=value)
+        self.add_mutation(mutation)
+        return mutation
 
 
 class ArraySizeFieldExpression(FieldExpression):
@@ -230,6 +364,69 @@ class ArrayFieldExpression(FieldExpression):
         """
         expression = {self.field_name: {"$nin": value}}
         return CollectionFilterExpression().with_expression(expression)
+
+    def push(self, value: Any) -> MutationExpression:
+        """Build a push expression to add an element to the array.
+
+        Args:
+            value (Any): The value to push into the array.
+
+        Returns:
+            MutationExpression: A MongoDB `$push` expression.
+        """
+        mutation = MutationExpression(field_name=self.field_name, operation="$push", value=value)
+        self.add_mutation(mutation)
+        return mutation
+
+    def add_to_set(self, value: Any) -> MutationExpression:
+        """Build an addToSet expression to add an element to the array if it doesn't already exist.
+
+        Args:
+            value (Any): The value to add to the set.
+
+        Returns:
+            MutationExpression: A MongoDB `$addToSet` expression.
+        """
+        mutation = MutationExpression(field_name=self.field_name, operation="$addToSet", value=value)
+        self.add_mutation(mutation)
+        return mutation
+
+    def pull(self, value: Any) -> MutationExpression:
+        """Build a pull expression to remove an element from the array.
+
+        Args:
+            value (Any): The value to remove from the array.
+
+        Returns:
+            MutationExpression: A MongoDB `$pull` expression.
+        """
+        mutation = MutationExpression(field_name=self.field_name, operation="$pull", value=value)
+        self.add_mutation(mutation)
+        return mutation
+
+    def popleft(self) -> MutationExpression:
+        """Build a pop expression to remove the first element from the array.
+
+        Returns:
+            MutationExpression: A MongoDB `$pop` expression.
+        """
+        position = 1
+
+        mutation = MutationExpression(field_name=self.field_name, operation="$pop", value=position)
+        self.add_mutation(mutation)
+        return mutation
+
+    def popright(self) -> MutationExpression:
+        """Build a pop expression to remove the last element from the array.
+
+        Returns:
+            MutationExpression: A MongoDB `$pop` expression.
+        """
+        position = -1
+
+        mutation = MutationExpression(field_name=self.field_name, operation="$pop", value=position)
+        self.add_mutation(mutation)
+        return mutation
 
     def __getattr__(self, name: str) -> FieldExpression:
         """Support accessing subfields within an array of objects.
