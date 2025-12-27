@@ -1,0 +1,970 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../dsl-querying/">
+      
+      
+        <link rel="next" href="../indexing/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+    
+    
+      
+        <title>Updating Documents with Mutations - Pydongo</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.2a3383ac.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#pydongo-mutation-system-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Pydongo" class="md-header__button md-logo" aria-label="Pydongo" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Pydongo
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Updating Documents with Mutations
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Pydongo" class="md-nav__button md-logo" aria-label="Pydongo" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Pydongo
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quickstart
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../drivers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Drivers & Extensibility
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../documents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Documents
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../collections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Collections
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dsl-querying/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Querying with the DSL
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Updating Documents with Mutations
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Updating Documents with Mutations
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#updates-from-mutations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updates from Mutations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-idea" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Idea
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Idea">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-create-and-apply-mutations" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to Create and Apply Mutations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How to Create and Apply Mutations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recommended-bulk-update-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recommended Bulk Update Pattern
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#important-warning-shared-mutation-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      Important Warning: Shared Mutation Context
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Important Warning: Shared Mutation Context">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#danger-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Danger Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-safe-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recommended Safe Patterns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-mutation-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Supported Mutation Operations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#single-document-updates-less-common-use-case" class="md-nav__link">
+    <span class="md-ellipsis">
+      Single Document Updates (less common use case)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-which-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      When to Use Which Approach
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../indexing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MongoDB Indexing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#updates-from-mutations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updates from Mutations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-idea" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Idea
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Idea">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-create-and-apply-mutations" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to Create and Apply Mutations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How to Create and Apply Mutations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recommended-bulk-update-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recommended Bulk Update Pattern
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#important-warning-shared-mutation-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      Important Warning: Shared Mutation Context
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Important Warning: Shared Mutation Context">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#danger-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Danger Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-safe-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recommended Safe Patterns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-mutation-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Supported Mutation Operations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#single-document-updates-less-common-use-case" class="md-nav__link">
+    <span class="md-ellipsis">
+      Single Document Updates (less common use case)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-which-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      When to Use Which Approach
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="pydongo-mutation-system-guide">Pydongo Mutation System Guide<a class="headerlink" href="#pydongo-mutation-system-guide" title="Permanent link">&para;</a></h1>
+<h2 id="updates-from-mutations">Updates from Mutations<a class="headerlink" href="#updates-from-mutations" title="Permanent link">&para;</a></h2>
+<p>Pydongo's mutation system allows you to perform atomic MongoDB updates on large numbers of documents without loading them into memory.</p>
+<p>Instead of fetching documents, modifying them in Python, and saving them one by one (which becomes slow and memory-intensive for thousands or millions of records), you can compose MongoDB update operations directly using familiar Python syntax.</p>
+<p>This is the primary intended use case of the Mutation DSL.</p>
+<h2 id="core-idea">Core Idea<a class="headerlink" href="#core-idea" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Write Python-like syntax -&gt; Generate efficient MongoDB bulk/atomic updates</strong></li>
+<li><strong>No documents are loaded into memory when using collection-level mutations</strong></li>
+</ul>
+<h3 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Efficient: updates 10,000+ documents in one MongoDB operation</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">followers</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">query</span><span class="o">.</span><span class="n">followers</span> <span class="o">+=</span> <span class="mi">10</span>
+<span class="n">query</span><span class="o">.</span><span class="n">posts</span><span class="o">.</span><span class="n">add_to_set</span><span class="p">(</span><span class="n">Post</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s2">&quot;Thanks for being active!&quot;</span><span class="p">))</span>
+<span class="n">query</span><span class="o">.</span><span class="n">mutate</span><span class="p">()</span>               <span class="c1"># Single updateMany() call</span>
+</code></pre></div>
+<h2 id="how-to-create-and-apply-mutations">How to Create and Apply Mutations<a class="headerlink" href="#how-to-create-and-apply-mutations" title="Permanent link">&para;</a></h2>
+<p>Mutations are collected automatically inside a context created when you call <code>.find()</code>.</p>
+<h3 id="recommended-bulk-update-pattern">Recommended Bulk Update Pattern<a class="headerlink" href="#recommended-bulk-update-pattern" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="n">query</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">)</span>
+
+<span class="c1"># These statements build mutations in the shared context</span>
+<span class="n">query</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;active&quot;</span>                    <span class="c1"># $set</span>
+<span class="n">query</span><span class="o">.</span><span class="n">score</span> <span class="o">+=</span> <span class="mi">100</span>                         <span class="c1"># $inc</span>
+<span class="n">query</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">add_to_set</span><span class="p">(</span><span class="s2">&quot;vip&quot;</span><span class="p">)</span>               <span class="c1"># $addToSet</span>
+<span class="n">query</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">setmax</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>           <span class="c1"># $max</span>
+<span class="n">query</span><span class="o">.</span><span class="n">bio</span><span class="o">.</span><span class="n">unset</span><span class="p">()</span>                          <span class="c1"># $unset</span>
+
+<span class="c1"># Execute the bulk update (updateMany)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">mutate</span><span class="p">()</span>                    <span class="c1"># or await query.amutate()</span>
+</code></pre></div>
+<p>You can always inspect the generated update document:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">get_mutations</span><span class="p">())</span>
+<span class="c1"># {</span>
+<span class="c1">#   &quot;$set&quot;: {&quot;status&quot;: &quot;active&quot;},</span>
+<span class="c1">#   &quot;$inc&quot;: {&quot;score&quot;: 100},</span>
+<span class="c1">#   &quot;$addToSet&quot;: {&quot;tags&quot;: &quot;vip&quot;},</span>
+<span class="c1">#   &quot;$max&quot;: {&quot;profile.views&quot;: 1000},</span>
+<span class="c1">#   &quot;$unset&quot;: {&quot;bio&quot;: &quot;&quot;}</span>
+<span class="c1"># }</span>
+</code></pre></div>
+<h3 id="important-warning-shared-mutation-context">Important Warning: Shared Mutation Context<a class="headerlink" href="#important-warning-shared-mutation-context" title="Permanent link">&para;</a></h3>
+<p>The mutation context is thread-local / event-loop-local and shared across all <code>.find()</code> calls in the same execution context.</p>
+<h4 id="danger-example">Danger Example<a class="headerlink" href="#danger-example" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># DANGER - same context is reused!</span>
+<span class="n">q1</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">country</span> <span class="o">==</span> <span class="s2">&quot;FR&quot;</span><span class="p">)</span>
+<span class="n">q1</span><span class="o">.</span><span class="n">followers</span> <span class="o">+=</span> <span class="mi">5</span>
+
+<span class="n">q2</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">country</span> <span class="o">==</span> <span class="s2">&quot;DE&quot;</span><span class="p">)</span>     <span class="c1"># ← same mutation context!</span>
+<span class="n">q2</span><span class="o">.</span><span class="n">followers</span> <span class="o">+=</span> <span class="mi">10</span>
+
+<span class="n">q1</span><span class="o">.</span><span class="n">mutate</span><span class="p">()</span>   <span class="c1"># Will apply BOTH +5 and +10 to French users!</span>
+</code></pre></div>
+<h3 id="recommended-safe-patterns">Recommended Safe Patterns<a class="headerlink" href="#recommended-safe-patterns" title="Permanent link">&para;</a></h3>
+<p><strong>Pattern 1: Short-lived query builder</strong></p>
+<div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">users</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">65</span><span class="p">)</span> <span class="k">as</span> <span class="n">elderly</span><span class="p">:</span>
+    <span class="n">elderly</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;retired&quot;</span>
+    <span class="n">elderly</span><span class="o">.</span><span class="n">pension</span> <span class="o">+=</span> <span class="mi">200</span>
+    <span class="n">elderly</span><span class="o">.</span><span class="n">mutate</span><span class="p">()</span>
+</code></pre></div>
+<p><strong>Pattern 2: Explicit reset</strong></p>
+<div class="highlight"><pre><span></span><code><span class="n">query</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">active</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">query</span><span class="o">.</span><span class="n">last_seen</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+<span class="n">query</span><span class="o">.</span><span class="n">mutate</span><span class="p">()</span>
+<span class="n">MutationExpressionContext</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>          <span class="c1"># Reset for next query</span>
+</code></pre></div>
+<blockquote>
+<p>In most real applications, prefer short-lived query builders.</p>
+</blockquote>
+<h2 id="supported-mutation-operations">Supported Mutation Operations<a class="headerlink" href="#supported-mutation-operations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Python Syntax</th>
+<th>MongoDB Operator</th>
+<th>Example / Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>field = value</td>
+<td>$set</td>
+<td>user.name = "Alice"</td>
+</tr>
+<tr>
+<td>field.unset()</td>
+<td>$unset</td>
+<td>Removes field completely</td>
+</tr>
+<tr>
+<td>numeric += n / numeric -= n</td>
+<td>$inc</td>
+<td>followers += 10, balance -= 50</td>
+</tr>
+<tr>
+<td>numeric *= n</td>
+<td>$mul</td>
+<td>score *= 1.5</td>
+</tr>
+<tr>
+<td>numeric /= n</td>
+<td>$mul (1/n)</td>
+<td>price /= 2</td>
+</tr>
+<tr>
+<td>field.setmax(value)</td>
+<td>$max</td>
+<td>Keeps greater value</td>
+</tr>
+<tr>
+<td>field.setmin(value)</td>
+<td>$min</td>
+<td>Keeps smaller value</td>
+</tr>
+<tr>
+<td>array.push(value)</td>
+<td>$push</td>
+<td>Append value</td>
+</tr>
+<tr>
+<td>array.add_to_set(value)</td>
+<td>$addToSet</td>
+<td>Add only if not present</td>
+</tr>
+<tr>
+<td>array.pull(value)</td>
+<td>$pull</td>
+<td>Remove matching values</td>
+</tr>
+<tr>
+<td>array.popleft()</td>
+<td>$pop: 1</td>
+<td>Remove first element</td>
+</tr>
+<tr>
+<td>array.popright()</td>
+<td>$pop: -1</td>
+<td>Remove last element</td>
+</tr>
+<tr>
+<td>nested.field = value</td>
+<td>dot notation</td>
+<td>user.address.city = "Paris"</td>
+</tr>
+</tbody>
+</table>
+<h2 id="single-document-updates-less-common-use-case">Single Document Updates (less common use case)<a class="headerlink" href="#single-document-updates-less-common-use-case" title="Permanent link">&para;</a></h2>
+<p>When you already have a document loaded (<code>find_one</code> / <code>afind_one</code>), you can still use mutation syntax, but the traditional approach is usually simpler:</p>
+<div class="highlight"><pre><span></span><code><span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">users</span><span class="o">.</span><span class="n">afind_one</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">username</span> <span class="o">==</span> <span class="s2">&quot;alice&quot;</span><span class="p">)</span>
+
+<span class="n">user</span><span class="o">.</span><span class="n">bio</span> <span class="o">=</span> <span class="s2">&quot;Loves async Python&quot;</span>
+<span class="n">user</span><span class="o">.</span><span class="n">followers</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="n">user</span><span class="o">.</span><span class="n">posts</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">Post</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s2">&quot;New post!&quot;</span><span class="p">))</span>
+
+<span class="k">await</span> <span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>  <span class="c1"># Applies mutations + full document save</span>
+</code></pre></div>
+<blockquote>
+<p>For single documents, modifying the Python object and calling <code>.save()</code> is usually more readable.</p>
+</blockquote>
+<p>The real power of the Mutation DSL appears when performing bulk updates without fetching documents.</p>
+<h2 id="when-to-use-which-approach">When to Use Which Approach<a class="headerlink" href="#when-to-use-which-approach" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Goal</th>
+<th>Recommended Approach</th>
+<th>Memory Usage</th>
+<th>Speed (large N)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Update 1 document (already loaded)</td>
+<td>Modify object -&gt; .save()</td>
+<td>Low</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Update 1 document (without loading)</td>
+<td>.find_one(...).mutate()</td>
+<td>None</td>
+<td>Fast</td>
+</tr>
+<tr>
+<td>Update hundreds / thousands / millions</td>
+<td>.find(...).mutate()</td>
+<td>None</td>
+<td>Very fast</td>
+</tr>
+<tr>
+<td>Complex per-document logic</td>
+<td>Load -&gt; process -&gt; save (loop)</td>
+<td>High</td>
+<td>Slow</td>
+</tr>
+</tbody>
+</table>
+<p>Pydongo's Mutation DSL lets you harness MongoDB's atomic <code>updateMany</code> power using clean, type-safe Python syntax.</p>
+<p>Perfect for bulk maintenance tasks, counter updates, user rewards, data cleanups, and migrations.</p>
+<p>See the <code>social_media_app.py</code> example for a complete demonstration of rewarding many users in a single operation.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>
