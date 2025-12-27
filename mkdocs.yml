@@ -15,6 +15,7 @@ nav:
   - Working with Documents: documents.md
   - Working with Collections: collections.md
   - Querying with the DSL: dsl-querying.md
+  - Updating Documents with Mutations: updates-with-mutations.md
   - MongoDB Indexing: indexing.md
 
 markdown_extensions:

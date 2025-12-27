@@ -198,3 +198,21 @@ class PyMongoAsyncDriver(AbstractAsyncMongoDBDriver):
             final_kwargs.update(expr.build_kwargs())
 
         await self.db[collection].create_index(index_key, **final_kwargs)
+
+    async def update_many(self, collection: str, query: dict[str, Any], update: dict[str, Any]) -> dict[str, Any]:
+        """Update multiple documents matching the filter.
+
+        Args:
+            collection (str): Name of the collection.
+            query (dict): MongoDB filter.
+            update (dict): MongoDB update expression.
+
+        Returns:
+            dict: Result of the update operation.
+        """
+        result = await self.db[collection].update_many(query, update)
+        return {
+            "matched_count": result.matched_count,
+            "modified_count": result.modified_count,
+            "upserted_id": str(result.upserted_id) if result.upserted_id else None,
+        }

@@ -199,3 +199,20 @@ class PyMongoDriver(AbstractSyncMongoDBDriver):
             final_kwargs.update(expr.build_kwargs())
 
         self.db[collection].create_index(index_key, **final_kwargs)
+
+    def update_many(self, collection: str, query: dict[str, Any], update: dict[str, Any]) -> dict[str, Any]:
+        """Update multiple documents matching the filter.
+
+        Args:
+            collection (str): Name of the collection.
+            query (dict): Filter conditions.
+            update (dict): Update operations.
+
+        Returns:
+            dict: Update result with count of matched and modified documents.
+        """
+        result = self.db[collection].update_many(query, update)
+        return {
+            "matched_count": result.matched_count,
+            "modified_count": result.modified_count,
+        }

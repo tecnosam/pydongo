@@ -188,6 +188,14 @@ class MockMongoDBDriver(AbstractSyncMongoDBDriver):
         """
         self.indexes[collection].append(index)
 
+    def update_many(self, collection: str, query: dict[str, Any], update: dict[str, Any]) -> dict[str, Any]:
+        """Update multiple documents matching the query."""
+        return {
+            "collection": collection,
+            "query": query,
+            "update": update,
+        }
+
 
 class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
     """In-memory mock implementation of the AbstractAsyncMongoDBDriver.
@@ -369,3 +377,11 @@ class MockAsyncMongoDBDriver(AbstractAsyncMongoDBDriver):
 
         """
         self.indexes[collection].append(index)
+
+    async def update_many(self, collection: str, query: dict[str, Any], update: dict[str, Any]) -> dict[str, Any]:
+        """Mock async update multiple documents matching the query."""
+        return {
+            "collection": collection,
+            "query": query,
+            "update": update,
+        }

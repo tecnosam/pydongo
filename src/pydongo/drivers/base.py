@@ -188,6 +188,24 @@ class AbstractSyncMongoDBDriver(AbstractMongoDBDriver):
                 NOTE: Multiple elements in tuple indicate a single compound index
         """
 
+    @abstractmethod
+    def update_many(
+        self,
+        collection: str,
+        query: dict[str, Any],
+        update: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Update multiple documents matching the query.
+
+        Args:
+            collection (str): Name of the collection.
+            query (dict): MongoDB filter.
+            update (dict): MongoDB update expression.
+
+        Returns:
+            dict: Result of the update operation.
+        """
+
 
 class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
     """Abstract base class for asynchronous MongoDB drivers.
@@ -365,4 +383,22 @@ class AbstractAsyncMongoDBDriver(AbstractMongoDBDriver):
                 A tuple of IndexExpression objects representing the index to create
                 NOTE: Muiltiple elements in tuple indicate a single compound index
                 not multiple indexes
+        """
+
+    @abstractmethod
+    async def update_many(
+        self,
+        collection: str,
+        query: dict[str, Any],
+        update: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Update multiple documents matching the query.
+
+        Args:
+            collection (str): Name of the collection.
+            query (dict): MongoDB filter.
+            update (dict): MongoDB update expression.
+
+        Returns:
+            dict: Result of the update operation.
         """

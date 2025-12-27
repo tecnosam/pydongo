@@ -119,11 +119,15 @@ class BaseDocumentWorker(Generic[T]):
         """
         return f"{self.__class__.__name__}(<{self.pydantic_object}>)"
 
-    # def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Pipe updates to the pydantic object where applicable."""
+        if name == "pydantic_object":
+            return super().__setattr__(name, value)
 
-    #     if not hasattr(self.pydantic_object, name):
-    #         raise AttributeError(f"{self.pydantic_object} has no attribute {name}")
-    #     setattr(self.pydantic_object, name, value)
+        if hasattr(self.pydantic_object, name):
+            setattr(self.pydantic_object, name, value)
+
+        return super().__setattr__(name, value)
 
 
 class DocumentWorker(BaseDocumentWorker):  # type: ignore[type-arg]
