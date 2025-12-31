@@ -1,5 +1,3 @@
-import contextvars
-from types import TracebackType
 from typing import Any
 
 from pydantic import BaseModel
@@ -41,43 +39,20 @@ class MutationExpression(BaseExpression):
 class MutationExpressionContext:
     """Context Manager for Mutation expressions across the call stack."""
 
-    _mutations: contextvars.ContextVar[dict[str, Any]] = contextvars.ContextVar("mutations")
+    def __init__(self) -> None:
+        self.__mutations: dict[str, Any] = {}
 
-    def __enter__(self) -> "MutationExpressionContext":
-        """Enter context."""
-        self._token = self._mutations.set({})
-        return self
-
-    def __exit__(
-        self, exc_type: type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None
-    ) -> None:
-        """Exit current context."""
-        self._mutations.reset(self._token)
-
-    @classmethod
-    def add_mutation(cls, mutation: "MutationExpression") -> None:
+    def add_mutation(self, mutation: "MutationExpression") -> None:
         """Add mutations to context."""
-        mutations = cls._mutations.get()
         serialized = mutation.serialize()
 
         for operator, values in serialized.items():
-            mutations.setdefault(operator, {}).update(values)
+            self.__mutations.setdefault(operator, {}).update(values)
 
-    @classmethod
-    def get_mutations(cls) -> dict[str, Any]:
+    def get_mutations(self) -> dict[str, Any]:
         """Get mutations from context."""
-        return cls._mutations.get()
+        return self.__mutations
 
-    @classmethod
-    def clear(cls) -> None:
+    def clear(self) -> None:
         """Clear the current context."""
-        cls._mutations.set({})
-
-    @classmethod
-    def has_context(cls) -> bool:
-        """Check if current execution has context."""
-        try:
-            cls._mutations.get()
-            return True
-        except LookupError:
-            return False
+        self.__mutations = {}

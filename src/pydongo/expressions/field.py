@@ -20,7 +20,12 @@ class FieldExpression:
     """
 
     def __init__(
-        self, field_name: str, annotation: Any = None, sort_ascending: bool = True, update_alias: str | None = None
+        self,
+        field_name: str,
+        annotation: Any = None,
+        sort_ascending: bool = True,
+        update_alias: str | None = None,
+        mutation_ctx: MutationExpressionContext | None = None,
     ) -> None:
         """Initialize a field expression.
 
@@ -29,8 +34,10 @@ class FieldExpression:
             annotation (Any): The Pydantic type annotation for the field.
             sort_ascending (bool): Whether sorting on this field is ascending by default.
             update_alias (str): Custom alias for update expressions
+            mutation_ctx (MutationExpressionContext): Reference to mutation context
         """
         self.annotation = annotation
+        self.mutation_ctx = mutation_ctx
         self._field_name = field_name
         self._update_alias = update_alias or field_name
         self.sort_ascending = sort_ascending
@@ -147,14 +154,14 @@ class FieldExpression:
         Returns:
             FieldExpression: A new field expression for the nested field.
         """
-        return self._getattr(self.field_name, self.annotation, name)
+        return self._getattr(self._field_name, self.annotation, name, mutation_ctx=self.mutation_ctx)
 
     def __setattr__(self, name: str, value: Any) -> None:
         """Append a mutation to context."""
-        if not MutationExpressionContext.has_context():
+        if name in ("annotation", "mutation_ctx"):
             return super().__setattr__(name, value)
 
-        if name == "annotation":
+        if self.mutation_ctx is None:
             return super().__setattr__(name, value)
 
         annotation = resolve_annotation(annotation=self.annotation)
@@ -167,7 +174,7 @@ class FieldExpression:
         if name not in annotation.model_fields:
             return super().__setattr__(name, value)
 
-        field = self._getattr(self.field_name, annotation, name)
+        field = self._getattr(self.field_name, annotation, name, mutation_ctx=self.mutation_ctx)
 
         if isinstance(value, MutationExpression):
             self.add_mutation(value)
@@ -178,17 +185,21 @@ class FieldExpression:
 
     def add_mutation(self, value: MutationExpression) -> None:
         """Helper function to add a mutation."""
-        if MutationExpressionContext.has_context():
-            MutationExpressionContext.add_mutation(value)
+        if self.mutation_ctx is None:
+            return
+        self.mutation_ctx.add_mutation(value)
 
     @classmethod
-    def _getattr(cls, field_name: str, annotation: Any, name: str) -> "FieldExpression":
+    def _getattr(
+        cls, field_name: str, annotation: Any, name: str, mutation_ctx: MutationExpressionContext | None = None
+    ) -> "FieldExpression":
         """Helper to resolve nested fields.
 
         Args:
             field_name (str): Current field name path.
             annotation (Any): Type annotation of the current field.
             name (str): Next subfield name.
+            mutation_ctx (MutationExpressionContext): reference to mutation context
 
         Returns:
             FieldExpression: A new expression with nested field access.
@@ -205,17 +216,19 @@ class FieldExpression:
             raise AttributeError(f"'{annotation.__name__}' has no field named '{name}'")
 
         annotation = annotation.model_fields[name].annotation
-        return cls.get_field_expression(field_name, annotation)
+        return cls.get_field_expression(field_name, annotation, mutation_ctx=mutation_ctx)
 
     @staticmethod
-    def get_field_expression(field_name: str, annotation: Any) -> "FieldExpression":
+    def get_field_expression(
+        field_name: str, annotation: Any, mutation_ctx: MutationExpressionContext | None = None
+    ) -> "FieldExpression":
         """Factory method to return the appropriate FieldExpression subclass."""
         dtype = get_origin(annotation) or annotation
         if isinstance(dtype, type) and issubclass(dtype, (Sequence, set)):
-            return ArrayFieldExpression(field_name, annotation=annotation)
+            return ArrayFieldExpression(field_name, annotation=annotation, mutation_ctx=mutation_ctx)
         if isinstance(dtype, type) and issubclass(dtype, (int, float)):
-            return NumericFieldExpression(field_name, annotation=annotation)
-        return FieldExpression(field_name, annotation=annotation)
+            return NumericFieldExpression(field_name, annotation=annotation, mutation_ctx=mutation_ctx)
+        return FieldExpression(field_name, annotation=annotation, mutation_ctx=mutation_ctx)
 
 
 class NumericFieldExpression(FieldExpression):
@@ -445,7 +458,7 @@ class ArrayFieldExpression(FieldExpression):
             raise TypeError(f"Cannot extract element type from {self.annotation}")
 
         element_type = args[0]
-        return self._getattr(self.field_name, element_type, name)
+        return self._getattr(self.field_name, element_type, name, mutation_ctx=self.mutation_ctx)
 
     def __len__(self) -> ArraySizeFieldExpression:
         """Return an expression for the array's size (using `len()`).

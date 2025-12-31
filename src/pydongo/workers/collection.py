@@ -1,4 +1,3 @@
-import contextlib
 from abc import ABC, abstractmethod
 from collections.abc import Iterable, Sequence
 from typing import Any, Generic, Self, TypeVar
@@ -39,13 +38,15 @@ def as_collection(
     )
 
 
-def _get_field_expression(name: str, model: type[T]) -> FieldExpression:
+def _get_field_expression(
+    name: str, model: type[T], mutation_ctx: MutationExpressionContext | None = None
+) -> FieldExpression:
     if name not in model.model_fields:
         raise AttributeError(f"'{model.__name__}' has no field named '{name}'")
     annotation = model.model_fields[name].annotation
     annotation = resolve_annotation(annotation=annotation)
 
-    return FieldExpression.get_field_expression(name, annotation)
+    return FieldExpression.get_field_expression(name, annotation, mutation_ctx)
 
 
 class CollectionWorker(Generic[T]):
@@ -221,8 +222,6 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         self.collection_name = collection_name
 
         self.__mutation_ctx = MutationExpressionContext()
-        self.__mutation_ctx.__enter__()
-
         self._other_kwargs = kwargs
 
     def skip(self, offset: int) -> "CollectionResponseBuilder[T]":
@@ -279,9 +278,7 @@ class CollectionResponseBuilder(ABC, Generic[T]):
 
     def get_mutations(self) -> dict[str, Any]:
         """Get current mutation context."""
-        if MutationExpressionContext.has_context():
-            return MutationExpressionContext.get_mutations()
-        return {}
+        return self.__mutation_ctx.get_mutations()
 
     def mutate(self) -> dict[str, Any]:
         """Run mutations through driver."""
@@ -353,18 +350,15 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         if name not in self.model.model_fields:
             return super().__setattr__(name, value)
 
-        if self.__mutation_ctx.has_context():
-            if isinstance(value, MutationExpression):
-                MutationExpressionContext.add_mutation(value)
-                return None
-
-            expression: FieldExpression = _get_field_expression(
-                name=name,
-                model=self.model,
-            )
-
-            MutationExpressionContext.add_mutation(expression.set_value(value))
+        if isinstance(value, MutationExpression):
+            self.__mutation_ctx.add_mutation(value)
             return None
+
+        expression: FieldExpression = _get_field_expression(
+            name=name, model=self.model, mutation_ctx=self.__mutation_ctx
+        )
+
+        self.__mutation_ctx.add_mutation(expression.set_value(value))
         return None
 
     def __getattr__(self, name: str) -> FieldExpression:
@@ -379,13 +373,7 @@ class CollectionResponseBuilder(ABC, Generic[T]):
         Raises:
             AttributeError: If the field does not exist on the model.
         """  # noqa: E501
-        return _get_field_expression(name, self.model)
-
-    def __del__(self) -> None:
-        """Exit the mutation context."""
-        if hasattr(self, "__mutation_ctx"):
-            with contextlib.suppress(Exception):
-                self.__mutation_ctx.__exit__(None, None, None)
+        return _get_field_expression(name, self.model, mutation_ctx=self.__mutation_ctx)
 
 
 class SyncCollectionResponseBuilder(CollectionResponseBuilder[T]):

@@ -234,7 +234,7 @@ async def test_mutation_context_is_async_safe(driver) -> None:
         builder.age += delta
 
         # Yield control to force context switching
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0)
 
         return builder.get_mutations()
 
@@ -251,3 +251,119 @@ async def test_mutation_context_is_async_safe(driver) -> None:
         "$inc": {"age": -7},
     }
 
+
+def test_mutate_clears_only_own_context(driver) -> None:
+    collection = CollectionWorker(
+        pydantic_model=DummyModel,
+        driver=driver,
+        collection_name="dummy_models",
+    )
+
+    builder_a = collection.find()
+    builder_b = collection.find()
+
+    builder_a.age += 5
+    builder_b.age += 20
+
+    # Sanity check
+    assert builder_a.get_mutations() == {"$inc": {"age": 5}}
+    assert builder_b.get_mutations() == {"$inc": {"age": 20}}
+
+    # Trigger mutation execution / clear on builder A
+    builder_a.mutate()
+
+    # Builder A should be cleared
+    assert builder_a.get_mutations() == {}
+
+    # Builder B must remain untouched
+    assert builder_b.get_mutations() == {
+        "$inc": {"age": 20}
+    }
+
+
+def test_mutation_expression_context_isolated_per_builder(driver) -> None:
+    collection = CollectionWorker(
+        pydantic_model=DummyModel,
+        driver=driver,
+        collection_name="dummy_models",
+    )
+
+    builder_a = collection.find()
+    builder_b = collection.find()
+
+    builder_a.name = "Alice"
+    builder_a.age += 10
+
+    builder_b.name = "Bob"
+    builder_b.age -= 3
+
+    mutations_a = builder_a.get_mutations()
+    mutations_b = builder_b.get_mutations()
+
+    assert mutations_a == {
+        "$set": {"name": "Alice"},
+        "$inc": {"age": 10},
+    }
+
+    assert mutations_b == {
+        "$set": {"name": "Bob"},
+        "$inc": {"age": -3},
+    }
+
+
+def test_mutate_clears_only_own_context(driver) -> None:
+    collection = CollectionWorker(
+        pydantic_model=DummyModel,
+        driver=driver,
+        collection_name="dummy_models",
+    )
+
+    builder_a = collection.find()
+    builder_b = collection.find()
+
+    builder_a.age += 5
+    builder_b.age += 20
+
+    # Sanity check
+    assert builder_a.get_mutations() == {"$inc": {"age": 5}}
+    assert builder_b.get_mutations() == {"$inc": {"age": 20}}
+
+    # Trigger mutation execution / clear on builder A
+    builder_a.mutate()
+
+    # Builder A should be cleared
+    assert builder_a.get_mutations() == {}
+
+    # Builder B must remain untouched
+    assert builder_b.get_mutations() == {
+        "$inc": {"age": 20}
+    }
+
+def test_nested_object_field_mutations(driver) -> None:
+    """
+    Ensure mutations work correctly for nested (embedded) object fields.
+    Array element addressing is intentionally not tested.
+    """
+
+    collection = CollectionWorker(
+        pydantic_model=DummyModel,
+        driver=driver,
+        collection_name="dummy_models",
+    )
+
+    builder = collection.find()
+
+    # Mutate nested object fields
+    builder.bff.username = "charlie"
+    builder.bff.age += 2
+
+    mutations = builder.get_mutations()
+
+    assert mutations == {
+        "$set": {
+            "bff.username": "charlie",
+        },
+        "$inc": {
+            "bff.age": 2,
+        },
+    }

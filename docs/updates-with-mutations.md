@@ -56,45 +56,6 @@ print(query.get_mutations())
 # }
 ```
 
-### Important Warning: Shared Mutation Context
-
-The mutation context is thread-local / event-loop-local and shared across all `.find()` calls in the same execution context.
-
-#### Danger Example
-
-```python
-# DANGER - same context is reused!
-q1 = users.find(users.country == "FR")
-q1.followers += 5
-
-q2 = users.find(users.country == "DE")     # ← same mutation context!
-q2.followers += 10
-
-q1.mutate()   # Will apply BOTH +5 and +10 to French users!
-```
-
-### Recommended Safe Patterns
-
-**Pattern 1: Short-lived query builder**
-
-```python
-with users.find(users.age > 65) as elderly:
-    elderly.status = "retired"
-    elderly.pension += 200
-    elderly.mutate()
-```
-
-**Pattern 2: Explicit reset**
-
-```python
-query = users.find(users.active == True)
-query.last_seen = datetime.utcnow()
-query.mutate()
-MutationExpressionContext.clear()          # Reset for next query
-```
-
-> In most real applications, prefer short-lived query builders.
-
 ## Supported Mutation Operations
 
 | Python Syntax               | MongoDB Operator | Example / Notes                |
@@ -115,19 +76,7 @@ MutationExpressionContext.clear()          # Reset for next query
 
 ## Single Document Updates (less common use case)
 
-When you already have a document loaded (`find_one` / `afind_one`), you can still use mutation syntax, but the traditional approach is usually simpler:
-
-```python
-user = await users.afind_one(users.username == "alice")
-
-user.bio = "Loves async Python"
-user.followers += 1
-user.posts.push(Post(content="New post!"))
-
-await user.save()  # Applies mutations + full document save
-```
-
-> For single documents, modifying the Python object and calling `.save()` is usually more readable.
+For single documents, modifying the Python object and calling `.save()` is usually more readable.
 
 The real power of the Mutation DSL appears when performing bulk updates without fetching documents.
 
@@ -136,7 +85,6 @@ The real power of the Mutation DSL appears when performing bulk updates without 
 | Goal                                   | Recommended Approach           | Memory Usage | Speed (large N) |
 | -------------------------------------- | ------------------------------ | ------------ | --------------- |
 | Update 1 document (already loaded)     | Modify object -> .save()       | Low          | -               |
-| Update 1 document (without loading)    | .find_one(...).mutate()        | None         | Fast            |
 | Update hundreds / thousands / millions | .find(...).mutate()            | None         | Very fast       |
 | Complex per-document logic             | Load -> process -> save (loop) | High         | Slow            |
 
