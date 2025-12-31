@@ -1,6 +1,6 @@
 [project]
 name = "pydongo"
-version = "0.6.0"
+version = "0.6.1"
 description = "A lightweight ORM for MongoDB using Pydantic models."
 readme = "README.md"
 license = "MIT"
