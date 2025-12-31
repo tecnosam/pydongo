@@ -9,6 +9,7 @@ class Friend(BaseModel):
     """A simple friend model."""
 
     username: str
+    age: int
 
 
 class DemoModel(BaseModel):
@@ -40,8 +41,8 @@ class User(BaseModel):
     age: int = 19
     joined: int = 2023
     n_likes: int = 0
-    close_friend: Friend = Friend(username="XXXXXX")
-    best_friend: Friend = Friend(username="YYYYYY")
+    close_friend: Friend = Friend(username="XXXXXX", age=20)
+    best_friend: Friend = Friend(username="YYYYYY", age=21)
 
 
 class UserWithModelConfig(BaseModel):
@@ -60,3 +61,4 @@ class DummyModel(BaseModel):
     age: int
     tags: list[str]
     friends: list[Friend]
+    bff: Friend
