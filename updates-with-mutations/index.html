@@ -457,39 +457,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#important-warning-shared-mutation-context" class="md-nav__link">
-    <span class="md-ellipsis">
-      Important Warning: Shared Mutation Context
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Important Warning: Shared Mutation Context">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#danger-example" class="md-nav__link">
-    <span class="md-ellipsis">
-      Danger Example
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#recommended-safe-patterns" class="md-nav__link">
-    <span class="md-ellipsis">
-      Recommended Safe Patterns
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -630,39 +597,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#important-warning-shared-mutation-context" class="md-nav__link">
-    <span class="md-ellipsis">
-      Important Warning: Shared Mutation Context
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Important Warning: Shared Mutation Context">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#danger-example" class="md-nav__link">
-    <span class="md-ellipsis">
-      Danger Example
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#recommended-safe-patterns" class="md-nav__link">
-    <span class="md-ellipsis">
-      Recommended Safe Patterns
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -753,34 +687,6 @@
 <span class="c1">#   &quot;$unset&quot;: {&quot;bio&quot;: &quot;&quot;}</span>
 <span class="c1"># }</span>
 </code></pre></div>
-<h3 id="important-warning-shared-mutation-context">Important Warning: Shared Mutation Context<a class="headerlink" href="#important-warning-shared-mutation-context" title="Permanent link">&para;</a></h3>
-<p>The mutation context is thread-local / event-loop-local and shared across all <code>.find()</code> calls in the same execution context.</p>
-<h4 id="danger-example">Danger Example<a class="headerlink" href="#danger-example" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># DANGER - same context is reused!</span>
-<span class="n">q1</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">country</span> <span class="o">==</span> <span class="s2">&quot;FR&quot;</span><span class="p">)</span>
-<span class="n">q1</span><span class="o">.</span><span class="n">followers</span> <span class="o">+=</span> <span class="mi">5</span>
-
-<span class="n">q2</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">country</span> <span class="o">==</span> <span class="s2">&quot;DE&quot;</span><span class="p">)</span>     <span class="c1"># ← same mutation context!</span>
-<span class="n">q2</span><span class="o">.</span><span class="n">followers</span> <span class="o">+=</span> <span class="mi">10</span>
-
-<span class="n">q1</span><span class="o">.</span><span class="n">mutate</span><span class="p">()</span>   <span class="c1"># Will apply BOTH +5 and +10 to French users!</span>
-</code></pre></div>
-<h3 id="recommended-safe-patterns">Recommended Safe Patterns<a class="headerlink" href="#recommended-safe-patterns" title="Permanent link">&para;</a></h3>
-<p><strong>Pattern 1: Short-lived query builder</strong></p>
-<div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">users</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">65</span><span class="p">)</span> <span class="k">as</span> <span class="n">elderly</span><span class="p">:</span>
-    <span class="n">elderly</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;retired&quot;</span>
-    <span class="n">elderly</span><span class="o">.</span><span class="n">pension</span> <span class="o">+=</span> <span class="mi">200</span>
-    <span class="n">elderly</span><span class="o">.</span><span class="n">mutate</span><span class="p">()</span>
-</code></pre></div>
-<p><strong>Pattern 2: Explicit reset</strong></p>
-<div class="highlight"><pre><span></span><code><span class="n">query</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">active</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)</span>
-<span class="n">query</span><span class="o">.</span><span class="n">last_seen</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
-<span class="n">query</span><span class="o">.</span><span class="n">mutate</span><span class="p">()</span>
-<span class="n">MutationExpressionContext</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>          <span class="c1"># Reset for next query</span>
-</code></pre></div>
-<blockquote>
-<p>In most real applications, prefer short-lived query builders.</p>
-</blockquote>
 <h2 id="supported-mutation-operations">Supported Mutation Operations<a class="headerlink" href="#supported-mutation-operations" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -859,18 +765,7 @@
 </tbody>
 </table>
 <h2 id="single-document-updates-less-common-use-case">Single Document Updates (less common use case)<a class="headerlink" href="#single-document-updates-less-common-use-case" title="Permanent link">&para;</a></h2>
-<p>When you already have a document loaded (<code>find_one</code> / <code>afind_one</code>), you can still use mutation syntax, but the traditional approach is usually simpler:</p>
-<div class="highlight"><pre><span></span><code><span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">users</span><span class="o">.</span><span class="n">afind_one</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">username</span> <span class="o">==</span> <span class="s2">&quot;alice&quot;</span><span class="p">)</span>
-
-<span class="n">user</span><span class="o">.</span><span class="n">bio</span> <span class="o">=</span> <span class="s2">&quot;Loves async Python&quot;</span>
-<span class="n">user</span><span class="o">.</span><span class="n">followers</span> <span class="o">+=</span> <span class="mi">1</span>
-<span class="n">user</span><span class="o">.</span><span class="n">posts</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">Post</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s2">&quot;New post!&quot;</span><span class="p">))</span>
-
-<span class="k">await</span> <span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>  <span class="c1"># Applies mutations + full document save</span>
-</code></pre></div>
-<blockquote>
 <p>For single documents, modifying the Python object and calling <code>.save()</code> is usually more readable.</p>
-</blockquote>
 <p>The real power of the Mutation DSL appears when performing bulk updates without fetching documents.</p>
 <h2 id="when-to-use-which-approach">When to Use Which Approach<a class="headerlink" href="#when-to-use-which-approach" title="Permanent link">&para;</a></h2>
 <table>
@@ -888,12 +783,6 @@
 <td>Modify object -&gt; .save()</td>
 <td>Low</td>
 <td>-</td>
-</tr>
-<tr>
-<td>Update 1 document (without loading)</td>
-<td>.find_one(...).mutate()</td>
-<td>None</td>
-<td>Fast</td>
 </tr>
 <tr>
 <td>Update hundreds / thousands / millions</td>
