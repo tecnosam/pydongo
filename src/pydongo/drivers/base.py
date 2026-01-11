@@ -2,7 +2,11 @@ import contextvars
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from types import TracebackType
-from typing import Any, Self
+from typing import Any
+try:
+    from typing import Self  # For Python 3.11+
+except ImportError:
+    from typing_extensions import Self  # For earlier versions
 
 from pydongo.expressions.index import IndexExpression
 
